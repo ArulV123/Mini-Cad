@@ -2547,7 +2547,7 @@ Q('genc').onclick=function(){const r=old.apply(this,arguments);try{hint.textCont
 })();
 upd();rs();setTool('select');olist();mlist();info();
 (function(){
-const LOBBY=(()=>{try{const r=new URL(document.referrer);if(r.origin===location.origin&&!/minicad/i.test(r.pathname))return r.origin+r.pathname}catch(e){}return 'index.html'})(),Q=new URLSearchParams(location.search),pid=Q.get('p'),veil=$('veil');
+const LOBBY='https://arulv123.github.io/Mini-cad-main-ui/',Q=new URLSearchParams(location.search),pid=Q.get('p'),veil=$('veil');
 const rj=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}};
 const me=rj('mc_me',null);let projs=rj('mc_projects',[]),pr=projs.find(p=>p.id===pid)||null;
 const mem=pr&&me&&(pr.owner===me.name?{role:'Owner'}:pr.members.find(m=>m.user===me.name&&m.status==='accepted'));
