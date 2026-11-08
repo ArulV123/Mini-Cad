@@ -267,6 +267,14 @@ API.bcast=b=>room.forEach(u=>API.live(u,b));
 API.room=ms=>{room=[...new Set(ms)].filter(u=>u&&me&&u!==me.name);probe()};
 API.peers=()=>room.filter(up);
 API.drop=u=>{const c=C[u];if(c){delete C[u];try{c.close()}catch(e){}fire('presence')}};
+API.fetchScene=(u,pid,ms)=>new Promise(res=>{let done=0,cs=[],t0=Date.now(),iv=0,to=0;
+ const fin=v=>{if(done)return;done=1;clearInterval(iv);clearTimeout(to);cs.forEach(c=>{try{c.close()}catch(e){}});res(v)};
+ to=setTimeout(()=>fin(null),ms||7000);
+ const go=()=>{if(done||cs.length)return;if(!peer||!peer.open)return;clearInterval(iv);
+  for(let g=1;g<=8;g++)try{const c=peer.connect(hexId(u)+(g>1?'-'+g:''),{reliable:true});cs.push(c);
+   c.on('open',()=>{try{c.send({t:'scq',pid})}catch(e){}});
+   c.on('data',m=>{if(m&&m.t==='scr'&&m.pid===pid&&m.d&&m.d.length)fin({ts:+m.ts||0,d:m.d})});c.on('error',()=>{})}catch(e){}};
+ iv=setInterval(go,200);go()});
 setInterval(()=>{probe();if(lp&&lp.disconnected&&!lp.destroyed)try{lp.reconnect()}catch(e){}},4000);
 setInterval(()=>Object.keys(C).forEach(u=>{const c=C[u];if(Date.now()-seenAt[u]>12000){try{c.close()}catch(e){}if(C[u]===c){delete C[u];fire('presence');emit('down',null,u)}return}try{c.send({t:'p'})}catch(e){}}),4000);
 const wake=()=>{if(peer&&peer.disconnected&&!peer.destroyed)try{peer.reconnect()}catch(e){}setTimeout(probe,400)};
@@ -2578,7 +2586,7 @@ const go=()=>{if(LOBBY_IS_SELF)return;veil.classList.add('on');setTimeout(()=>lo
 const sig=()=>objs.map(o=>[o.position.x,o.position.y,o.position.z,o.rotation.y,o.scale.x,o.children.length,o.userData.hole].join()).join('|');
 let base=sig();
 $('pj').textContent=pr?pr.name+' · '+role:'Untitled (not linked to a project)';
-$('bk').onclick=()=>{if(sig()!==base&&!confirm('You have unsaved changes. Leave without saving?'))return;go()};
+$('bk').onclick=async()=>{if(sig()!==base){if(canSave&&!window.__mcDead){try{await sv.onclick()}catch(e){}}else if(!confirm('You have unsaved changes. Leave without saving?'))return}go()};
 const sv=$('sv');sv.disabled=!canSave;if(!canSave)sv.title='Viewers cannot save';
 const idb=()=>new Promise((ok,no)=>{const r=indexedDB.open('minicad',1);r.onupgradeneeded=()=>r.result.createObjectStore('scenes');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
 const tx=async(m,f)=>{const d=await idb();return new Promise((ok,no)=>{const t=d.transaction('scenes',m),rq=f(t.objectStore('scenes'));t.oncomplete=()=>ok(rq&&rq.result);t.onerror=()=>no(t.error)})};
@@ -2613,7 +2621,9 @@ const COL=['#e5484d','#30a46c','#f5a623','#8e4ec6','#0ea5e9','#d6409f'],col=u=>C
 const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 let applying=0,lastS='',lastC='',last={},follow=null,at=0,unread=0,sceneTs=0,dead=0,tick=0,known=new Set(),T0=Date.now(),ready=0,lastSend=0,dirty=0;
 window.__mcSetTs=t=>{sceneTs=+t||0};window.__mcGetTs=()=>sceneTs||Date.now();
-window.__mcReady=()=>{if(ready)return;ready=1;known=new Set(objs.map(o=>o.uuid));out('hi',{ts:sceneTs,n:objs.length,r:1});if(mems().length<=1)return window.__mcHideLd();const t=document.getElementById('ldt');if(t)t.textContent='Syncing the latest version with the others…';setTimeout(window.__mcHideLd,5000)};setTimeout(()=>window.__mcReady(),6000);
+function pullLobby(){const us=mems().filter(u=>u!==me.name);if(!N.fetchScene||!us.length)return;let left=us.length;
+ us.forEach(u=>N.fetchScene(u,pr.id,7000).then(r=>{if(dead||!r||!r.d||!(r.ts>sceneTs))return;applyScene(r.d);sceneTs=r.ts;note('Loaded the latest version saved by '+u);auto();draw()}).catch(()=>{}).then(()=>{if(--left<=0)window.__mcHideLd()}))}
+window.__mcReady=()=>{if(ready)return;ready=1;known=new Set(objs.map(o=>o.uuid));lastS=stS();snap();out('hi',{ts:sceneTs,n:objs.length,r:1});if(mems().length<=1)return window.__mcHideLd();const t=document.getElementById('ldt');if(t)t.textContent='Syncing the latest version with the others…';pullLobby();setTimeout(window.__mcHideLd,9000)};setTimeout(()=>window.__mcReady(),6000);
 const out=(t,m)=>N.bcast(Object.assign({t:'c:'+t,pid:pr.id},m)),to=(u,t,m)=>N.live(u,Object.assign({t:'c:'+t,pid:pr.id},m));
 const xk=o=>[o.position.x,o.position.y,o.position.z,o.rotation.x,o.rotation.y,o.rotation.z,o.scale.x,o.scale.y,o.scale.z],ks=o=>xk(o).map(v=>v.toFixed(3)).join();
 const stS=()=>objs.map(o=>{let g='';o.traverse(n=>{if(n.isMesh)g+=n.geometry.uuid.slice(0,3)});return o.uuid+o.children.length+(o.userData.hole?1:0)+g}).join('|');
