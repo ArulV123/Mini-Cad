@@ -59,9 +59,22 @@ h4{margin:14px 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.07e
 #psr{width:100%;margin:0 0 4px}
 .pop{position:fixed;z-index:60;display:none;width:300px;max-width:94vw;background:var(--bg);border:1px solid var(--b);border-radius:10px;box-shadow:0 8px 28px #0004;padding:12px}.pop h5{margin:12px 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--m)}.pop h5:first-child{margin-top:0}
 #sbar button,#pbar button,#pend button{white-space:nowrap;height:auto;min-height:28px}#sbar{flex-wrap:wrap;width:max-content;max-width:94%}
-[hidden]{display:none!important}#veil{position:fixed;inset:0;background:var(--bg);z-index:999;opacity:0;pointer-events:none;transition:opacity .35s ease}#veil.on{opacity:1;pointer-events:all}#pj{color:var(--m);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}@view-transition{navigation:auto}</style></head><body><div id="veil" class="on"></div>
+[hidden]{display:none!important}#veil{position:fixed;inset:0;background:var(--bg);z-index:999;opacity:0;pointer-events:none;transition:opacity .35s ease}#veil.on{opacity:1;pointer-events:all}#pj{color:var(--m);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}@view-transition{navigation:auto}</style><style>
+#gfixall,#mdir{display:none}
+.qo{position:fixed;inset:0;background:#0006;z-index:99;display:none;align-items:flex-start;justify-content:center;padding-top:12vh}.qo.on{display:flex}
+.qb{background:var(--bg);color:var(--t);border:1px solid var(--b);border-radius:10px;padding:12px;width:min(460px,92vw);max-height:70vh;overflow:auto;box-shadow:0 8px 30px #0006}
+.qb input{width:100%;height:34px;margin-bottom:6px}.qi{padding:6px 8px;border-radius:5px;cursor:pointer}.qi.s,.qi:hover{background:var(--h)}.qi small{color:var(--m);margin-left:6px}
+.qb table{width:100%;border-collapse:collapse}.qb td{padding:3px 6px;border-bottom:1px solid var(--b)}.qb td:first-child{font-weight:600;white-space:nowrap}
+.flash{outline:2px solid var(--a);outline-offset:2px;transition:outline .3s}
+#dirty{color:#e8590c;font-size:12px}
+@media(max-width:760px){#app{grid-template:"h" auto "v" 1fr "t" auto "s" 42vh/1fr}#tools{flex-direction:row;flex-wrap:wrap;justify-content:center;padding:4px;border-right:0;border-top:1px solid var(--b)}#side{border-left:0;border-top:1px solid var(--b)}header{gap:4px}}
+</style><style>#p-gears.gs .adv{display:none!important}#p-gears>.seg{position:sticky;top:0;z-index:1}</style><style>
+header{gap:6px;padding:5px 12px}header button,header select{padding:4px 8px;white-space:nowrap}
+#pj{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--m);font-size:12px}
+#views button{padding:4px 8px}header .sep{margin:0 2px}
+</style></head><body><div id="veil" class="on"></div>
 <div id="app">
-<header><button id="bk" title="Back to projects">← Back</button><svg style="width:46px;height:46px;flex:none;margin:0 2px;filter:drop-shadow(0 3px 8px #3b7cff66)" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lgd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b7cff"/><stop offset="1" stop-color="#7a4dff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#lgd)"/><path d="M32 8 55 21.5v21L32 56 9 42.5v-21z" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="1.2"/><path d="M32 12 52 23.5 32 35 12 23.5z" fill="#fff"/><path d="M12 23.5 32 35v21L12 44.5z" fill="#fff" fill-opacity=".6"/><path d="M52 23.5 32 35v21l20-11.5z" fill="#fff" fill-opacity=".32"/><g transform="translate(32 23.5) scale(1 .577)"><path d="M9.23 -1.78L11.91 -1.44L11.91 1.44L9.23 1.78L8.52 3.98L10.49 5.83L8.79 8.17L6.42 6.87L4.55 8.23L5.05 10.88L2.31 11.78L1.15 9.33L-1.15 9.33L-2.31 11.78L-5.05 10.88L-4.55 8.23L-6.42 6.87L-8.79 8.17L-10.49 5.83L-8.52 3.98L-9.23 1.78L-11.91 1.44L-11.91 -1.44L-9.23 -1.78L-8.52 -3.98L-10.49 -5.83L-8.79 -8.17L-6.42 -6.87L-4.55 -8.23L-5.05 -10.88L-2.31 -11.78L-1.15 -9.33L1.15 -9.33L2.31 -11.78L5.05 -10.88L4.55 -8.23L6.42 -6.87L8.79 -8.17L10.49 -5.83L8.52 -3.98Z" fill="#4a5df0"/><circle r="4.4" fill="#fff"/><circle r="1.8" fill="#4a5df0"/></g><path d="M32 35v21" stroke="#fff" stroke-opacity=".5"/></svg><span class="logo" style="font-weight:300;font-size:24px;letter-spacing:-.01em">Mini<b style="font-weight:800">CAD</b></span><span id="pj"></span><button id="sv" class="pri" title="Save (Ctrl+S)">Save</button><span class="sep"></span>
+<header><button id="bk" title="Back to projects">← Back</button><svg style="width:42px;height:42px;flex:none;margin:0 4px 0 2px;filter:drop-shadow(0 3px 8px #3b7cff66)" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lgd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b7cff"/><stop offset="1" stop-color="#7a4dff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#lgd)"/><path d="M32 8 55 21.5v21L32 56 9 42.5v-21z" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="1.2"/><path d="M32 12 52 23.5 32 35 12 23.5z" fill="#fff"/><path d="M12 23.5 32 35v21L12 44.5z" fill="#fff" fill-opacity=".6"/><path d="M52 23.5 32 35v21l20-11.5z" fill="#fff" fill-opacity=".32"/><g transform="translate(32 23.5) scale(1 .577)"><path d="M9.23 -1.78L11.91 -1.44L11.91 1.44L9.23 1.78L8.52 3.98L10.49 5.83L8.79 8.17L6.42 6.87L4.55 8.23L5.05 10.88L2.31 11.78L1.15 9.33L-1.15 9.33L-2.31 11.78L-5.05 10.88L-4.55 8.23L-6.42 6.87L-8.79 8.17L-10.49 5.83L-8.52 3.98L-9.23 1.78L-11.91 1.44L-11.91 -1.44L-9.23 -1.78L-8.52 -3.98L-10.49 -5.83L-8.79 -8.17L-6.42 -6.87L-4.55 -8.23L-5.05 -10.88L-2.31 -11.78L-1.15 -9.33L1.15 -9.33L2.31 -11.78L5.05 -10.88L4.55 -8.23L6.42 -6.87L8.79 -8.17L10.49 -5.83L8.52 -3.98Z" fill="#4a5df0"/><circle r="4.4" fill="#fff"/><circle r="1.8" fill="#4a5df0"/></g><path d="M32 35v21" stroke="#fff" stroke-opacity=".5"/></svg><span class="logo" style="font-weight:300;font-size:28px;letter-spacing:-.01em">Mini<b style="font-weight:800">CAD</b></span><span id="pj"></span><button id="sv" class="pri" title="Save (Ctrl+S)">Save</button><span class="sep"></span>
 <button id="imp">Import model</button><input type="file" id="file" accept=".stl,.obj" hidden>
 <button id="exp" class="pri">Export</button><span class="sep"></span>
 <button id="undo">Undo</button><button id="redo">Redo</button><span class="sep"></span>
@@ -502,7 +515,7 @@ let dls=null;if(window.claude)claude.use('downloads').then(d=>dls=d).catch(()=>{
 $('exp').onclick=async()=>{if(!objs.length){hint.textContent='Nothing to export yet.';return}const z=zip([{name:'design.stl',data:stl()},{name:'design.obj',data:obj()}]);
 try{if(dls)await dls.save({filename:'minicad-design.zip',data:z});else{const a=document.createElement('a');a.href=URL.createObjectURL(z);a.download='minicad-design.zip';a.click()}hint.textContent='Exported zip with design.stl and design.obj (mm, Z-up). Holes are excluded.'}
 catch(e){hint.textContent=e&&e.code==='declined'?'Export cancelled.':'Export is not available in this view.'}};
-function tab(n){document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===n));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='p-'+n))}
+function tab(n){n=({parts:'shapes',text:'shapes',cut:'era',wheels:'gears'})[n]||n;document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===n));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='p-'+n))}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>tab(b.dataset.p));
 $('snap').onchange=e=>snap=+e.target.value;
 function fit(){const b=new THREE.Box3();objs.forEach(o=>b.expandByObject(o));if(b.isEmpty()){tgt.set(0,0,0);dist=330}else{tgt.copy(b.getCenter(V(0,0,0)));dist=Math.max(60,b.getSize(V(0,0,0)).length()*1.6)}upd()}
@@ -1229,7 +1242,7 @@ ui();
 }
 {const _cp=THREE.Object3D.prototype.copy;THREE.Object3D.prototype.copy=function(src,rec){const u=src.userData;src.userData={};try{_cp.call(this,src,rec)}finally{src.userData=u}this.userData=Object.assign({},u);return this}}
 {
-const _tab=tab;tab=function(n){_tab(({mot:'parts',wheels:'parts',print:'parts'})[n]||n)};
+const _tab=tab;tab=function(n){_tab(({mot:'gears',wheels:'gears',print:'parts'})[n]||n)};
 const _st=setTool;setTool=function(t){_st(t);if(['erase','cutr','cutc'].includes(t))tab('era');else if(t==='text')tab('text')};
 $('esk').innerHTML=$('shp').innerHTML;
 window.eshPoly=(s0,p)=>{const x0=Math.min(s0.x,p.x),x1=Math.max(s0.x,p.x),z0=Math.min(s0.z,p.z),z1=Math.max(s0.z,p.z),k=$('esk').value;if(k==='rect')return rc(x0,z0,x1,z1);if(k==='rrect')return rrPoly(x0,z0,x1,z1,.2);if(k==='slot')return rrPoly(x0,z0,x1,z1,.5);const cx=(x0+x1)/2,cz=(z0+z1)/2,w=(x1-x0)/2,d=(z1-z0)/2;return SHP[k]().map(q=>({x:cx+q[0]*w,z:cz+q[1]*d}))};
@@ -1341,8 +1354,8 @@ drop(grp(...ms),'Gearbox frame',[0,0,0]);return`Compound spur gearbox: ${n} stag
 function planBox(p,R,n,Np){const m=p.m,bl=BL();let Ns=Math.max(8,Math.round(2*Np/(Math.max(2.2,R)-2)));for(let i=0;i<n*2&&(2*Ns+2*Np)%n;i++)Ns++;const Nr=Ns+2*Np;if(Nr>150)return'Too many teeth – lower the ratio or the planet teeth.';
 const ap=m*(Ns+Np)/2,Ps=2*PI/Ns,Pp=2*PI/Np,Pr=2*PI/Nr,t=p.t,bp=3,rp0=meshRot(Ps,0,0,0,Pp,ap,0),th=-fr(rp0/Pp)*Pr-.5*Pr,ms=[];
 mkGear({N:Ns,m,t,b:Math.max(3,p.b)},0,0,0,0);
-for(let k=0;k<n;k++){const be=2*PI*k/n,x=ap*Math.cos(be),z=ap*Math.sin(be);mkGear({N:Np,m,t,b:bp},x,0,z,meshRot(Ps,0,0,0,Pp,x,z));ms.push(cyl(bp/2-.15,t+3.5,x,-2.5,z,0xcfd4dc))}
-ms.push(M(ext(circ(0,0,ap+m*Np/2+3,64),1.5),0x6b7280,0,-2.5,0),cyl(3,8,0,-10.5,0,0xcfd4dc));
+for(let k=0;k<n;k++){const be=2*PI*k/n,x=ap*Math.cos(be),z=ap*Math.sin(be);mkGear({N:Np,m,t,b:bp},x,0,z,meshRot(Ps,0,0,0,Pp,x,z));ms.push(cyl(bp/2-.15,t+3.8,x,-1.2,z,0xcfd4dc))}
+ms.push(M(ext(circ(0,0,ap+m*Np/2+3,64),2),0x6b7280,0,t+.6,0),cyl(3,8,0,t+2.6,0,0xcfd4dc));
 drop(grp(...ms),'Planet carrier',[0,0,0]);drop(M(ringGeo(Nr,m,t,4,th,bl),GC),'Ring gear '+Nr+'T',[0,0,0]);
 return`Planetary gearbox: sun ${Ns}T, ${n}× planet ${Np}T, ring ${Nr}T. Ring fixed, sun in, carrier out → ratio ${f1(1+Nr/Ns,2)}:1.`}
 $('gbgo').onclick=()=>{const p=rd(),k=$('gbk').value,R=Math.max(1.2,+$('gbr').value||10),n=Math.max(1,Math.min(5,Math.round(+$('gbs').value||2))),Np=Math.round(Math.max(8,Math.min(60,+$('gbp').value||12))),pn=Math.max(2,Math.min(6,Math.round(+$('gbn').value||3))),fold=+$('gbf').value||0;commit();let msg;
@@ -1410,11 +1423,12 @@ if(k.N*Math.PI*k.m<2*Math.PI*rp*0+Math.PI*z.m*2)out.push(['warn',n+': rack is ve
 if(out.length)box.insertAdjacentHTML('beforeend','<h4 style="margin-top:10px">Stacks &amp; racks</h4>'+out.map(l=>`<div class="ln ${l[0]}">${l[1]}</div>`).join(''))}
 const _rep=report;report=function(){const r=_rep.apply(this,arguments);try{extra()}catch(e){console.error(e)}return r};
 const MOT={tt:{rpm:200,tau:.078,nm:'TT gear motor',min:12},sg90:{rpm:100,tau:.18,nm:'SG90 servo',min:20},mg996r:{rpm:55,tau:.92,nm:'MG996R servo',min:20}};
-function plan(){const K=MOT[A('v9mo').value],R=Math.max(1.5,num('v9ra',9)),m=+A('v9bm').value||2;let S=1;while(Math.pow(R,1/S)>4.5&&S<4)S++;
+function plan(){if(+A('v9bm').value)return plan0(0);let b=null;[1.5,2,2.5,3].forEach(m=>{const r=plan0(m);if(!b||r.t<b.t-.5)b=r});return b}
+function plan0(M){const K=MOT[A('v9mo').value],R=Math.max(1.5,num('v9ra',9)),m=M||+A('v9bm').value||2;let S=1;while(Math.pow(R,1/S)>4.5&&S<4)S++;
 const r=Math.pow(R,1/S);let Np=K.min,Ng=Math.round(Np*r);while(Ng>70&&Np>K.min-4&&Np>8){Np--;Ng=Math.round(Np*r)}if(Ng<=Np)Ng=Np+1;
 const act=Math.pow(Ng/Np,S),mat=A('gmat').value,s0=mat==='Custom'?num('gcs',30):GM[mat],sa=.5*s0*(.3+.7*num('ginf',100)/100);
 const stress=t=>{let w=0;for(let i=0;i<S;i++){const T=K.tau*Math.pow(Ng/Np,i)*Math.pow(.97,i),rp=m*Np/2,Ft=T/(rp/1000),v=K.rpm/Math.pow(Ng/Np,i)*Math.PI/30*rp/1000,Y=Math.max(.06,.154-.912/Np);w=Math.max(w,Ft*(6.1+v)/6.1/(t*m*Y)/sa)}return w};
-let t=Math.max(4,Math.round(2*m*1.5));while(stress(t)>.6&&t<20)t+=1;return{S,Np,Ng,m,t,act,rpm:K.rpm/act,tq:K.tau*act*Math.pow(.97,S),u:stress(t),K}}
+let t=Math.max(3,Math.round(m*1.5));while(stress(t)>.8&&t<14)t+=1;return{S,Np,Ng,m,t,act,rpm:K.rpm/act,tq:K.tau*act*Math.pow(.97,S),u:stress(t),K}}
 function pv(){const p=plan();A('v9pv').innerHTML=`<b>${p.S} stage${p.S>1?'s':''}</b>: ${p.Np}T → ${p.Ng}T each (${(p.Ng/p.Np).toFixed(2)}:1)${p.S>1?', stacked on shared axes':''}<br>Real ratio <b>${p.act.toFixed(2)}:1</b> · output <b>${p.rpm.toFixed(0)} rpm</b>, <b>${p.tq.toFixed(2)} N·m</b> (stall)<br>Gear thickness set to <b>${p.t} mm</b> – tooth stress ${(p.u*100).toFixed(0)}% of the limit${p.u>1?' ⚠ too weak even at 20 mm: use a stronger material or lower ratio/motor':''}`}
 ['v9mo','v9ra','v9bm','v9ou','gmat','ginf','gcs'].forEach(i=>A(i)&&A(i).addEventListener('change',pv));A('v9ra').addEventListener('input',pv);
 const QS={car:['tt',3,'wheel'],crawl:['tt',9,'wheel'],winch:['tt',27,'gear'],lin:['tt',3,'rack'],arm:['sg90',3,'gear']};
@@ -1428,7 +1442,7 @@ if(out==='rack'){select([last]);A('v9rm').value=m;makeRack(last,rackRead())}else
 if(encOn&&A('genc')){select([gs[0]]);try{A('genc').onclick()}catch(e){console.error(e)}}
 select([gs[0]]);try{report()}catch(e){console.error(e)}return gs}
 A('v9build').onclick=()=>{const p=plan(),enc=A('v9enc').checked;train(p,A('v9ou').value,enc,A('v9mo').value);
-hint.textContent=`Gearbox built: ${p.S} stage(s), ${p.act.toFixed(2)}:1, output ${p.rpm.toFixed(0)} rpm / ${p.tq.toFixed(2)} N·m${enc?', enclosure generated':''}. Press “Spin” (Gears tab, section 3) to run it – when you stop the motor everything slows down and stops by itself.`};
+hint.textContent=`Gearbox built: ${p.S} stage(s), ${p.act.toFixed(2)}:1, output ${p.rpm.toFixed(0)} rpm / ${p.tq.toFixed(2)} N·m${enc?', enclosure generated':''}. Press “Spin” under Check, strength & spin to run it – when you stop the motor everything slows down and stops by itself.`};
 pv();
 rackInfo();A('v9rl').value=f1(rackRead().N*Math.PI*rackRead().m);
 window.V9={stackOf,reGear,boreFor,makeRack,train,plan,rackRead,num};
@@ -2634,4 +2648,83 @@ $('cbs').onclick=say;$('cbx').onkeydown=e=>{if(e.key==='Enter')say()};
 })()}catch(e){console.error('collab',e)}
 
 })();
+</script><script>
+(()=>{const T=f=>{try{f()}catch(e){console.error(e)}},g=i=>document.getElementById(i),E=(t,h,c)=>{const e=document.createElement(t);if(h)e.innerHTML=h;if(c)e.className=c;return e};
+T(()=>{const pS=g('p-shapes'),pP=g('p-parts'),pT=g('p-text'),pC=g('p-cut'),pE=g('p-era'),pG=g('p-gears'),tabs=document.querySelector('#side .tabs');
+[...pT.childNodes].forEach(n=>pS.appendChild(n));
+const k=[...pP.children];pS.appendChild(E('h4','Parts library'));k.slice(0,3).forEach(n=>pS.appendChild(n));
+const gr=g('grep');pG.insertBefore(E('h4','Motors, wheels, shafts, run &amp; physics'),gr);k.slice(3).forEach(n=>pG.insertBefore(n,gr));
+pE.insertBefore(E('h4','Erase &amp; carve'),pE.firstChild);[...pC.childNodes].forEach(n=>pE.appendChild(n));
+tabs.querySelectorAll('button').forEach(b=>{const p=b.dataset.p;if(['parts','cut','text'].includes(p))b.remove();else if(p==='shapes')b.textContent='Add';else if(p==='era')b.textContent='Cut & Erase';else if(p==='gears')b.textContent='Gears & Motors'})});
+T(()=>{const D=['w3','dk','dpl','dh'].map(i=>g(i).closest('label')),SH=g('shp').closest('label'),DT=['rect','circle','poly','shape','free'];
+const ctx=t=>{const on=DT.includes(t);D.forEach(l=>l.style.display=on?'':'none');SH.style.display=t==='shape'?'':'none'};
+const o=setTool;setTool=function(t){o(t);ctx(t)};ctx(typeof tool==='string'?tool:'select');
+const w=E('div','<h4>Placement</h4>');[g('kab'),g('stk')].forEach(i=>{const l=i.closest('label');l.style.cssText='display:flex;gap:6px;align-items:center;margin:4px 0;color:var(--m)';w.appendChild(l)});g('p-inspect').prepend(w)});
+const H=document.querySelector('header'),mk=(t,ti,f)=>{const b=E('button',t);b.title=ti;b.onclick=f;H.appendChild(b);return b};
+T(()=>{const d=E('span','','');d.id='dirty';g('pj').after(d);
+setInterval(()=>{try{const u=typeof sig==='function'&&typeof base!=='undefined'&&sig()!==base;d.textContent=u?'● unsaved':'';
+if(u&&typeof pr!=='undefined'&&pr&&!g('sv').disabled&&Date.now()-(window._as||0)>20000){window._as=Date.now();g('sv').click()}}catch(e){}},2000)});
+T(()=>{const ap=m=>{if(m){document.documentElement.dataset.theme=m;try{S.background=new THREE.Color(m==='dark'?0x1d222a:0xe8ebf0)}catch(e){}}};
+let m=null;try{m=localStorage.getItem('mc_theme')}catch(e){}ap(m);
+mk('◐','Light / dark',()=>{const c=document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'),n=c==='dark'?'light':'dark';ap(n);try{localStorage.setItem('mc_theme',n)}catch(e){}})});
+const SC=[['V / O / H','Select / Orbit / Pan'],['M','Measure'],['R / C / P / S / F','Rectangle / Circle / Polygon / Shape / Freehand'],['T','Text'],['E','Eraser'],['X / D','Cut rectangle / drill circle'],['Ctrl+Z / Y','Undo / Redo'],['Ctrl+D','Duplicate'],['Ctrl+A','Select all'],['Ctrl+G (+Shift)','Group / Ungroup'],['Delete','Delete selected'],['Arrows, PgUp/PgDn','Nudge selected (X/Z, Y)'],['[ and ]','Rotate selected'],['Enter / Esc','Finish / cancel'],['Ctrl+K','Search every command'],['?','This sheet']];
+const ov=E('div','','qo'),bx=E('div','','qb');ov.appendChild(bx);document.body.appendChild(ov);ov.onclick=e=>{if(e.target===ov)ov.classList.remove('on')};
+const show=h=>{bx.innerHTML=h;ov.classList.add('on')};
+const help=()=>show('<b>Keyboard shortcuts</b><table>'+SC.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('')+'</table>');
+mk('?','Keyboard shortcuts (?)',help);
+const pan={'p-inspect':'inspect','p-shapes':'shapes','p-era':'era','p-gears':'gears'};
+const items=()=>{const seen={},o=[];document.querySelectorAll('#side button[id],#side summary,#acts button:not([data-a=del]),header button').forEach(b=>{if(b.closest('[hidden]')||['gfixall','mdir'].includes(b.id))return;const t=(b.textContent||'').trim().replace(/\s+/g,' '),ti=b.title||'',l=t||ti;if(!l||seen[l])return;seen[l]=1;o.push({b,l,ti,side:!!b.closest('#side')})});return o};
+const pal=()=>{const a=items();show('<input id="qs" placeholder="Search commands, e.g. gear, motor, cut, export…" autocomplete="off"><div id="ql"></div>');const q=g('qs'),L=g('ql');let f=[],sel=0;
+const run=it=>{ov.classList.remove('on');const b=it.b;if(it.side){const p=b.closest('.pane');if(b.closest('.adv')&&window.gAdv)gAdv(1);if(p&&pan[p.id])tab(pan[p.id]);let d=b.closest('details');if(b.tagName==='SUMMARY')d.open=!d.open;else while(d){d.open=true;d=d.parentElement.closest('details')}b.scrollIntoView({block:'center'});b.classList.add('flash');setTimeout(()=>b.classList.remove('flash'),1600)}else b.click()};
+const draw=()=>{const v=q.value.toLowerCase();f=a.filter(i=>(i.l+' '+i.ti).toLowerCase().includes(v)).slice(0,9);sel=0;L.innerHTML='';f.forEach((it,i)=>{const r=E('div',it.l+(it.ti?'<small>'+it.ti.slice(0,60)+'</small>':''),'qi'+(i?'':' s'));r.onclick=()=>run(it);L.appendChild(r)})};
+q.oninput=draw;q.onkeydown=e=>{const r=L.children;if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();r[sel]&&r[sel].classList.remove('s');sel=(sel+(e.key==='ArrowDown'?1:-1)+r.length)%r.length;r[sel]&&r[sel].classList.add('s')}else if(e.key==='Enter'&&f[sel])run(f[sel]);else if(e.key==='Escape')ov.classList.remove('on')};draw();q.focus()};
+mk('⌕ Search','Search every command (Ctrl+K)',pal);
+addEventListener('keydown',e=>{const k=e.key,inp=/INPUT|SELECT|TEXTAREA/.test(e.target.tagName);if((e.ctrlKey||e.metaKey)&&k.toLowerCase()==='k'){e.preventDefault();pal()}else if(k==='?'&&!inp){e.preventDefault();help()}else if(k==='Escape')ov.classList.remove('on')},true);
+})();
+</script><script>
+(()=>{const g=i=>document.getElementById(i),T=f=>{try{f()}catch(e){console.error(e)}};
+T(()=>{const s=g('gty');[...s.options].forEach(o=>{if(['crown','ratchet','sprocket','rack','ring'].includes(o.value))o.remove()})});
+T(()=>{const P=g('p-gears'),gr=g('grep');P.querySelectorAll(':scope>h4').forEach(h=>h.remove());
+const D=[...P.querySelectorAll(':scope>details')],nm=d=>d.querySelector('summary').textContent,by=t=>D.find(d=>nm(d).includes(t)),hd=t=>{const h=document.createElement('h4');h.innerHTML=t;P.insertBefore(h,gr)};
+const put=(t,title)=>{const d=by(t);if(!d)return;if(title)d.querySelector('summary').textContent=title;P.insertBefore(d,gr);return d};
+['7 · Gearbox generator','Gear builder'].forEach(t=>{const d=by(t);if(d)d.style.display='none'});
+const q=put('Gearbox designer','Quick gearbox (ratio, motor, wheel, enclosure)');if(q)q.open=true;
+hd('Build by hand');['1 · Gear','2 · Mesh','4 · Motor, shaft','Stack gears','Rack & pinion','5 · Enclosure'].forEach(t=>put(t));
+hd('Test &amp; strength');put('3 · Drive','Check, strength & spin');
+hd('Other gear styles');const o=put('6 · More gear types','Other single gears (helical, bevel, worm, pulley)');if(o)o.querySelector('div').insertAdjacentHTML('afterbegin','<p class="mut" style="margin:0 0 6px">Adds ONE gear with a different tooth style. To get a whole working gearbox (gears + motor + output + box) use <b>Quick gearbox</b> at the top.</p>');
+hd('Motors, wheels, shafts &amp; simulation');['Motors','Wheels','Shaft &','Run &','Spring'].forEach(t=>put(t));
+D.forEach(d=>{const sm=d.querySelector('summary');if(sm&&sm.firstChild&&sm.firstChild.nodeType===3)sm.firstChild.textContent=sm.firstChild.textContent.replace(/^\d · /,'')})});
+T(()=>{const gm=g('gmadd'),o=gm.onclick;gm.onclick=function(){const G=sel.find(isG),y0=G?G.position.y:0,pl=G&&objs.some(q=>q.userData.pl&&Math.hypot(q.position.x-G.position.x,q.position.z-G.position.z)>3&&Math.abs(q.position.y-y0)<.6);const r=o.apply(this,arguments);
+if(pl){const dy=G.position.y-y0;if(Math.abs(dy)>.01){G.position.y=y0;objs.forEach(q=>{if(q.userData.link===G)q.position.y-=dy})}}return r}});
+})();
+</script><script>
+(()=>{try{const g=i=>document.getElementById(i),P=g('p-gears'),nm=d=>d.querySelector('summary').textContent,D=[...P.querySelectorAll(':scope>details')],by=t=>D.find(d=>nm(d).includes(t));
+const bar=document.createElement('div');bar.className='seg';bar.innerHTML='<button data-m="s" class="on" style="flex:1">Simple</button><button data-m="a" style="flex:1">Advanced</button>';
+P.prepend(bar);const S=['Quick gearbox','Enclosure','Check, strength'].map(by).filter(Boolean);bar.after(...S);
+P.querySelectorAll(':scope>h4').forEach(h=>h.classList.add('adv'));D.forEach(d=>{if(!S.includes(d))d.classList.add('adv')});
+['gkeep','gauto'].forEach(i=>{const l=g(i)&&g(i).closest('label');if(l)l.classList.add('adv')});
+const set=a=>{P.classList.toggle('gs',!a);bar.querySelectorAll('button').forEach(b=>b.classList.toggle('on',(b.dataset.m==='a')===!!a))};
+bar.querySelectorAll('button').forEach(b=>b.onclick=()=>set(b.dataset.m==='a'));window.gAdv=set;set(false);
+}catch(e){console.error(e)}})();
+</script><script>
+(()=>{const g=i=>document.getElementById(i),T=f=>{try{f()}catch(e){console.error(e)}};
+T(()=>{const b=g('v9bm');b.insertAdjacentHTML('afterbegin','<option value="0">Auto (thinnest strong gear)</option>');b.value='0';
+const q=g('v9q');q.insertAdjacentHTML('beforeend','<option value="tq1">High torque crawler – TT, 60:1, wheel</option><option value="tq2">Heavy lift – MG996R, 20:1, output gear</option><option value="pl1">Compact planetary – TT, 8:1</option><option value="pl2">Compact planetary – MG996R, 10:1</option>');
+const ty=document.createElement('div');ty.className='v9f';ty.innerHTML='<label>Gearbox type</label><select id="v9ty"><option value="spur">Compound spur (simple, any ratio)</option><option value="planet">Planetary (compact, high torque, up to ~10:1)</option></select>';g('v9mo').parentNode.before(ty);
+const Q={tq1:['tt',60,'wheel','spur'],tq2:['mg996r',20,'gear','spur'],pl1:['tt',8,'gear','planet'],pl2:['mg996r',10,'gear','planet']},o=q.onchange;
+q.onchange=()=>{o&&o();const k=Q[q.value];g('v9ty').value=k?k[3]:'spur';if(k){g('v9mo').value=k[0];g('v9ra').value=k[1];g('v9ou').value=k[2]}g('v9ra').dispatchEvent(new Event('change'))};
+const ob=g('v9build').onclick;g('v9build').onclick=()=>{if(g('v9ty').value!=='planet')return ob();
+const p=window.V9.plan(),R=Math.min(10,Math.max(3,+g('v9ra').value||8));g('gm').value=p.m;g('gt').value=Math.max(4,Math.min(p.t,8));g('gbk').value='planet';g('gbr').value=R;g('gbp').value=12;g('gbn').value=3;g('gbm').value=g('v9mo').value;g('gbe').checked=g('v9enc').checked;g('gbgo').onclick()}});
+T(()=>{const P=g('p-gears'),d=document.createElement('details');d.open=true;d.innerHTML='<summary>Add motor / wheel to selected gear</summary><div><p class="mut" style="margin:0 0 6px">Click a gear first.</p><div class="v9f"><label>Motor</label><select id="sm_mo"><option value="tt">TT gear motor</option><option value="sg90">SG90 servo</option><option value="mg996r">MG996R servo</option></select></div><button class="full btn-c c-orange" id="sm_m">＋ Add motor</button><div class="v9f"><label>Wheel diameter (mm)</label><input id="sm_w" type="number" value="40"></div><button class="full btn-c c-violet" id="sm_wb">＋ Add wheel</button></div>';
+[...P.querySelectorAll(':scope>details')].find(x=>x.querySelector('summary').textContent.includes('Quick gearbox')).after(d);
+g('sm_m').onclick=()=>{g('gmk').value=g('sm_mo').value;g('gmk').onchange&&g('gmk').onchange();g('gmadd').onclick()};
+g('sm_wb').onclick=()=>{g('gwr').value=g('sm_w').value;g('gwhl').onclick()}});
+})();
+</script><script>
+(()=>{try{const g=i=>document.getElementById(i),set=(i,t,ti)=>{const b=g(i);if(b){b.textContent=t;b.title=ti}};
+set('bk','←','Back to projects');set('undo','↶','Undo (Ctrl+Z)');set('redo','↷','Redo (Ctrl+Y)');set('imp','Import','Import STL / OBJ model');
+const pj=g('pj');pj.title=pj.textContent;new MutationObserver(()=>{pj.title=pj.textContent}).observe(pj,{childList:true,characterData:true,subtree:true});
+const H=document.querySelector('header'),sp=H.querySelector('.sp');
+[...H.querySelectorAll(':scope>button')].filter(b=>['?','⌕ Search','◐'].includes(b.textContent.trim())).forEach(b=>H.appendChild(b));
+}catch(e){console.error(e)}})();
 </script></body></html>
