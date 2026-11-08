@@ -72,7 +72,7 @@ h4{margin:14px 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.07e
 header{gap:6px;padding:5px 12px}header button,header select{padding:4px 8px;white-space:nowrap}
 #pj{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--m);font-size:12px}
 #views button{padding:4px 8px}header .sep{margin:0 2px}
-</style></head><body><div id="veil" class="on"></div>
+</style></head><body><div id="ld" style="position:fixed;inset:0;z-index:99998;background:#e8ebf0;color:#1b2330;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font:14px system-ui;transition:opacity .3s"><div style="width:38px;height:38px;border:4px solid #0002;border-top-color:#3b7cff;border-radius:50%;animation:ldspin .8s linear infinite"></div><div id="ldt">Loading project…</div></div><style>@keyframes ldspin{to{transform:rotate(360deg)}}@media(prefers-color-scheme:dark){#ld{background:#1d222a!important;color:#e6e9ef!important}}</style><script>window.__mcHideLd=function(){var e=document.getElementById("ld");if(e){e.style.opacity=0;setTimeout(function(){e.remove()},320)}};setTimeout(window.__mcHideLd,15000)</script><div id="veil" class="on"></div>
 <div id="app">
 <header><button id="bk" title="Back to projects">← Back</button><svg style="width:42px;height:42px;flex:none;margin:0 4px 0 2px;filter:drop-shadow(0 3px 8px #3b7cff66)" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lgd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b7cff"/><stop offset="1" stop-color="#7a4dff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#lgd)"/><path d="M32 8 55 21.5v21L32 56 9 42.5v-21z" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="1.2"/><path d="M32 12 52 23.5 32 35 12 23.5z" fill="#fff"/><path d="M12 23.5 32 35v21L12 44.5z" fill="#fff" fill-opacity=".6"/><path d="M52 23.5 32 35v21l20-11.5z" fill="#fff" fill-opacity=".32"/><g transform="translate(32 23.5) scale(1 .577)"><path d="M9.23 -1.78L11.91 -1.44L11.91 1.44L9.23 1.78L8.52 3.98L10.49 5.83L8.79 8.17L6.42 6.87L4.55 8.23L5.05 10.88L2.31 11.78L1.15 9.33L-1.15 9.33L-2.31 11.78L-5.05 10.88L-4.55 8.23L-6.42 6.87L-8.79 8.17L-10.49 5.83L-8.52 3.98L-9.23 1.78L-11.91 1.44L-11.91 -1.44L-9.23 -1.78L-8.52 -3.98L-10.49 -5.83L-8.79 -8.17L-6.42 -6.87L-4.55 -8.23L-5.05 -10.88L-2.31 -11.78L-1.15 -9.33L1.15 -9.33L2.31 -11.78L5.05 -10.88L4.55 -8.23L6.42 -6.87L8.79 -8.17L10.49 -5.83L8.52 -3.98Z" fill="#4a5df0"/><circle r="4.4" fill="#fff"/><circle r="1.8" fill="#4a5df0"/></g><path d="M32 35v21" stroke="#fff" stroke-opacity=".5"/></svg><span class="logo" style="font-weight:300;font-size:28px;letter-spacing:-.01em">Mini<b style="font-weight:800">CAD</b></span><span id="pj"></span><button id="sv" class="pri" title="Save (Ctrl+S)">Save</button><span class="sep"></span>
 <button id="imp">Import model</button><input type="file" id="file" accept=".stl,.obj" hidden>
@@ -246,20 +246,33 @@ function start(g){if(!me||!window.Peer)return;const p=peer=new Peer(ID(me.name,g
   else if(e.type==='peer-unavailable'){const mm=/peer\s+(\S+)/.exec(String(e.message||'')),id=mm&&mm[1];
    if(id)room.forEach(u=>{const d=D[u];if(d&&!up(u)&&ID(u,d.s)===id){d.s=d.s%SLOTS+1;if(d.s>1){d.t=0;dial(u)}}})}
   else if(/^(network|server-error|socket-error|socket-closed)$/.test(e.type)){setSt('offline');if(p.disconnected)keep(p,0)}})}
-function stop(){const p=peer;peer=null;try{p&&p.destroy()}catch(e){}Object.keys(C).forEach(u=>{try{C[u].close()}catch(e){}delete C[u]});setSt('off');fire('presence')}
-API.init=()=>{const m=getMe();if(peer&&me&&m&&m.name===me.name)return;stop();me=m;if(me)start(1)};
+function stop(){const p=peer;peer=null;try{p&&p.destroy()}catch(e){}{const q=lp;lp=null;try{q&&q.destroy()}catch(e){}}Object.keys(C).forEach(u=>{try{C[u].close()}catch(e){}delete C[u]});setSt('off');fire('presence')}
+/* keep the main page's "online" status alive while the builder is open (same protocol as the projects page) */
+const hexId=n=>'mcad-'+[...String(n)].map(c=>c.charCodeAt(0).toString(16).padStart(2,'0')).join('');
+const lobbyFr=()=>{const a=rj('mc_friends',{})[me.name]||[];return a.length?a:(rj('mc_friends_bak',{})[me.name]||[])};
+const okL=(p,n)=>{const b=hexId(n);return p===b||new RegExp('^'+b+'-\\d{1,2}$').test(String(p))};
+let lp=null;
+function lstart(g){if(!me||!window.Peer)return;const p=lp=new Peer(hexId(me.name)+(g>1?'-'+g:''),{config:{iceServers:ICE}});
+ p.on('connection',c=>{if(lp!==p)return;c.on('data',m=>{if(!m)return;
+  if(m.t==='ping'){const n=lobbyFr().find(x=>okL(c.peer,x));if(n)try{c.send({t:'pong'})}catch(e){}}
+  else if(m.t==='env'||m.t==='knock')try{c.close()}catch(e){}})});   /* messages/join requests can't be handled here: the sender keeps them and retries when you're back on the projects page */
+ p.on('close',()=>{if(lp===p){lp=null;setTimeout(()=>{if(!lp)lstart(1)},3000)}});
+ p.on('error',e=>{if(lp!==p)return;
+  if(e.type==='unavailable-id'){lp=null;try{p.destroy()}catch(x){}setTimeout(()=>{if(!lp)lstart(g>=8?1:g+1)},g>=8?8000:300)}
+  else if(/^(network|server-error|socket-error|socket-closed)$/.test(e.type))setTimeout(()=>{if(lp===p){if(p.destroyed){lp=null;lstart(1)}else try{p.reconnect()}catch(x){}}},4000)})}
+API.init=()=>{const m=getMe();if(peer&&me&&m&&m.name===me.name)return;stop();me=m;if(me){start(1);lstart(1)}};
 API.stop=stop;
 API.live=(u,b)=>{if(up(u))try{C[u].send({t:'l',b})}catch(e){}};
 API.bcast=b=>room.forEach(u=>API.live(u,b));
 API.room=ms=>{room=[...new Set(ms)].filter(u=>u&&me&&u!==me.name);probe()};
 API.peers=()=>room.filter(up);
 API.drop=u=>{const c=C[u];if(c){delete C[u];try{c.close()}catch(e){}fire('presence')}};
-setInterval(probe,4000);
-setInterval(()=>Object.keys(C).forEach(u=>{const c=C[u];if(Date.now()-seenAt[u]>20000){try{c.close()}catch(e){}if(C[u]===c){delete C[u];fire('presence');emit('down',null,u)}return}try{c.send({t:'p'})}catch(e){}}),6000);
+setInterval(()=>{probe();if(lp&&lp.disconnected&&!lp.destroyed)try{lp.reconnect()}catch(e){}},4000);
+setInterval(()=>Object.keys(C).forEach(u=>{const c=C[u];if(Date.now()-seenAt[u]>12000){try{c.close()}catch(e){}if(C[u]===c){delete C[u];fire('presence');emit('down',null,u)}return}try{c.send({t:'p'})}catch(e){}}),4000);
 const wake=()=>{if(peer&&peer.disconnected&&!peer.destroyed)try{peer.reconnect()}catch(e){}setTimeout(probe,400)};
 addEventListener('online',wake);addEventListener('offline',()=>setSt('offline'));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)wake()});
-addEventListener('pagehide',()=>{const p=peer;peer=null;try{p&&p.destroy()}catch(e){}});
+addEventListener('pagehide',()=>{const p=peer;peer=null;try{p&&p.destroy()}catch(e){}const q=lp;lp=null;try{q&&q.destroy()}catch(e){}});
 addEventListener('pageshow',e=>{if(e.persisted)API.init()});
 API.init();
 })();
@@ -2582,15 +2595,15 @@ sv.onclick=async()=>{if(!canSave||window.__mcDead)return;if(!me&&!LOBBY_IS_SELF)
 try{sv.textContent='Saving…';let id=pid;
 if(!pr){const n=prompt('Name this project:','Untitled project');if(!n)return sv.textContent='Save';id='p'+Date.now().toString(36);pr={id,name:n,owner:me.name,members:[],allowHostLeave:false,created:Date.now()};projs.push(pr);history.replaceState(null,'','?p='+id);$('pj').textContent=n+' · Owner'}
 const root=objs.filter(o=>o.parent===S);
-const data={v:1,objs:root.map(ser),cam:{th,ph,dist,t:[tgt.x,tgt.y,tgt.z]}};
+const data={v:1,objs:root.map(ser),cam:{th,ph,dist,t:[tgt.x,tgt.y,tgt.z]},ts:window.__mcGetTs?window.__mcGetTs():Date.now()};
 await tx('readwrite',s=>s.put(data,id));
-projs=rj('mc_projects',[]);const i=projs.findIndex(p=>p.id===id);const meta=Object.assign({},projs[i]||pr,{updated:Date.now(),thumb:thumb(),count:root.length,lastBy:me.name});i<0?projs.push(meta):projs[i]=meta;pr=meta;
+projs=rj('mc_projects',[]);const i=projs.findIndex(p=>p.id===id);const meta=Object.assign({},projs[i]||pr,{updated:Date.now(),ts:data.ts,thumb:thumb(),count:root.length,lastBy:me.name});i<0?projs.push(meta):projs[i]=meta;pr=meta;
 localStorage.setItem('mc_projects',JSON.stringify(projs));base=sig();sv.textContent='Saved ✓';note('Saved to this device – it now shows on your projects page.');setTimeout(()=>sv.textContent='Save',1800)}
 catch(e){console.error(e);sv.textContent='Save';note('Save failed: '+e.message)}};
 addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();sv.click()}});
-if(pid)tx('readonly',s=>s.get(pid)).then(d=>{if(!d)return;const L=new THREE.ObjectLoader(),roots=d.objs.map(j=>L.parse(j));fix(roots);
+if(pid)tx('readonly',s=>s.get(pid)).then(d=>{if(!d){window.__mcReady&&window.__mcReady();return}const L=new THREE.ObjectLoader(),roots=d.objs.map(j=>L.parse(j));fix(roots);
 roots.forEach(o=>{S.add(o);objs.push(o);own(o)});if(d.cam){th=d.cam.th;ph=d.cam.ph;dist=d.cam.dist;tgt.set(...d.cam.t)}
-upd();olist();mlist();info();base=sig();note('Loaded "'+(pr&&pr.name)+'".')}).catch(e=>{console.error(e);note('Could not load saved scene: '+e.message)});
+upd();olist();mlist();info();base=sig();note('Loaded "'+(pr&&pr.name)+'".');if(window.__mcSetTs)window.__mcSetTs(d.ts||+(pr&&pr.updated)||0);window.__mcReady&&window.__mcReady()}).catch(e=>{console.error(e);note('Could not load saved scene: '+e.message);window.__mcReady&&window.__mcReady()});
 /* ---- live collaboration: owner = host, others = co-owners, owner can kick ---- */
 if(pr&&window.MCNET)try{(()=>{
 const N=MCNET,OWN=pr.owner,isO=me.name===OWN,P=new Map(),chat=[];
@@ -2598,13 +2611,15 @@ let R=MC.members.map(m=>({user:m.user,role:m.user===OWN?'Owner':(m.role||'Co-own
 const rl=u=>(R.find(m=>m.user===u)||{}).role,mem=u=>!!rl(u),mems=()=>R.map(m=>m.user),rd=()=>rl(me.name)==='Viewer',EDIT=u=>{const r=rl(u);return !!r&&r!=='Viewer'};
 const COL=['#e5484d','#30a46c','#f5a623','#8e4ec6','#0ea5e9','#d6409f'],col=u=>COL[[...u].reduce((a,c)=>a+c.charCodeAt(0),0)%COL.length];
 const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
-let applying=0,lastS='',lastC='',last={},follow=null,at=0,unread=0,sceneTs=+pr.updated||0,dead=0,tick=0,known=new Set(),T0=Date.now();
+let applying=0,lastS='',lastC='',last={},follow=null,at=0,unread=0,sceneTs=0,dead=0,tick=0,known=new Set(),T0=Date.now(),ready=0,lastSend=0,dirty=0;
+window.__mcSetTs=t=>{sceneTs=+t||0};window.__mcGetTs=()=>sceneTs||Date.now();
+window.__mcReady=()=>{if(ready)return;ready=1;known=new Set(objs.map(o=>o.uuid));out('hi',{ts:sceneTs,n:objs.length,r:1});if(mems().length<=1)return window.__mcHideLd();const t=document.getElementById('ldt');if(t)t.textContent='Syncing the latest version with the others…';setTimeout(window.__mcHideLd,5000)};setTimeout(()=>window.__mcReady(),6000);
 const out=(t,m)=>N.bcast(Object.assign({t:'c:'+t,pid:pr.id},m)),to=(u,t,m)=>N.live(u,Object.assign({t:'c:'+t,pid:pr.id},m));
 const xk=o=>[o.position.x,o.position.y,o.position.z,o.rotation.x,o.rotation.y,o.rotation.z,o.scale.x,o.scale.y,o.scale.z],ks=o=>xk(o).map(v=>v.toFixed(3)).join();
 const stS=()=>objs.map(o=>{let g='';o.traverse(n=>{if(n.isMesh)g+=n.geometry.uuid.slice(0,3)});return o.uuid+o.children.length+(o.userData.hole?1:0)+g}).join('|');
 const snap=()=>{last={};objs.forEach(o=>last[o.uuid]=ks(o))};
 const full=()=>objs.filter(o=>o.parent===S).map(ser);
-const auto=()=>{if(!canSave||dead)return;clearTimeout(at);at=setTimeout(()=>sv.click(),4000)};
+const auto=()=>{if(!canSave||dead)return;dirty=1;clearTimeout(at);at=setTimeout(()=>sv.click(),4000)};
 const marks=()=>{P.forEach((p,u)=>{(p.h||[]).forEach(b=>S.remove(b));p.h=(p.s||[]).map(id=>objs.find(o=>o.uuid===id)).filter(Boolean).map(o=>{const b=new THREE.BoxHelper(o,col(u));S.add(b);return b})})};
 function applyScene(js){applying=1;try{const keep=sel.map(o=>o.uuid),L=new THREE.ObjectLoader(),rs_=js.map(j=>L.parse(j));fix(rs_);
  objs.forEach(o=>S.remove(o));objs=rs_;objs.forEach(o=>{S.add(o);own(o)});hist.length=0;redo.length=0;
@@ -2624,7 +2639,7 @@ function gone(why){if(dead)return;dead=1;window.__mcDead=1;clearTimeout(at);
  try{localStorage.setItem('mc_projects',JSON.stringify(rj('mc_projects',[]).filter(p=>p.id!==pr.id)))}catch(e){}
  N.stop();N.toast(why==='kicked'?'The owner removed you from this project.':'You are no longer a member of this project.');note('Removed from the project – returning to your projects…');
  setTimeout(()=>{try{go()}catch(e){}setTimeout(()=>{location.href=LOBBY},500)},2600)}
-const G=(t,f)=>N.on('c:'+t,(m,u)=>{if(!dead&&m&&m.pid===pr.id&&mem(u))f(m,u)});
+const G=(t,f)=>N.on('c:'+t,(m,u)=>{if(!dead&&m&&m.pid===pr.id&&mem(u)&&(ready||t==='cv'||t==='chat'))f(m,u)});
 N.on('c:kick',(m,u)=>{if(!isO&&u===OWN&&m&&m.pid===pr.id)gone('kicked')});
 N.on('c:ro',(m,u)=>{if(isO||u!==OWN||!m||m.pid!==pr.id||!Array.isArray(m.m))return;
  const l=m.m.filter(a=>Array.isArray(a)&&typeof a[0]==='string').map(a=>({user:a[0],role:String(a[1]||'Co-owner')}));
@@ -2632,14 +2647,14 @@ N.on('c:ro',(m,u)=>{if(isO||u!==OWN||!m||m.pid!==pr.id||!Array.isArray(m.m))retu
  try{const ps=rj('mc_projects',[]),p=ps.find(x=>x.id===pr.id);if(p){p.members=l.filter(x=>x.user!==OWN).map(x=>({user:x.user,role:x.role,status:'accepted'}));localStorage.setItem('mc_projects',JSON.stringify(ps))}}catch(e){}
  setR(l)});
 const goCam=c=>{[th,ph,dist]=c;tgt.set(c[3],c[4],c[5]);upd()};
-G('hi',(m,u)=>{if(objs.length&&EDIT(me.name)&&(m.n===0||sceneTs>(+m.ts||0)))to(u,'sc',{d:full(),ts:sceneTs,init:1})});
-G('sc',(m,u)=>{if(!EDIT(u)||!Array.isArray(m.d))return;const ts=+m.ts||Date.now();if(m.init&&objs.length&&ts<=sceneTs)return;const b4=new Set(objs.map(o=>o.uuid));applyScene(m.d);sceneTs=ts;if(!m.init&&u!==OWN){const ad=objs.filter(o=>!b4.has(o.uuid));if(ad.length)addPend(u,ad)}note(u+' updated the model');auto();draw()});
+G('hi',(m,u)=>{const mt=+m.ts||0;if(!(mt>sceneTs&&m.n>0))window.__mcHideLd();if(m.r)to(u,'hi',{ts:sceneTs,n:objs.length});if(objs.length&&EDIT(me.name)&&(sceneTs>mt||(m.n===0&&!mt)))to(u,'sc',{d:full(),ts:sceneTs,init:1})});
+G('sc',(m,u)=>{if(!EDIT(u)||!Array.isArray(m.d))return;const ts=+m.ts||Date.now();if(m.init&&objs.length&&ts<=sceneTs)return;const b4=new Set(objs.map(o=>o.uuid));applyScene(m.d);sceneTs=ts;window.__mcHideLd();if(!m.init&&u!==OWN){const ad=objs.filter(o=>!b4.has(o.uuid));if(ad.length)addPend(u,ad)}note(u+' updated the model');auto();draw()});
 G('xf',(m,u)=>{if(!EDIT(u)||!Array.isArray(m.o))return;m.o.forEach(a=>{const o=objs.find(x=>x.uuid===a[0]);if(!o)return;tw.set(a[0],{p:new THREE.Vector3(a[1],a[2],a[3]),r:[a[4],a[5],a[6]],s:new THREE.Vector3(a[7],a[8],a[9])});last[a[0]]=a.slice(1).map(v=>v.toFixed(3)).join()});sceneTs=Date.now();auto()});
-G('cv',(m,u)=>{const p=P.get(u)||{},ch=(p.s||[]).join()!==(m.s||[]).join();p.c=m.c;p.s=m.s||[];p.d=m.d||[];p.p=m.p||null;P.set(u,p);if(ch){marks();draw()}if(follow===u)goCam(m.c)});
+G('cv',(m,u)=>{const p=P.get(u)||{},ch=(p.s||[]).join()!==(m.s||[]).join();p.c=m.c;p.s=m.s||[];p.d=m.d||[];p.p=m.p||null;p.at=Date.now();P.set(u,p);if(ch){marks();draw()}if(follow===u)goCam(m.c)});
 G('chat',(m,u)=>{chat.push({u,x:String(m.x).slice(0,300)});if($('cbp').hidden)unread++;draw()});
 N.on('up',(m,u)=>{if(dead)return;if(isO)syncOwner();
  if(!mem(u)){if(isO)[0,300].forEach(d=>setTimeout(()=>to(u,'kick',{}),d)),setTimeout(()=>N.drop(u),900);return}
- lastC='';if(isO)pushR(u);to(u,'hi',{ts:sceneTs,n:objs.length});draw()});
+ lastC='';if(isO)pushR(u);if(ready)to(u,'hi',{ts:sceneTs,n:objs.length});draw()});
 N.on('down',(m,u)=>{((P.get(u)||{}).h||[]).forEach(b=>S.remove(b));P.delete(u);dropRig(u);if(follow===u)follow=null;draw()});
 /* smooth remote presence: tweened models, name-tagged cursors, dotted pointer beam */
 const tw=new Map(),RIG=new Map();let ptr=null;
@@ -2658,27 +2673,28 @@ const eyeOf=c=>new THREE.Vector3(c[3]+c[2]*Math.sin(c[1])*Math.sin(c[0]),c[4]+c[
 const nmOf=o=>(o.userData&&o.userData.name)||'a model';
 /* fast channel (~14/s): model moves, camera, pointer, what I'm dragging */
 setInterval(()=>{if(dead||applying)return;
- if(!rd()){const ch=[];objs.forEach(o=>{if(tw.has(o.uuid))return;const k=ks(o);if(last[o.uuid]!==k){last[o.uuid]=k;ch.push([o.uuid,...xk(o)])}});if(ch.length){sceneTs=Date.now();if(N.peers().length)out('xf',{o:ch})}}
+ if(!rd()){const ch=[];objs.forEach(o=>{if(tw.has(o.uuid))return;const k=ks(o);if(last[o.uuid]!==k){last[o.uuid]=k;ch.push([o.uuid,...xk(o)])}});if(ch.length){sceneTs=Date.now();auto();if(N.peers().length)out('xf',{o:ch})}}
  const c=[th,ph,dist,tgt.x,tgt.y,tgt.z].map(v=>+v.toFixed(3)),s=sel.map(o=>o.uuid),d=(mv&&mv.c&&!rd())?mv.s.map(q=>q.o.uuid):[],p=ptr?ptr.map(v=>+v.toFixed(1)):null,cs=c+'|'+s+'|'+d+'|'+p;
- if(cs!==lastC){lastC=cs;out('cv',{c,s,d,p})}},70);
+ if(cs!==lastC||Date.now()-lastSend>1500){lastC=cs;lastSend=Date.now();out('cv',{c,s,d,p})}},70);
 /* per-frame easing + drawing of everyone else */
 (function frame(){requestAnimationFrame(frame);if(dead)return;
  tw.forEach((a,id)=>{const o=objs.find(x=>x.uuid===id);if(!o||(mv&&mv.s.some(q=>q.o===o))){tw.delete(id);return}
   if(o.position.distanceTo(a.p)>300){o.position.copy(a.p)}else o.position.lerp(a.p,.3);
   o.rotation.x+=(a.r[0]-o.rotation.x)*.3;o.rotation.y+=(a.r[1]-o.rotation.y)*.3;o.rotation.z+=(a.r[2]-o.rotation.z)*.3;o.scale.lerp(a.s,.3);
   if(o.position.distanceTo(a.p)<.02&&Math.abs(a.r[1]-o.rotation.y)<1e-3&&o.scale.distanceTo(a.s)<1e-3){o.position.copy(a.p);o.rotation.set(a.r[0],a.r[1],a.r[2]);o.scale.copy(a.s);last[id]=ks(o);tw.delete(id)}});
- P.forEach((p,u)=>{(p.h||[]).forEach(b=>b.update());if(!p.c)return;const r=rig(u),eye=eyeOf(p.c);if(!r.has)r.eye.copy(eye);r.eye.lerp(eye,.2);
+ P.forEach((p,u)=>{(p.h||[]).forEach(b=>b.update());if(!p.c)return;if(Date.now()-(p.at||0)>4500){const r0=RIG.get(u);if(r0){r0.g.visible=false;r0.el.style.display='none';r0.has=0}return}const r=rig(u),eye=eyeOf(p.c);if(!r.has)r.eye.copy(eye);r.eye.lerp(eye,.2);
   const dO=p.d&&p.d.length?objs.find(o=>o.uuid===p.d[0]):null;let tp=null;
   if(dO){const b=new THREE.Box3().setFromObject(dO);tp=b.getCenter(new THREE.Vector3());tp.y=b.min.y}else if(p.p)tp=new THREE.Vector3(p.p[0],p.p[1],p.p[2]);
   if(!tp){r.g.visible=false;r.el.style.display='none';return}
   if(!r.has){r.cp.copy(tp);r.has=1}r.cp.lerp(tp,.3);
   r.g.visible=true;r.ring.position.copy(r.cp);r.ring.scale.setScalar(dO?1.6:1);
-  const dir=r.eye.clone().sub(r.cp),L=dir.length(),st=r.cp.clone().add(dir.normalize().multiplyScalar(Math.min(L,140))),a=r.geo.attributes.position;
+  const dir=r.eye.clone().sub(r.cp),L=dir.length(),st=r.cp.clone().add(dir.normalize().multiplyScalar(Math.min(L,50))),a=r.geo.attributes.position;
   a.setXYZ(0,st.x,st.y,st.z);a.setXYZ(1,r.cp.x,r.cp.y,r.cp.z);a.needsUpdate=true;r.line.computeLineDistances();r.line.visible=!dO; /* dotted beam only while not holding a model */
   const q=r.cp.clone();q.y+=10;q.project(cam);r.el.style.display=q.z<1?'block':'none';r.el.style.left=((q.x*.5+.5)*vp.clientWidth)+'px';r.el.style.top=((-q.y*.5+.5)*vp.clientHeight)+'px';
   r.el.textContent=u+(dO?' · dragging '+nmOf(dO):'')})})();
 setInterval(()=>{if(dead)return;if(isO&&++tick%4===0)syncOwner();if(applying)return;
- const ss=stS();if(ss!==lastS){lastS=ss;snap();sceneTs=Date.now();localAdds();if(!rd()&&N.peers().length)out('sc',{d:full(),ts:sceneTs})}},250);
+ const ss=stS();if(ss!==lastS){lastS=ss;snap();sceneTs=Date.now();auto();localAdds();if(!rd()&&N.peers().length)out('sc',{d:full(),ts:sceneTs})}},250);
+const flush=()=>{if(dirty&&canSave&&!dead){dirty=0;clearTimeout(at);sv.click()}};document.addEventListener('visibilitychange',()=>{if(document.hidden)flush()});addEventListener('pagehide',flush);
 /* approval flow: objects added by co-owners show as dashed "pending" until the owner accepts or rejects */
 const PEND=new Map(),BAT=[];let bseq=0;
 const E12=[[0,1],[1,3],[3,2],[2,0],[4,5],[5,7],[7,6],[6,4],[0,4],[1,5],[2,6],[3,7]];
@@ -2727,7 +2743,7 @@ const say=()=>{const i=$('cbx'),x=i.value.trim();if(!x||dead)return;i.value='';c
 $('cbs').onclick=say;$('cbx').onkeydown=e=>{if(e.key==='Enter')say()};
 ['presence','status'].forEach(e=>N.ev.addEventListener(e,draw));
 N.room(mems());draw();
-})()}catch(e){console.error('collab',e)}
+})()}catch(e){console.error('collab',e);window.__mcHideLd()}if(!pr||!window.MCNET)window.__mcHideLd();
 
 })();
 </script><script>
