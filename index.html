@@ -225,7 +225,8 @@ function wire(c){
    c._u=u;c._ok=1;C[u]=c;seenAt[u]=Date.now();if(old&&old!==c)try{old.close()}catch(e){}
    fire('presence');emit('up',null,u);return}
   if(!c._ok)return;seenAt[c._u]=Date.now();
-  if(m.t==='l'&&m.b)emit(m.b.t,m.b,c._u)});
+  if(m.t==='l'&&m.b)emit(m.b.t,m.b,c._u);
+  else if(m.t==='lz'&&m.z&&window.DecompressionStream){const u=c._u;c._rq=(c._rq||Promise.resolve()).then(()=>new Response(new Blob([m.z]).stream().pipeThrough(new DecompressionStream('gzip'))).text()).then(tx=>{const b=JSON.parse(tx);if(b&&b.t)emit(b.t,b,u)}).catch(e=>console.error(e))}});
  const gone=()=>{if(c._u&&C[c._u]===c){delete C[c._u];fire('presence');emit('down',null,c._u)}};
  c.on('close',gone);c.on('error',gone);
  if(c._out)setTimeout(()=>{if(!c._ok)try{c.close()}catch(e){}},10000)}
@@ -262,7 +263,9 @@ function lstart(g){if(!me||!window.Peer)return;const p=lp=new Peer(hexId(me.name
   else if(/^(network|server-error|socket-error|socket-closed)$/.test(e.type))setTimeout(()=>{if(lp===p){if(p.destroyed){lp=null;lstart(1)}else try{p.reconnect()}catch(x){}}},4000)})}
 API.init=()=>{const m=getMe();if(peer&&me&&m&&m.name===me.name)return;stop();me=m;if(me){start(1);lstart(1)}};
 API.stop=stop;
-API.live=(u,b)=>{if(up(u))try{C[u].send({t:'l',b})}catch(e){}};
+API.live=(u,b)=>{if(!up(u))return;const c=C[u];
+ try{if(window.CompressionStream&&(c._sq||(b.d&&JSON.stringify(b).length>40000))){const js=JSON.stringify(b);c._sq=(c._sq||Promise.resolve()).then(()=>js.length>40000?new Response(new Blob([js]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer().then(z=>{try{c.send({t:'lz',z:new Uint8Array(z)})}catch(e){}}):(()=>{try{c.send({t:'l',b})}catch(e){}})()).catch(()=>{});const q=c._sq;q.then(()=>{if(c._sq===q)c._sq=null});return}
+  c.send({t:'l',b})}catch(e){}};
 API.bcast=b=>room.forEach(u=>API.live(u,b));
 API.room=ms=>{room=[...new Set(ms)].filter(u=>u&&me&&u!==me.name);probe()};
 API.peers=()=>room.filter(up);
@@ -407,8 +410,10 @@ const g=ground();if(!g)return null;g.set(sn(g.x),0,sn(g.z));return{p:g}}
 cv.addEventListener('contextmenu',e=>e.preventDefault());
 cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);const l=e.button===0,m=(e.button===2||(tool==='orbit'&&l))?'orbit':(e.button===1||(tool==='pan'&&l))?'pan':'tool';drag={m,x:e.clientX,y:e.clientY};if(m==='tool')down(e)});
 cv.addEventListener('pointermove',e=>{if(drag&&drag.m!=='tool'){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;
-if(drag.m==='orbit'){th-=dx*.008;ph=Math.min(3.05,Math.max(.05,ph-dy*.008))}else{const k=dist*.0016;tgt.addScaledVector(V(0,0,0).setFromMatrixColumn(cam.matrix,0),-dx*k).addScaledVector(V(0,0,0).setFromMatrixColumn(cam.matrix,1),dy*k)}upd()}else move(e)});
-cv.addEventListener('pointerup',e=>{if(drag&&drag.m==='tool')up(e);drag=null});
+if(drag.m==='orbit'){th-=dx*.008;ph=Math.min(3.05,Math.max(.05,ph-dy*.008))}else{const k=dist*.0016;tgt.addScaledVector(V(0,0,0).setFromMatrixColumn(cam.matrix,0),-dx*k).addScaledVector(V(0,0,0).setFromMatrixColumn(cam.matrix,1),dy*k)}upd()}else mvQ(e)});
+let mvE=null,mvR=0;const mvQ=e=>{mvE=e;if(!mvR)mvR=requestAnimationFrame(()=>{mvR=0;const x=mvE;mvE=null;if(x)move(x)})};
+let _it=0;const infoT=()=>{const n=performance.now();if(n-_it>90){_it=n;info()}};
+cv.addEventListener('pointerup',e=>{if(mvE){const x=mvE;mvE=null;move(x)}if(drag&&drag.m==='tool')up(e);drag=null});
 cv.addEventListener('wheel',e=>{e.preventDefault();dist=Math.min(3000,Math.max(15,dist*Math.exp(e.deltaY*.001)));upd()},{passive:false});
 cv.addEventListener('dblclick',()=>{if(tool==='poly'||tool==='erase')closePoly()});
 const DRAWT=['rect','circle','poly','free','shape','erase','cutr','cutc'];
@@ -445,7 +450,7 @@ function move(e){if(pe&&tool!=='select')return;
 if(tool==='select'){setRay(e);if(mq){const[x,y,w,h]=mqBox(e);Object.assign(mqd.style,{display:'block',left:x+'px',top:y+'px',width:w+'px',height:h+'px'});return}
 if(hd){dragHd(e);return}if(rt){dragRot(e);return}
 if(mv){const g=ground();if(!g)return;const fs=v=>e.altKey?Math.round(v*100)/100:sn(v),dx=fs(g.x-mv.g0.x),dz=fs(g.z-mv.g0.z);if(!mv.c&&(dx||dz)){mv.c=true;const cur=objs.map(T);cur.forEach(n=>{const s=mv.s.find(q=>q.o===n.o);if(s)n.p=s.p.clone()});hist.push(cur);redo=[]}
-mv.s.forEach(s=>{const o=s.o,a=o.userData.gearAttach,g=a&&a.gear,gearDragged=g&&mv.s.some(k=>k.o===g);if(a&&g&&objs.includes(g)&&!gearDragged){const basis=(a.role==='motor'?(g.userData.mountQ||g.quaternion):g.quaternion).clone(),local=V(dx,0,dz).applyQuaternion(basis.invert()),off=s.off||{x:0,y:0,z:0};a.offset={x:(off.x||0)+local.x,y:(off.y||0)+local.y,z:(off.z||0)+local.z};__syncGearAttachment(o)}else o.position.set(s.p.x+dx,s.p.y,s.p.z+dz)});info()}return}
+mv.s.forEach(s=>{const o=s.o,a=o.userData.gearAttach,g=a&&a.gear,gearDragged=g&&mv.s.some(k=>k.o===g);if(a&&g&&objs.includes(g)&&!gearDragged){const basis=(a.role==='motor'?(g.userData.mountQ||g.quaternion):g.quaternion).clone(),local=V(dx,0,dz).applyQuaternion(basis.invert()),off=s.off||{x:0,y:0,z:0};a.offset={x:(off.x||0)+local.x,y:(off.y||0)+local.y,z:(off.z||0)+local.z};__syncGearAttachment(o)}else o.position.set(s.p.x+dx,s.p.y,s.p.z+dz)});infoT()}return}
 if(tool==='orbit'||tool==='pan')return;
 if(!start&&!pts.length&&!fh&&tool!=='measure'){if(DRAWT.includes(tool))faceM(e);const um=dmd()!=='ground',ny=um?(hovM?hovOff:0):surfY(e);if(um&&lastM!==dmd()&&DRAWV.includes(tool))hint.textContent='Upright drawing plane (shown in blue): left-right = width, up = height. You set thickness after drawing. Use "Draw on" in the header for flat drawing.';lastM=dmd();if(ny!==workY){workY=ny;pl.constant=-ny;hint.textContent=ny?`Surface detected – drawing at height ${ny} mm`:(HT[tool]||'')}}
 if(isFree()){if(fh){setRay(e);const g=ground();if(g&&g.distanceTo(fh[fh.length-1])>Math.max(.6,dist*.006)){fh.push(g.clone());{const q=wOK()&&sp(e);if(q)wp.push(q)}setPrev(fh.map(q=>V(q.x,.2,q.z)),false)}}return}
@@ -2640,7 +2645,7 @@ const out=(t,m)=>N.bcast(Object.assign({t:'c:'+t,pid:pr.id},m)),to=(u,t,m)=>N.li
 const xk=o=>[o.position.x,o.position.y,o.position.z,o.quaternion.x,o.quaternion.y,o.quaternion.z,o.quaternion.w,o.scale.x,o.scale.y,o.scale.z],ks=o=>xk(o).map(v=>v.toFixed(3)).join();
 const stS=()=>objs.map(o=>{let g='';o.traverse(n=>{if(n.isMesh)g+=n.geometry.uuid.slice(0,3)});return o.uuid+o.children.length+(o.userData.hole?1:0)+g}).join('|');
 const snap=()=>{last={};objs.forEach(o=>last[o.uuid]=ks(o))};
-const full=()=>objs.filter(o=>o.parent===S).map(ser);
+const full=()=>objs.filter(o=>o.parent===S).map(o=>{try{return ser(o)}catch(e){console.error('sync: could not serialise',o.userData&&o.userData.name,e);return null}}).filter(Boolean);
 const auto=()=>{if(!canSave||dead)return;dirty=1;clearTimeout(at);at=setTimeout(()=>sv.click(),4000)};
 const marks=()=>{P.forEach((p,u)=>{(p.h||[]).forEach(b=>S.remove(b));p.h=(p.s||[]).map(id=>objs.find(o=>o.uuid===id)).filter(Boolean).map(o=>{const b=new THREE.BoxHelper(o,col(u));S.add(b);return b})})};
 function applyScene(js){applying=1;try{const keep=sel.map(o=>o.uuid),L=new THREE.ObjectLoader(),rs_=js.map(j=>L.parse(j));fix(rs_);
@@ -2676,8 +2681,8 @@ G('sc',(m,u)=>{if(!EDIT(u)||!Array.isArray(m.d))return;const ts=+m.ts||Date.now(
 G('xf',(m,u)=>{if(!EDIT(u)||!Array.isArray(m.o))return;m.o.forEach(a=>{const o=objs.find(x=>x.uuid===a[0]);if(!o)return;tw.set(a[0],{p:new THREE.Vector3(a[1],a[2],a[3]),q:new THREE.Quaternion(a[4],a[5],a[6],a[7]).normalize(),s:new THREE.Vector3(a[8],a[9],a[10])});last[a[0]]=a.slice(1).map(v=>v.toFixed(3)).join()});sceneTs=Date.now();auto()});
 G('cv',(m,u)=>{const p=P.get(u)||{},ch=(p.s||[]).join()!==(m.s||[]).join();p.c=m.c;p.s=m.s||[];p.d=m.d||[];p.p=m.p||null;p.at=Date.now();P.set(u,p);if(ch){marks();draw()}if(follow===u)goCam(m.c)});
 G('pv',(m,u)=>{if(!EDIT(u))return;let r=PV.get(u);if(r){S.remove(r.l);r.l.geometry.dispose();PV.delete(u)}
- if(!Array.isArray(m.a)||m.a.length<6||m.a.length>6000)return;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(m.a,3));
- const l=new(m.l?THREE.LineLoop:THREE.Line)(g,new THREE.LineDashedMaterial({color:col(u),dashSize:3,gapSize:2.5,depthTest:false}));l.computeLineDistances();l.renderOrder=996;l.frustumCulled=false;S.add(l);PV.set(u,{l,at:Date.now()})});
+ if(!Array.isArray(m.a)||m.a.length<6||m.a.length>12000)return;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(m.a,3));
+ const l=new(m.l===2?THREE.LineSegments:m.l?THREE.LineLoop:THREE.Line)(g,new THREE.LineDashedMaterial({color:col(u),dashSize:3,gapSize:2.5,depthTest:false}));l.computeLineDistances();l.renderOrder=996;l.frustumCulled=false;S.add(l);PV.set(u,{l,at:Date.now()})});
 G('chat',(m,u)=>{chat.push({u,x:String(m.x).slice(0,300)});if($('cbp').hidden)unread++;draw()});
 N.on('up',(m,u)=>{if(dead)return;if(isO)syncOwner();
  if(!mem(u)){if(isO)[0,300].forEach(d=>setTimeout(()=>to(u,'kick',{}),d)),setTimeout(()=>N.drop(u),900);return}
@@ -2711,6 +2716,7 @@ setInterval(()=>{if(dead||applying)return;
  calcPtr();const c=[th,ph,dist,tgt.x,tgt.y,tgt.z].map(v=>+v.toFixed(3)),s=sel.map(o=>o.uuid),d=(mv&&mv.c&&!rd())?mv.s.map(q=>q.o.uuid):[],p=ptr?ptr.map(v=>+v.toFixed(1)):null,cs=c+'|'+s+'|'+d+'|'+p;
  if(cs!==lastC||Date.now()-lastSend>1500){lastC=cs;lastSend=Date.now();out('cv',{c,s,d,p})}
  if(!rd()){let pa=null,pl=0;if(prev&&prev.geometry&&prev.geometry.attributes.position){pa=Array.from(prev.geometry.attributes.position.array,v=>+v.toFixed(2));pl=prev.isLineLoop?1:0}
+  else if(pe&&pe.mesh&&pe.mesh.children[0]&&pe.mesh.children[0].geometry.attributes.position){pe.mesh.updateMatrixWorld(true);const ar=pe.mesh.children[0].geometry.attributes.position.array,mw=pe.mesh.matrixWorld,t=new THREE.Vector3();if(ar.length<=12000){pa=[];for(let i=0;i<ar.length;i+=3){t.set(ar[i],ar[i+1],ar[i+2]).applyMatrix4(mw);pa.push(+t.x.toFixed(2),+t.y.toFixed(2),+t.z.toFixed(2))}pl=2}}
   const sg=pa?pl+','+pa.join():'';if(sg!==lastPv||(pa&&Date.now()-lastPvT>1500)){lastPv=sg;lastPvT=Date.now();out('pv',{a:pa,l:pl})}}},33);
 /* per-frame easing + drawing of everyone else */
 (function frame(){requestAnimationFrame(frame);if(dead)return;
@@ -2856,7 +2862,7 @@ const Q={tq1:['tt',60,'wheel','spur'],tq2:['mg996r',20,'gear','spur'],pl1:['tt',
 q.onchange=()=>{o&&o();const k=Q[q.value];g('v9ty').value=k?k[3]:'spur';if(k){g('v9mo').value=k[0];g('v9ra').value=k[1];g('v9ou').value=k[2]}g('v9ra').dispatchEvent(new Event('change'))};
 const ob=g('v9build').onclick;g('v9build').onclick=()=>{if(g('v9ty').value!=='planet')return ob();
 const p=window.V9.plan(),R=Math.min(10,Math.max(3,+g('v9ra').value||8));g('gm').value=p.m;g('gt').value=Math.max(4,Math.min(p.t,8));g('gbk').value='planet';g('gbr').value=R;g('gbp').value=12;g('gbn').value=3;g('gbm').value=g('v9mo').value;g('gbe').checked=g('v9enc').checked;g('gbgo').onclick()}});
-T(()=>{const P=g('p-gears'),d=document.createElement('details');d.open=true;d.innerHTML='<summary>Add motor / wheel to selected gear</summary><div><p class="mut" style="margin:0 0 6px">Click a gear first.</p><div class="v9f"><label>Motor</label><select id="sm_mo"><option value="tt">TT gear motor</option><option value="sg90">SG90 servo</option><option value="mg996r">MG996R servo</option></select></div><button class="full btn-c c-orange" id="sm_m">＋ Add motor</button><div class="v9f"><label>Wheel diameter (mm)</label><input id="sm_w" type="number" value="40"></div><button class="full btn-c c-violet" id="sm_wb">＋ Add wheel</button></div>';
+T(()=>{const P=g('p-gears'),d=document.createElement('details');d.open=false;d.innerHTML='<summary>Add motor / wheel to selected gear</summary><div><p class="mut" style="margin:0 0 6px">Click a gear first.</p><div class="v9f"><label>Motor</label><select id="sm_mo"><option value="tt">TT gear motor</option><option value="sg90">SG90 servo</option><option value="mg996r">MG996R servo</option></select></div><button class="full btn-c c-orange" id="sm_m">＋ Add motor</button><div class="v9f"><label>Wheel diameter (mm)</label><input id="sm_w" type="number" value="40"></div><button class="full btn-c c-violet" id="sm_wb">＋ Add wheel</button></div>';
 [...P.querySelectorAll(':scope>details')].find(x=>x.querySelector('summary').textContent.includes('Quick gearbox')).after(d);
 g('sm_m').onclick=()=>{g('gmk').value=g('sm_mo').value;g('gmk').onchange&&g('gmk').onchange();g('gmadd').onclick()};
 g('sm_wb').onclick=()=>{g('gwr').value=g('sm_w').value;g('gwhl').onclick()}});
