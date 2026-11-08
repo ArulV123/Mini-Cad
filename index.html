@@ -2669,8 +2669,14 @@ N.on('down',(m,u)=>{((P.get(u)||{}).h||[]).forEach(b=>S.remove(b));P.delete(u);d
 /* smooth remote presence: tweened models, name-tagged cursors, dotted pointer beam */
 const tw=new Map(),RIG=new Map();let ptr=null;
 const rc2=new THREE.Raycaster(),nd=new THREE.Vector2(),gp0=new THREE.Vector3(),pl0=new THREE.Plane(new THREE.Vector3(0,1,0),0);
-cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();nd.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);rc2.setFromCamera(nd,cam);ptr=rc2.ray.intersectPlane(pl0,gp0)&&Math.abs(gp0.x)<2500&&Math.abs(gp0.z)<2500?[gp0.x,gp0.y,gp0.z]:null});
-cv.addEventListener('pointerleave',()=>{ptr=null});
+let pcl=null;
+/* where the mouse really points in the 3D scene: first model surface under it, otherwise the ground. Recomputed every tick so camera moves / model moves keep it correct */
+function calcPtr(){if(!pcl){ptr=null;return}const r=cv.getBoundingClientRect();if(!r.width)return;nd.set((pcl.x-r.left)/r.width*2-1,-((pcl.y-r.top)/r.height)*2+1);cam.updateMatrixWorld(true);rc2.setFromCamera(nd,cam);
+ let h=null;try{h=rc2.intersectObjects(meshes(),false)[0]}catch(e){}
+ if(h){ptr=[h.point.x,h.point.y,h.point.z];return}
+ ptr=rc2.ray.intersectPlane(pl0,gp0)&&Math.abs(gp0.x)<2500&&Math.abs(gp0.z)<2500?[gp0.x,gp0.y,gp0.z]:null}
+cv.addEventListener('pointermove',e=>{pcl={x:e.clientX,y:e.clientY};calcPtr()});
+cv.addEventListener('pointerleave',()=>{pcl=null;ptr=null});
 function rig(u){let r=RIG.get(u);if(r)return r;const c=col(u),g=new THREE.Group();
  const ring=new THREE.Mesh(new THREE.RingGeometry(3,4.4,32).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:c,depthTest:false,transparent:true,opacity:.95,side:THREE.DoubleSide}));ring.renderOrder=999;
  const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3(0,1,0)]);
@@ -2684,7 +2690,7 @@ const nmOf=o=>(o.userData&&o.userData.name)||'a model';
 /* fast channel (~14/s): model moves, camera, pointer, what I'm dragging */
 setInterval(()=>{if(dead||applying)return;
  if(!rd()){const ch=[];objs.forEach(o=>{if(tw.has(o.uuid))return;const k=ks(o);if(last[o.uuid]!==k){last[o.uuid]=k;ch.push([o.uuid,...xk(o)])}});if(ch.length){sceneTs=Date.now();auto();if(N.peers().length)out('xf',{o:ch})}}
- const c=[th,ph,dist,tgt.x,tgt.y,tgt.z].map(v=>+v.toFixed(3)),s=sel.map(o=>o.uuid),d=(mv&&mv.c&&!rd())?mv.s.map(q=>q.o.uuid):[],p=ptr?ptr.map(v=>+v.toFixed(1)):null,cs=c+'|'+s+'|'+d+'|'+p;
+ calcPtr();const c=[th,ph,dist,tgt.x,tgt.y,tgt.z].map(v=>+v.toFixed(3)),s=sel.map(o=>o.uuid),d=(mv&&mv.c&&!rd())?mv.s.map(q=>q.o.uuid):[],p=ptr?ptr.map(v=>+v.toFixed(1)):null,cs=c+'|'+s+'|'+d+'|'+p;
  if(cs!==lastC||Date.now()-lastSend>1500){lastC=cs;lastSend=Date.now();out('cv',{c,s,d,p})}},70);
 /* per-frame easing + drawing of everyone else */
 (function frame(){requestAnimationFrame(frame);if(dead)return;
