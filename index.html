@@ -211,7 +211,7 @@ const getMe=()=>{try{const s=JSON.parse(sessionStorage.getItem('mc_tab'));if(s&&
 const up=u=>{const c=C[u];return !!(c&&c.open&&c._ok)};
 const API=window.MCNET={ev:E,status:'off',online:up,on:(t,f)=>{(H[t]=H[t]||[]).push(f)}};
 const setSt=s=>{if(API.status!==s){API.status=s;fire('status')}};
-const st=document.createElement('style');st.textContent='.pd{display:inline-block;width:9px;height:9px;border-radius:50%;background:#9aa3b2;margin-right:6px;vertical-align:middle}.pd.on{background:#2ecc71;box-shadow:0 0 0 3px #2ecc7133}';document.head.appendChild(st);
+const st=document.createElement('style');st.textContent='.pd{display:inline-block;width:9px;height:9px;border-radius:50%;background:#9aa3b2;margin-right:6px;vertical-align:middle}.pd.on{background:#2ecc71;box-shadow:0 0 0 3px #2ecc7133}.pd.st{background:#f5a623;box-shadow:0 0 0 3px #f5a62333}';document.head.appendChild(st);
 API.toast=t=>{const d=document.createElement('div');d.textContent=t;d.style.cssText='position:fixed;right:14px;top:14px;z-index:99999;background:#1f2937;color:#fff;padding:10px 14px;border-radius:10px;font:13px system-ui;box-shadow:0 6px 24px #0005;max-width:300px';document.body.appendChild(d);setTimeout(()=>d.remove(),4500)};
 function wire(c){
  const hi=()=>{try{c.send({t:'id',u:me.name})}catch(e){}};
@@ -253,8 +253,8 @@ const lobbyFr=()=>{const a=rj('mc_friends',{})[me.name]||[];return a.length?a:(r
 const okL=(p,n)=>{const b=hexId(n);return p===b||new RegExp('^'+b+'-\\d{1,2}$').test(String(p))};
 let lp=null;
 function lstart(g){if(!me||!window.Peer)return;const p=lp=new Peer(hexId(me.name)+(g>1?'-'+g:''),{config:{iceServers:ICE}});
- p.on('connection',c=>{if(lp!==p)return;c.on('data',m=>{if(!m)return;
-  if(m.t==='ping'){const n=lobbyFr().find(x=>okL(c.peer,x));if(n)try{c.send({t:'pong'})}catch(e){}}
+ p.on('connection',c=>{if(lp!==p)return;(window.__LC=window.__LC||new Set()).add(c);c.on('close',()=>window.__LC.delete(c));c.on('data',m=>{if(!m)return;
+  if(m.t==='ping'){const n=lobbyFr().find(x=>okL(c.peer,x));if(n)try{c.send({t:'pong',w:'b'})}catch(e){}}
   else if(m.t==='env'||m.t==='knock')try{c.close()}catch(e){}})});   /* messages/join requests can't be handled here: the sender keeps them and retries when you're back on the projects page */
  p.on('close',()=>{if(lp===p){lp=null;setTimeout(()=>{if(!lp)lstart(1)},3000)}});
  p.on('error',e=>{if(lp!==p)return;
@@ -267,6 +267,11 @@ API.bcast=b=>room.forEach(u=>API.live(u,b));
 API.room=ms=>{room=[...new Set(ms)].filter(u=>u&&me&&u!==me.name);probe()};
 API.peers=()=>room.filter(up);
 API.drop=u=>{const c=C[u];if(c){delete C[u];try{c.close()}catch(e){}fire('presence')}};
+API.lobbyCall=(u,msg,ms)=>new Promise(res=>{let done=0,cs=[],iv=0,to=0;const fin=v=>{if(done)return;done=1;clearInterval(iv);clearTimeout(to);cs.forEach(c=>{try{c.close()}catch(e){}});res(v)};
+ to=setTimeout(()=>fin(null),ms||3500);
+ const go=()=>{if(done||cs.length)return;if(!peer||!peer.open)return;clearInterval(iv);
+  for(let g=1;g<=8;g++)try{const c=peer.connect(hexId(u)+(g>1?'-'+g:''),{reliable:true});cs.push(c);c.on('open',()=>{try{c.send(msg)}catch(e){}});c.on('data',m=>{if(m&&(m.t==='pong'||m.t==='bak'))fin(m)});c.on('error',()=>{})}catch(e){}};
+ iv=setInterval(go,200);go()});
 API.fetchScene=(u,pid,ms)=>new Promise(res=>{let done=0,cs=[],t0=Date.now(),iv=0,to=0;
  const fin=v=>{if(done)return;done=1;clearInterval(iv);clearTimeout(to);cs.forEach(c=>{try{c.close()}catch(e){}});res(v)};
  to=setTimeout(()=>fin(null),ms||7000);
@@ -280,7 +285,7 @@ setInterval(()=>Object.keys(C).forEach(u=>{const c=C[u];if(Date.now()-seenAt[u]>
 const wake=()=>{if(peer&&peer.disconnected&&!peer.destroyed)try{peer.reconnect()}catch(e){}setTimeout(probe,400)};
 addEventListener('online',wake);addEventListener('offline',()=>setSt('offline'));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)wake()});
-addEventListener('pagehide',()=>{const p=peer;peer=null;try{p&&p.destroy()}catch(e){}const q=lp;lp=null;try{q&&q.destroy()}catch(e){}});
+addEventListener('pagehide',()=>{if(!window.__nav&&window.__LC)window.__LC.forEach(c=>{try{c.open&&c.send({t:'bye'})}catch(e){}});const p=peer;peer=null;try{p&&p.destroy()}catch(e){}const q=lp;lp=null;try{q&&q.destroy()}catch(e){}});
 addEventListener('pageshow',e=>{if(e.persisted)API.init()});
 API.init();
 })();
@@ -2582,7 +2587,7 @@ else if(!me||(pid&&(!pr||!mem))){location.replace(LOBBY);return}
 const role=pr?(mem?mem.role:'Viewer'):'Owner',canSave=role!=='Viewer';
 window.MC={me,project:pr,role,roomId:pr&&pr.id,allowHostLeave:!!(pr&&pr.allowHostLeave),members:pr?[{user:pr.owner,role:'Owner'}].concat(pr.members.filter(m=>m.status==='accepted')):[]};
 requestAnimationFrame(()=>requestAnimationFrame(()=>veil.classList.remove('on')));
-const go=()=>{if(LOBBY_IS_SELF)return;veil.classList.add('on');setTimeout(()=>location.href=LOBBY,380)};
+const go=()=>{if(LOBBY_IS_SELF)return;window.__nav=1;veil.classList.add('on');setTimeout(()=>location.href=LOBBY,380)};
 const sig=()=>objs.map(o=>[o.position.x,o.position.y,o.position.z,o.rotation.y,o.scale.x,o.children.length,o.userData.hole].join()).join('|');
 let base=sig();
 $('pj').textContent=pr?pr.name+' · '+role:'Untitled (not linked to a project)';
@@ -2622,7 +2627,9 @@ let R=MC.members.map(m=>({user:m.user,role:m.user===OWN?'Owner':(m.role||'Co-own
 const rl=u=>(R.find(m=>m.user===u)||{}).role,mem=u=>!!rl(u),mems=()=>R.map(m=>m.user),rd=()=>rl(me.name)==='Viewer',EDIT=u=>{const r=rl(u);return !!r&&r!=='Viewer'};
 const COL=['#e5484d','#30a46c','#f5a623','#8e4ec6','#0ea5e9','#d6409f'],col=u=>COL[[...u].reduce((a,c)=>a+c.charCodeAt(0),0)%COL.length];
 const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
-let askPlace=(()=>{try{return localStorage.getItem('mc_ap_'+pr.id)==='1'}catch(e){return false}})();let lastPv='',lastPvT=0;const PV=new Map();
+let askPlace=(()=>{try{return localStorage.getItem('mc_ap_'+pr.id)==='1'}catch(e){return false}})();const LOB=new Set();
+setInterval(()=>{if(dead||!N.lobbyCall||document.hidden)return;mems().filter(u=>u!==me.name&&!N.online(u)).forEach(u=>N.lobbyCall(u,{t:'ping'},3500).then(r=>{const w=!!(r&&r.t==='pong'&&r.w==='l');if(w!==LOB.has(u)){w?LOB.add(u):LOB.delete(u);draw()}}))},12000);
+let lastPv='',lastPvT=0;const PV=new Map();
 let fwOn=(()=>{try{return localStorage.getItem('mc_fw_'+pr.id)!=='0'}catch(e){return true}})(),ft=null;
 let applying=0,lastS='',lastC='',last={},follow=null,at=0,unread=0,sceneTs=0,dead=0,tick=0,known=new Set(),T0=Date.now(),ready=0,lastSend=0,dirty=0;
 window.__mcSetTs=t=>{sceneTs=+t||0};window.__mcGetTs=()=>sceneTs||Date.now();
@@ -2761,7 +2768,7 @@ const live=u=>u===me.name||N.online(u);
 function draw(){const on=mems().filter(u=>u!==me.name&&N.online(u)).length,s=N.status;
  $('cbt').innerHTML='👥 '+(s==='online'?(on?on+' online':'Live'):s==='offline'?'Offline – retrying…':'Connecting…')+(unread?' <b style="color:#e5484d">●</b>':'');
  if($('cbp').hidden)return;
- $('cbm').innerHTML=R.map(({user:u,role:r})=>{const you=u===me.name,o=live(u);return `<div class="r"><i class="pd${o?' on':''}"></i><b style="color:${col(u)}">${u===OWN?'👑 ':''}${esc(u)}</b>${you?'<span>&nbsp;(you)</span>':''}<small>${esc((u===OWN?'Owner':r)+' · '+(o?(you?'you':act(P.get(u))):'offline'))}</small>${!you&&o&&(isO||fwOn)?`<button data-f="${esc(u)}">${follow===u?'Stop':'Follow'}</button>`:''}${isO&&!you?`<button data-k="${esc(u)}" style="color:#e5484d">Kick</button>`:''}</div>`}).join('')
+ $('cbm').innerHTML=R.map(({user:u,role:r})=>{const you=u===me.name,o=live(u);return `<div class="r"><i class="pd${o?' on':!you&&LOB.has(u)?' st':''}"></i><b style="color:${col(u)}">${u===OWN?'👑 ':''}${esc(u)}</b>${you?'<span>&nbsp;(you)</span>':''}<small>${esc((u===OWN?'Owner':r)+' · '+(o?(you?'you':act(P.get(u))):LOB.has(u)?'on start page':'offline'))}</small>${!you&&!o&&LOB.has(u)?`<button data-i="${esc(u)}">Invite</button>`:''}${!you&&o&&(isO||fwOn)?`<button data-f="${esc(u)}">${follow===u?'Stop':'Follow'}</button>`:''}${isO&&!you?`<button data-k="${esc(u)}" style="color:#e5484d">Kick</button>`:''}</div>`}).join('')
   +(isO?`<div class="r"><button id="cap" style="margin:0">Ask permission to place: ${askPlace?'On':'Off'}</button></div>`:'')
   +(isO?`<div class="r"><button id="cfw" style="margin:0">Follow: ${fwOn?'On':'Off'} (for everyone)</button></div>`:'')
   +(isO&&R.length>1?'<div class="r"><button id="cka" style="color:#e5484d;margin:0">Remove everyone</button></div>':'')
@@ -2769,6 +2776,7 @@ function draw(){const on=mems().filter(u=>u!==me.name&&N.online(u)).length,s=N.s
  $('cbl').innerHTML=chat.slice(-40).map(c=>`<div><b style="color:${col(c.u)}">${esc(c.u)}:</b> ${esc(c.x)}</div>`).join('')||'<small style="color:#667">Chat with everyone in this project</small>';$('cbl').scrollTop=1e9}
 $('cbt').onclick=()=>{const p=$('cbp');p.hidden=!p.hidden;unread=0;draw()};
 $('cbm').onclick=e=>{const t=e.target,f=t.dataset&&t.dataset.f,k=t.dataset&&t.dataset.k;
+ if(t.dataset&&t.dataset.i){const u=t.dataset.i;t.disabled=true;t.textContent='Sent…';N.lobbyCall(u,{t:'binv',pid:pr.id},4000).then(r=>{t.textContent=r?'Invited':'Failed';setTimeout(draw,1800)});return}
  if(t.id==='cap'&&isO){askPlace=!askPlace;try{localStorage.setItem('mc_ap_'+pr.id,askPlace?'1':'0')}catch(x){}if(!askPlace)BAT.filter(b=>!b.done).forEach(b=>resolveB(b,true));pushR();draw();return}
  if(t.id==='cfw'&&isO){fwOn=!fwOn;try{localStorage.setItem('mc_fw_'+pr.id,fwOn?'1':'0')}catch(x){}pushR();draw();return}
  if(t.id==='cka'){if(confirm('Remove everyone except you from this project?'))kick(mems().filter(u=>u!==me.name));return}
