@@ -2619,7 +2619,7 @@ let R=MC.members.map(m=>({user:m.user,role:m.user===OWN?'Owner':(m.role||'Co-own
 const rl=u=>(R.find(m=>m.user===u)||{}).role,mem=u=>!!rl(u),mems=()=>R.map(m=>m.user),rd=()=>rl(me.name)==='Viewer',EDIT=u=>{const r=rl(u);return !!r&&r!=='Viewer'};
 const COL=['#e5484d','#30a46c','#f5a623','#8e4ec6','#0ea5e9','#d6409f'],col=u=>COL[[...u].reduce((a,c)=>a+c.charCodeAt(0),0)%COL.length];
 const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
-let lastPv='',lastPvT=0;const PV=new Map();
+let askPlace=(()=>{try{return localStorage.getItem('mc_ap_'+pr.id)==='1'}catch(e){return false}})();let lastPv='',lastPvT=0;const PV=new Map();
 let fwOn=(()=>{try{return localStorage.getItem('mc_fw_'+pr.id)!=='0'}catch(e){return true}})(),ft=null;
 let applying=0,lastS='',lastC='',last={},follow=null,at=0,unread=0,sceneTs=0,dead=0,tick=0,known=new Set(),T0=Date.now(),ready=0,lastSend=0,dirty=0;
 window.__mcSetTs=t=>{sceneTs=+t||0};window.__mcGetTs=()=>sceneTs||Date.now();
@@ -2640,7 +2640,7 @@ function applyScene(js){applying=1;try{const keep=sel.map(o=>o.uuid),L=new THREE
 const rSig=l=>l.map(m=>m.user+':'+m.role).join();
 const setR=l=>{R=l;N.room(mems());try{$('pj').textContent=pr.name+' · '+(rl(me.name)||role)}catch(e){}draw()};
 const ownerList=()=>{const p=rj('mc_projects',[]).find(x=>x.id===pr.id&&x.owner===me.name);return p?[{user:me.name,role:'Owner'}].concat((p.members||[]).filter(m=>m.status==='accepted').map(m=>({user:m.user,role:m.role||'Co-owner'}))):null};
-const pushR=u=>{const m=R.map(x=>[x.user,x.role]);u?to(u,'ro',{m,fw:fwOn?1:0}):out('ro',{m,fw:fwOn?1:0})};
+const pushR=u=>{const m=R.map(x=>[x.user,x.role]);u?to(u,'ro',{m,fw:fwOn?1:0,ap:askPlace?1:0}):out('ro',{m,fw:fwOn?1:0,ap:askPlace?1:0})};
 function syncOwner(){if(!isO||dead)return;const l=ownerList();if(l&&rSig(l)!==rSig(R)){setR(l);pushR()}}
 const ping=()=>{try{new BroadcastChannel('minicad').postMessage(1)}catch(e){}};
 function kick(us){us.forEach(u=>{if(u===me.name||!mem(u))return;
@@ -2654,6 +2654,7 @@ function gone(why){if(dead)return;dead=1;window.__mcDead=1;clearTimeout(at);
 const G=(t,f)=>N.on('c:'+t,(m,u)=>{if(!dead&&m&&m.pid===pr.id&&mem(u)&&(ready||t==='cv'||t==='chat'))f(m,u)});
 N.on('c:kick',(m,u)=>{if(!isO&&u===OWN&&m&&m.pid===pr.id)gone('kicked')});
 N.on('c:ro',(m,u)=>{if(isO||u!==OWN||!m||m.pid!==pr.id||!Array.isArray(m.m))return;
+ if(m.ap!==undefined){askPlace=!!m.ap;if(!askPlace){clearIds([...PEND.keys()]);prune()}}
  if(m.fw!==undefined){fwOn=!!m.fw;if(!fwOn&&follow){follow=null;ft=null;note('The owner turned off Follow')}}
  const l=m.m.filter(a=>Array.isArray(a)&&typeof a[0]==='string').map(a=>({user:a[0],role:String(a[1]||'Co-owner')}));
  if(!l.some(x=>x.user===me.name))return gone('removed');
@@ -2725,13 +2726,13 @@ const flush=()=>{if(dirty&&canSave&&!dead){dirty=0;clearTimeout(at);sv.click()}}
 /* approval flow: objects added by co-owners show as dashed "pending" until the owner accepts or rejects */
 const PEND=new Map(),BAT=[];let bseq=0;
 const E12=[[0,1],[1,3],[3,2],[2,0],[4,5],[5,7],[7,6],[6,4],[0,4],[1,5],[2,6],[3,7]];
-const pq=document.createElement('div');pq.style.cssText='position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:7;display:flex;flex-direction:column;gap:6px;max-width:92%';vp.appendChild(pq);
-const pcss=document.createElement('style');pcss.textContent='.pc{display:flex;align-items:center;gap:8px;background:#fff;color:#1f2328;border:1px solid #0003;border-radius:10px;padding:7px 10px;box-shadow:0 6px 20px #0003;font:13px system-ui}.pc button{padding:3px 10px;cursor:pointer;border-radius:6px;border:1px solid #0003;background:#f3f5f8}.pc button[data-a]{background:#30a46c;color:#fff;border-color:#30a46c}.pc button[data-r]{color:#e5484d}';document.head.appendChild(pcss);
+const pq=document.createElement('div');pq.style.cssText='position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:7;display:flex;flex-direction:column;gap:6px;max-width:92%;pointer-events:none';vp.appendChild(pq);
+const pcss=document.createElement('style');pcss.textContent='.pc{pointer-events:auto;display:flex;align-items:center;gap:8px;background:#fff;color:#1f2328;border:1px solid #0003;border-radius:10px;padding:7px 10px;box-shadow:0 6px 20px #0003;font:13px system-ui}.pc button{padding:3px 10px;cursor:pointer;border-radius:6px;border:1px solid #0003;background:#f3f5f8}.pc button[data-a]{background:#30a46c;color:#fff;border-color:#30a46c}.pc button[data-r]{color:#e5484d}';document.head.appendChild(pcss);
 const pOut=by=>{const ls=new THREE.LineSegments(new THREE.BufferGeometry().setAttribute('position',new THREE.BufferAttribute(new Float32Array(72),3)),new THREE.LineDashedMaterial({color:col(by),dashSize:3,gapSize:2,depthTest:false}));ls.frustumCulled=false;ls.renderOrder=997;S.add(ls);return ls};
 function cardText(b){const os=b.ids.map(id=>objs.find(o=>o.uuid===id)).filter(Boolean),n=os.length;if(!n)return;
  b.el.innerHTML='<span><b style="color:'+col(b.by)+'">'+esc(b.by===me.name?'You':b.by)+'</b> added '+n+' object'+(n>1?'s':'')+': '+esc(os.slice(0,3).map(nmOf).join(', ')+(n>3?' …':''))+(isO?'':' – waiting for the owner')+'</span>'+(isO?'<button data-a="1">Accept</button><button data-r="1">Reject</button>':'')}
-function addPend(by,ad){let b=BAT.find(x=>x.by===by&&!x.done);if(!b){b={by,ids:[],el:document.createElement('div')};b.el.className='pc';pq.appendChild(b.el);BAT.push(b)}
- ad.forEach(o=>{if(!PEND.has(o.uuid)){PEND.set(o.uuid,{by,ls:pOut(by)});b.ids.push(o.uuid)}});cardText(b);if(isO)N.toast(by+' added something – accept or reject it at the top of the view')}
+function addPend(by,ad){if(!askPlace)return;let b=BAT.find(x=>x.by===by&&!x.done);if(!b){b={by,ids:[],el:document.createElement('div')};b.el.className='pc';pq.appendChild(b.el);BAT.push(b)}
+ ad.forEach(o=>{if(!PEND.has(o.uuid)){PEND.set(o.uuid,{by,ls:pOut(by)});b.ids.push(o.uuid)}});cardText(b);if(isO)N.toast(by+' added something – accept or reject it at the bottom of the view')}
 const clearIds=ids=>ids.forEach(id=>{const p=PEND.get(id);if(p){S.remove(p.ls);PEND.delete(id)}});
 function prune(){PEND.forEach((p,id)=>{if(!objs.some(o=>o.uuid===id)){S.remove(p.ls);PEND.delete(id)}});BAT.forEach(b=>{if(b.done)return;if(!b.ids.some(id=>PEND.has(id))){b.done=1;b.el.remove()}else cardText(b)})}
 function resolveB(b,ok){b.done=1;const ids=b.ids.filter(id=>PEND.has(id));
@@ -2758,12 +2759,14 @@ function draw(){const on=mems().filter(u=>u!==me.name&&N.online(u)).length,s=N.s
  $('cbt').innerHTML='👥 '+(s==='online'?(on?on+' online':'Live'):s==='offline'?'Offline – retrying…':'Connecting…')+(unread?' <b style="color:#e5484d">●</b>':'');
  if($('cbp').hidden)return;
  $('cbm').innerHTML=R.map(({user:u,role:r})=>{const you=u===me.name,o=live(u);return `<div class="r"><i class="pd${o?' on':''}"></i><b style="color:${col(u)}">${u===OWN?'👑 ':''}${esc(u)}</b>${you?'<span>&nbsp;(you)</span>':''}<small>${esc((u===OWN?'Owner':r)+' · '+(o?(you?'you':act(P.get(u))):'offline'))}</small>${!you&&o&&(isO||fwOn)?`<button data-f="${esc(u)}">${follow===u?'Stop':'Follow'}</button>`:''}${isO&&!you?`<button data-k="${esc(u)}" style="color:#e5484d">Kick</button>`:''}</div>`}).join('')
+  +(isO?`<div class="r"><button id="cap" style="margin:0">Ask permission to place: ${askPlace?'On':'Off'}</button></div>`:'')
   +(isO?`<div class="r"><button id="cfw" style="margin:0">Follow: ${fwOn?'On':'Off'} (for everyone)</button></div>`:'')
   +(isO&&R.length>1?'<div class="r"><button id="cka" style="color:#e5484d;margin:0">Remove everyone</button></div>':'')
   +(!isO&&!N.online(OWN)?'<div class="r"><small style="margin:0;max-width:none;white-space:normal">The owner is offline – you can keep editing; changes sync when they return.</small></div>':'');
  $('cbl').innerHTML=chat.slice(-40).map(c=>`<div><b style="color:${col(c.u)}">${esc(c.u)}:</b> ${esc(c.x)}</div>`).join('')||'<small style="color:#667">Chat with everyone in this project</small>';$('cbl').scrollTop=1e9}
 $('cbt').onclick=()=>{const p=$('cbp');p.hidden=!p.hidden;unread=0;draw()};
 $('cbm').onclick=e=>{const t=e.target,f=t.dataset&&t.dataset.f,k=t.dataset&&t.dataset.k;
+ if(t.id==='cap'&&isO){askPlace=!askPlace;try{localStorage.setItem('mc_ap_'+pr.id,askPlace?'1':'0')}catch(x){}if(!askPlace)BAT.filter(b=>!b.done).forEach(b=>resolveB(b,true));pushR();draw();return}
  if(t.id==='cfw'&&isO){fwOn=!fwOn;try{localStorage.setItem('mc_fw_'+pr.id,fwOn?'1':'0')}catch(x){}pushR();draw();return}
  if(t.id==='cka'){if(confirm('Remove everyone except you from this project?'))kick(mems().filter(u=>u!==me.name));return}
  if(k){if(confirm('Remove '+k+' from this project?'))kick([k]);return}
