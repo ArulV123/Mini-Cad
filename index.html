@@ -2594,7 +2594,10 @@ const clean=u=>{const r={};for(const k in u){const v=u[k],t=typeof v;
 if(v==null||t==='number'||t==='string'||t==='boolean')r[k]=v;
 else if(v.isObject3D)r[k]={$ref:v.uuid};else if(v.isVector3)r[k]={$v:[v.x,v.y,v.z]};else if(v.isColor)r[k]={$c:v.getHex()};
 else if(Array.isArray(v)&&v.every(x=>typeof x==='number'||typeof x==='string'))r[k]=v}return r};
-const ser=o=>{const b=[];o.traverse(n=>{b.push([n,n.userData]);n.userData=clean(n.userData);n.userData.ord=n.rotation.order});try{return o.toJSON()}finally{b.forEach(([n,u])=>n.userData=u)}};
+const ser=o=>{const b=[];o.traverse(n=>{b.push([n,n.userData,n.geometry]);n.userData=clean(n.userData);n.userData.ord=n.rotation.order;
+ /* parametric geometries (Cylinder/Extrude/Box…) are saved as parameters only and lose any rotate/translate applied to their vertices -> rebuild as plain geometry so orientation survives sync/save */
+ const g=n.geometry;if(n.isMesh&&g&&g.parameters!==undefined){const p=new THREE.BufferGeometry();p.uuid=g.uuid;p.attributes=g.attributes;p.index=g.index;p.groups=g.groups;p.drawRange=g.drawRange;p.morphAttributes=g.morphAttributes;n.geometry=p}});
+ try{return o.toJSON()}finally{b.forEach(([n,u,g])=>{n.userData=u;if(g)n.geometry=g})}};
 const fix=roots=>{const m={};roots.forEach(r=>r.traverse(n=>m[n.uuid]=n));roots.forEach(r=>r.traverse(n=>{const u=n.userData;if(typeof u.ord==='string'&&u.ord!==n.rotation.order&&/^[XYZ]{3}$/.test(u.ord))n.rotation.reorder(u.ord);for(const k in u){const v=u[k];if(!v||typeof v!=='object'||Array.isArray(v))continue;
 if(v.$ref)m[v.$ref]?u[k]=m[v.$ref]:delete u[k];else if(v.$v)u[k]=V(...v.$v);else if('$c'in v)u[k]=new THREE.Color(v.$c)}}))};
 const thumb=()=>{R.render(S,cam);const c=document.createElement('canvas');c.width=320;c.height=200;const x=c.getContext('2d'),w=cv.width,h=cv.height,s=Math.max(320/w,200/h);x.fillStyle='#e8ebf0';x.fillRect(0,0,320,200);x.drawImage(cv,(320-w*s)/2,(200-h*s)/2,w*s,h*s);return c.toDataURL('image/jpeg',.7)};
