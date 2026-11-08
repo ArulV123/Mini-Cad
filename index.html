@@ -2619,6 +2619,7 @@ let R=MC.members.map(m=>({user:m.user,role:m.user===OWN?'Owner':(m.role||'Co-own
 const rl=u=>(R.find(m=>m.user===u)||{}).role,mem=u=>!!rl(u),mems=()=>R.map(m=>m.user),rd=()=>rl(me.name)==='Viewer',EDIT=u=>{const r=rl(u);return !!r&&r!=='Viewer'};
 const COL=['#e5484d','#30a46c','#f5a623','#8e4ec6','#0ea5e9','#d6409f'],col=u=>COL[[...u].reduce((a,c)=>a+c.charCodeAt(0),0)%COL.length];
 const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+let fwOn=(()=>{try{return localStorage.getItem('mc_fw_'+pr.id)!=='0'}catch(e){return true}})(),ft=null;
 let applying=0,lastS='',lastC='',last={},follow=null,at=0,unread=0,sceneTs=0,dead=0,tick=0,known=new Set(),T0=Date.now(),ready=0,lastSend=0,dirty=0;
 window.__mcSetTs=t=>{sceneTs=+t||0};window.__mcGetTs=()=>sceneTs||Date.now();
 function pullLobby(){const us=mems().filter(u=>u!==me.name);if(!N.fetchScene||!us.length)return;let left=us.length;
@@ -2638,7 +2639,7 @@ function applyScene(js){applying=1;try{const keep=sel.map(o=>o.uuid),L=new THREE
 const rSig=l=>l.map(m=>m.user+':'+m.role).join();
 const setR=l=>{R=l;N.room(mems());try{$('pj').textContent=pr.name+' · '+(rl(me.name)||role)}catch(e){}draw()};
 const ownerList=()=>{const p=rj('mc_projects',[]).find(x=>x.id===pr.id&&x.owner===me.name);return p?[{user:me.name,role:'Owner'}].concat((p.members||[]).filter(m=>m.status==='accepted').map(m=>({user:m.user,role:m.role||'Co-owner'}))):null};
-const pushR=u=>{const m=R.map(x=>[x.user,x.role]);u?to(u,'ro',{m}):out('ro',{m})};
+const pushR=u=>{const m=R.map(x=>[x.user,x.role]);u?to(u,'ro',{m,fw:fwOn?1:0}):out('ro',{m,fw:fwOn?1:0})};
 function syncOwner(){if(!isO||dead)return;const l=ownerList();if(l&&rSig(l)!==rSig(R)){setR(l);pushR()}}
 const ping=()=>{try{new BroadcastChannel('minicad').postMessage(1)}catch(e){}};
 function kick(us){us.forEach(u=>{if(u===me.name||!mem(u))return;
@@ -2652,11 +2653,12 @@ function gone(why){if(dead)return;dead=1;window.__mcDead=1;clearTimeout(at);
 const G=(t,f)=>N.on('c:'+t,(m,u)=>{if(!dead&&m&&m.pid===pr.id&&mem(u)&&(ready||t==='cv'||t==='chat'))f(m,u)});
 N.on('c:kick',(m,u)=>{if(!isO&&u===OWN&&m&&m.pid===pr.id)gone('kicked')});
 N.on('c:ro',(m,u)=>{if(isO||u!==OWN||!m||m.pid!==pr.id||!Array.isArray(m.m))return;
+ if(m.fw!==undefined){fwOn=!!m.fw;if(!fwOn&&follow){follow=null;ft=null;note('The owner turned off Follow')}}
  const l=m.m.filter(a=>Array.isArray(a)&&typeof a[0]==='string').map(a=>({user:a[0],role:String(a[1]||'Co-owner')}));
  if(!l.some(x=>x.user===me.name))return gone('removed');
  try{const ps=rj('mc_projects',[]),p=ps.find(x=>x.id===pr.id);if(p){p.members=l.filter(x=>x.user!==OWN).map(x=>({user:x.user,role:x.role,status:'accepted'}));localStorage.setItem('mc_projects',JSON.stringify(ps))}}catch(e){}
  setR(l)});
-const goCam=c=>{[th,ph,dist]=c;tgt.set(c[3],c[4],c[5]);upd()};
+const goCam=c=>{ft=c.slice()};
 G('hi',(m,u)=>{const mt=+m.ts||0;if(!(mt>sceneTs&&m.n>0))window.__mcHideLd();if(m.r)to(u,'hi',{ts:sceneTs,n:objs.length});if(objs.length&&EDIT(me.name)&&(sceneTs>mt||(m.n===0&&!mt)))to(u,'sc',{d:full(),ts:sceneTs,init:1})});
 G('sc',(m,u)=>{if(!EDIT(u)||!Array.isArray(m.d))return;const ts=+m.ts||Date.now();if(m.init&&objs.length&&ts<=sceneTs)return;const b4=new Set(objs.map(o=>o.uuid));applyScene(m.d);sceneTs=ts;window.__mcHideLd();if(!m.init&&u!==OWN){const ad=objs.filter(o=>!b4.has(o.uuid));if(ad.length)addPend(u,ad)}note(u+' updated the model');auto();draw()});
 G('xf',(m,u)=>{if(!EDIT(u)||!Array.isArray(m.o))return;m.o.forEach(a=>{const o=objs.find(x=>x.uuid===a[0]);if(!o)return;tw.set(a[0],{p:new THREE.Vector3(a[1],a[2],a[3]),r:[a[4],a[5],a[6]],s:new THREE.Vector3(a[7],a[8],a[9])});last[a[0]]=a.slice(1).map(v=>v.toFixed(3)).join()});sceneTs=Date.now();auto()});
@@ -2669,6 +2671,7 @@ N.on('down',(m,u)=>{((P.get(u)||{}).h||[]).forEach(b=>S.remove(b));P.delete(u);d
 /* smooth remote presence: tweened models, name-tagged cursors, dotted pointer beam */
 const tw=new Map(),RIG=new Map();let ptr=null;
 const rc2=new THREE.Raycaster(),nd=new THREE.Vector2(),gp0=new THREE.Vector3(),pl0=new THREE.Plane(new THREE.Vector3(0,1,0),0);
+cv.addEventListener('wheel',()=>{if(follow){follow=null;ft=null;draw()}},{passive:true});cv.addEventListener('pointermove',()=>{if(follow&&drag&&drag.m!=='tool'){follow=null;ft=null;draw()}});
 let pcl=null;
 /* where the mouse really points in the 3D scene: first model surface under it, otherwise the ground. Recomputed every tick so camera moves / model moves keep it correct */
 function calcPtr(){if(!pcl){ptr=null;return}const r=cv.getBoundingClientRect();if(!r.width)return;nd.set((pcl.x-r.left)/r.width*2-1,-((pcl.y-r.top)/r.height)*2+1);cam.updateMatrixWorld(true);rc2.setFromCamera(nd,cam);
@@ -2691,9 +2694,10 @@ const nmOf=o=>(o.userData&&o.userData.name)||'a model';
 setInterval(()=>{if(dead||applying)return;
  if(!rd()){const ch=[];objs.forEach(o=>{if(tw.has(o.uuid))return;const k=ks(o);if(last[o.uuid]!==k){last[o.uuid]=k;ch.push([o.uuid,...xk(o)])}});if(ch.length){sceneTs=Date.now();auto();if(N.peers().length)out('xf',{o:ch})}}
  calcPtr();const c=[th,ph,dist,tgt.x,tgt.y,tgt.z].map(v=>+v.toFixed(3)),s=sel.map(o=>o.uuid),d=(mv&&mv.c&&!rd())?mv.s.map(q=>q.o.uuid):[],p=ptr?ptr.map(v=>+v.toFixed(1)):null,cs=c+'|'+s+'|'+d+'|'+p;
- if(cs!==lastC||Date.now()-lastSend>1500){lastC=cs;lastSend=Date.now();out('cv',{c,s,d,p})}},70);
+ if(cs!==lastC||Date.now()-lastSend>1500){lastC=cs;lastSend=Date.now();out('cv',{c,s,d,p})}},33);
 /* per-frame easing + drawing of everyone else */
 (function frame(){requestAnimationFrame(frame);if(dead)return;
+ if(ft){if(!follow){ft=null}else{const k=.28;let d=ft[0]-th;d-=2*Math.PI*Math.round(d/(2*Math.PI));th+=d*k;ph+=(ft[1]-ph)*k;dist+=(ft[2]-dist)*k;tgt.x+=(ft[3]-tgt.x)*k;tgt.y+=(ft[4]-tgt.y)*k;tgt.z+=(ft[5]-tgt.z)*k;upd()}}
  tw.forEach((a,id)=>{const o=objs.find(x=>x.uuid===id);if(!o||(mv&&mv.s.some(q=>q.o===o))){tw.delete(id);return}
   if(o.position.distanceTo(a.p)>300){o.position.copy(a.p)}else o.position.lerp(a.p,.3);
   o.rotation.x+=(a.r[0]-o.rotation.x)*.3;o.rotation.y+=(a.r[1]-o.rotation.y)*.3;o.rotation.z+=(a.r[2]-o.rotation.z)*.3;o.scale.lerp(a.s,.3);
@@ -2746,15 +2750,17 @@ const live=u=>u===me.name||N.online(u);
 function draw(){const on=mems().filter(u=>u!==me.name&&N.online(u)).length,s=N.status;
  $('cbt').innerHTML='👥 '+(s==='online'?(on?on+' online':'Live'):s==='offline'?'Offline – retrying…':'Connecting…')+(unread?' <b style="color:#e5484d">●</b>':'');
  if($('cbp').hidden)return;
- $('cbm').innerHTML=R.map(({user:u,role:r})=>{const you=u===me.name,o=live(u);return `<div class="r"><i class="pd${o?' on':''}"></i><b style="color:${col(u)}">${u===OWN?'👑 ':''}${esc(u)}</b>${you?'<span>&nbsp;(you)</span>':''}<small>${esc((u===OWN?'Owner':r)+' · '+(o?(you?'you':act(P.get(u))):'offline'))}</small>${!you&&o?`<button data-f="${esc(u)}">${follow===u?'Stop':'Follow'}</button>`:''}${isO&&!you?`<button data-k="${esc(u)}" style="color:#e5484d">Kick</button>`:''}</div>`}).join('')
+ $('cbm').innerHTML=R.map(({user:u,role:r})=>{const you=u===me.name,o=live(u);return `<div class="r"><i class="pd${o?' on':''}"></i><b style="color:${col(u)}">${u===OWN?'👑 ':''}${esc(u)}</b>${you?'<span>&nbsp;(you)</span>':''}<small>${esc((u===OWN?'Owner':r)+' · '+(o?(you?'you':act(P.get(u))):'offline'))}</small>${!you&&o&&(isO||fwOn)?`<button data-f="${esc(u)}">${follow===u?'Stop':'Follow'}</button>`:''}${isO&&!you?`<button data-k="${esc(u)}" style="color:#e5484d">Kick</button>`:''}</div>`}).join('')
+  +(isO?`<div class="r"><button id="cfw" style="margin:0">Follow: ${fwOn?'On':'Off'} (for everyone)</button></div>`:'')
   +(isO&&R.length>1?'<div class="r"><button id="cka" style="color:#e5484d;margin:0">Remove everyone</button></div>':'')
   +(!isO&&!N.online(OWN)?'<div class="r"><small style="margin:0;max-width:none;white-space:normal">The owner is offline – you can keep editing; changes sync when they return.</small></div>':'');
  $('cbl').innerHTML=chat.slice(-40).map(c=>`<div><b style="color:${col(c.u)}">${esc(c.u)}:</b> ${esc(c.x)}</div>`).join('')||'<small style="color:#667">Chat with everyone in this project</small>';$('cbl').scrollTop=1e9}
 $('cbt').onclick=()=>{const p=$('cbp');p.hidden=!p.hidden;unread=0;draw()};
 $('cbm').onclick=e=>{const t=e.target,f=t.dataset&&t.dataset.f,k=t.dataset&&t.dataset.k;
+ if(t.id==='cfw'&&isO){fwOn=!fwOn;try{localStorage.setItem('mc_fw_'+pr.id,fwOn?'1':'0')}catch(x){}pushR();draw();return}
  if(t.id==='cka'){if(confirm('Remove everyone except you from this project?'))kick(mems().filter(u=>u!==me.name));return}
  if(k){if(confirm('Remove '+k+' from this project?'))kick([k]);return}
- if(!f)return;follow=follow===f?null:f;const p=P.get(f);if(follow&&p&&p.c)goCam(p.c);draw()};
+ if(!f)return;if(!isO&&!fwOn)return;follow=follow===f?null:f;if(!follow)ft=null;const p=P.get(f);if(follow&&p&&p.c)goCam(p.c);draw()};
 const say=()=>{const i=$('cbx'),x=i.value.trim();if(!x||dead)return;i.value='';chat.push({u:me.name,x});out('chat',{x});draw()};
 $('cbs').onclick=say;$('cbx').onkeydown=e=>{if(e.key==='Enter')say()};
 ['presence','status'].forEach(e=>N.ev.addEventListener(e,draw));
