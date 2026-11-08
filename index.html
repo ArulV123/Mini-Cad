@@ -199,82 +199,72 @@ header{gap:6px;padding:5px 12px}header button,header select{padding:4px 8px;whit
 <script src="https://cdn.jsdelivr.net/npm/@jscad/modeling@2.12.3/dist/jscad-modeling.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
+/* MCNET v5 – transport (Vibeo-Meet style): id slots, keep-alive, auto-reconnect, heartbeat */
 (function(){
-const rj=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},wj=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},rid=()=>Math.random().toString(36).slice(2,10);
-/* add TURN servers here for users behind strict NATs: {urls:'turn:host:443',username:'u',credential:'p'} */
-const ICE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}];
-const H={},E=new EventTarget(),C={},tryT={},seenAt={};let me=null,peer=null,room=null;
+const rj=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}};
+const ICE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}],SLOTS=6; /* add TURN here for strict NATs */
+const H={},E=new EventTarget(),C={},D={},seenAt={};let me=null,peer=null,room=[];
 const fire=t=>E.dispatchEvent(new Event(t)),emit=(t,m,u)=>(H[t]||[]).forEach(f=>{try{f(m,u)}catch(e){console.error(e)}});
-const ID=n=>'mcad4-'+n.toLowerCase().replace(/[^a-z0-9]/g,c=>'Z'+c.charCodeAt(0).toString(16)+'Z');
-const OUT=()=>(rj('mc_out',{})[me.name])||{},setOut=o=>{const a=rj('mc_out',{});a[me.name]=o;wj('mc_out',a)};
-const friends=()=>(rj('mc_friends',{})[me.name])||[];
+const enc=n=>'mcad4-'+n.toLowerCase().replace(/[^a-z0-9]/g,c=>'Z'+c.charCodeAt(0).toString(16)+'Z');
+const ID=(n,g)=>enc(n)+(g>1?'-'+g:''),okPeer=(p,n)=>p===enc(n)||new RegExp('^'+enc(n)+'-\\d{1,2}$').test(String(p));
+const getMe=()=>{try{const s=JSON.parse(sessionStorage.getItem('mc_tab'));if(s&&s.name)return s}catch(e){}return rj('mc_me',null)};
 const up=u=>{const c=C[u];return !!(c&&c.open&&c._ok)};
-const seen=id=>{const a=rj('mc_seen',[]);if(a.includes(id))return 1;a.push(id);wj('mc_seen',a.slice(-300));return 0};
 const API=window.MCNET={ev:E,status:'off',online:up,on:(t,f)=>{(H[t]=H[t]||[]).push(f)}};
+const setSt=s=>{if(API.status!==s){API.status=s;fire('status')}};
 const st=document.createElement('style');st.textContent='.pd{display:inline-block;width:9px;height:9px;border-radius:50%;background:#9aa3b2;margin-right:6px;vertical-align:middle}.pd.on{background:#2ecc71;box-shadow:0 0 0 3px #2ecc7133}';document.head.appendChild(st);
-function toast(t){const d=document.createElement('div');d.textContent=t;d.style.cssText='position:fixed;right:14px;top:14px;z-index:99999;background:#1f2937;color:#fff;padding:10px 14px;border-radius:10px;font:13px system-ui;box-shadow:0 6px 24px #0005;max-width:300px';document.body.appendChild(d);setTimeout(()=>d.remove(),4500)}
+API.toast=t=>{const d=document.createElement('div');d.textContent=t;d.style.cssText='position:fixed;right:14px;top:14px;z-index:99999;background:#1f2937;color:#fff;padding:10px 14px;border-radius:10px;font:13px system-ui;box-shadow:0 6px 24px #0005;max-width:300px';document.body.appendChild(d);setTimeout(()=>d.remove(),4500)};
 function wire(c){
  const hi=()=>{try{c.send({t:'id',u:me.name})}catch(e){}};
- c.on('open',hi);
+ if(c.open)hi();c.on('open',hi);
  c.on('data',m=>{
   if(!m||typeof m!=='object')return;
-  if(m.t==='id'){
-   if(c._ok)return;const u=String(m.u||'');
-   if(!/^[\w.-]{2,20}$/.test(u)||u===me.name||ID(u)!==c.peer)return c.close();
-   c._u=u;const old=C[u],pref=me.name<u?!!c._out:!c._out;
+  if(m.t==='id'){if(c._ok)return;const u=String(m.u||'');
+   if(!/^[\w.~-]{2,40}$/.test(u)||u===me.name||!okPeer(c.peer,u))return c.close();
+   const old=C[u],pref=me.name<u?!!c._out:!c._out;
    if(old&&old!==c&&old.open&&old._ok&&!pref)return c.close();
-   c._ok=1;C[u]=c;seenAt[u]=Date.now();if(old&&old!==c)try{old.close()}catch(e){}
-   fire('presence');flush(u);emit('up',null,u);return}
+   c._u=u;c._ok=1;C[u]=c;seenAt[u]=Date.now();if(old&&old!==c)try{old.close()}catch(e){}
+   fire('presence');emit('up',null,u);return}
   if(!c._ok)return;seenAt[c._u]=Date.now();
-  if(m.t==='m'){try{c.send({t:'ack',id:m.id})}catch(e){}if(!seen(m.id)&&m.b)emit(m.b.t,m.b,c._u)}
-  else if(m.t==='ack'){const o=OUT(),l=o[c._u];if(l){o[c._u]=l.filter(x=>x.id!==m.id);if(!o[c._u].length)delete o[c._u];setOut(o)}}
-  else if(m.t==='l'&&m.b)emit(m.b.t,m.b,c._u)});
+  if(m.t==='l'&&m.b)emit(m.b.t,m.b,c._u)});
  const gone=()=>{if(c._u&&C[c._u]===c){delete C[c._u];fire('presence');emit('down',null,c._u)}};
  c.on('close',gone);c.on('error',gone);
- if(c._out)setTimeout(()=>{if(!c._ok)try{c.close()}catch(e){}},12000)}
-function flush(u){const c=C[u];if(!up(u))return;(OUT()[u]||[]).forEach(x=>{try{c.send({t:'m',id:x.id,b:x.b})}catch(e){}})}
-const targets=()=>[...new Set([...friends(),...Object.keys(OUT()),...(room?room.members:[])])].filter(u=>u&&u!==me.name);
-function probe(){if(!me||!peer||!peer.open)return;
- targets().forEach(u=>{if(up(u)){flush(u);return}if(tryT[u]&&Date.now()-tryT[u]<7000)return;tryT[u]=Date.now();
-  try{const c=peer.connect(ID(u),{reliable:true});c._out=1;wire(c)}catch(e){}})}
-function start(n){
- const p=peer=new Peer(ID(me.name),{config:{iceServers:ICE}});API.status='connecting';fire('status');
- p.on('open',()=>{API.status='online';fire('status');probe()});
- p.on('connection',c=>wire(c));
- p.on('disconnected',()=>{if(peer!==p)return;API.status='connecting';fire('status');setTimeout(()=>{try{p.reconnect()}catch(e){}},2000)});
+ if(c._out)setTimeout(()=>{if(!c._ok)try{c.close()}catch(e){}},10000)}
+function dial(u){if(!peer||!peer.open||up(u))return;const d=D[u]=D[u]||{s:1,t:0};if(Date.now()-d.t<3500)return;d.t=Date.now();
+ try{const c=peer.connect(ID(u,d.s),{reliable:true});c._out=1;wire(c)}catch(e){}}
+const probe=()=>{if(me&&peer&&peer.open)room.forEach(dial)};
+function keep(p,n){if(peer!==p||p.destroyed||!p.disconnected)return;
+ if(n>8){peer=null;try{p.destroy()}catch(e){}start(1);return}
+ if(navigator.onLine)try{p.reconnect()}catch(e){}
+ setTimeout(()=>keep(p,n+1),Math.min(2000+n*1000,8000))}
+function start(g){if(!me||!window.Peer)return;const p=peer=new Peer(ID(me.name,g),{config:{iceServers:ICE}});setSt('connecting');
+ p.on('open',()=>{if(peer===p){setSt('online');probe()}});
+ p.on('connection',c=>{if(peer===p)wire(c)});
+ p.on('disconnected',()=>{if(peer!==p||p.destroyed)return;setSt('connecting');keep(p,0)});
+ p.on('close',()=>{if(peer!==p)return;peer=null;setSt('offline');setTimeout(()=>{if(!peer)start(1)},1500)});
  p.on('error',e=>{if(peer!==p)return;
-  if(e.type==='unavailable-id'){API.status='busy';fire('status');try{p.destroy()}catch(x){}setTimeout(()=>{if(me&&peer===p)start(n+1)},n<6?1500:12000)}
-  else if(['network','server-error','socket-error','socket-closed'].includes(e.type)){API.status='offline';fire('status');setTimeout(()=>{if(peer!==p)return;if(p.destroyed)start(0);else try{p.reconnect()}catch(x){}},5000)}})}
-function stop(){try{peer&&peer.destroy()}catch(e){}peer=null;Object.keys(C).forEach(u=>{try{C[u].close()}catch(e){}delete C[u]});API.status='off';fire('status');fire('presence')}
-API.init=()=>{const m=rj('mc_me',null);if(peer&&me&&m&&m.name===me.name)return;stop();me=m;if(me&&window.Peer)start(0)};
+  if(e.type==='unavailable-id'){peer=null;try{p.destroy()}catch(x){}setSt('connecting');setTimeout(()=>{if(!peer)start(g>=SLOTS?1:g+1)},g>=SLOTS?6000:400)}
+  else if(e.type==='peer-unavailable'){const mm=/peer\s+(\S+)/.exec(String(e.message||'')),id=mm&&mm[1];
+   if(id)room.forEach(u=>{const d=D[u];if(d&&!up(u)&&ID(u,d.s)===id){d.s=d.s%SLOTS+1;if(d.s>1){d.t=0;dial(u)}}})}
+  else if(/^(network|server-error|socket-error|socket-closed)$/.test(e.type)){setSt('offline');if(p.disconnected)keep(p,0)}})}
+function stop(){const p=peer;peer=null;try{p&&p.destroy()}catch(e){}Object.keys(C).forEach(u=>{try{C[u].close()}catch(e){}delete C[u]});setSt('off');fire('presence')}
+API.init=()=>{const m=getMe();if(peer&&me&&m&&m.name===me.name)return;stop();me=m;if(me)start(1)};
 API.stop=stop;
-API.send=(u,b)=>{const o=OUT();(o[u]=o[u]||[]).push({id:rid()+rid(),b});setOut(o);if(!up(u))probe();flush(u)};  /* reliable: stored until the friend acknowledges it */
-API.live=(u,b)=>{if(up(u))try{C[u].send({t:'l',b})}catch(e){}};                                          /* realtime, not stored */
-API.bcast=b=>room&&room.members.forEach(u=>API.live(u,b));
-API.room=(pid,members)=>{room={pid,members:members.filter(u=>u!==me.name)};probe()};
-API.peers=()=>room?room.members.filter(up):[];
-setInterval(probe,5000);
-setInterval(()=>Object.keys(C).forEach(u=>{const c=C[u];if(Date.now()-seenAt[u]>24000){try{c.close()}catch(e){}if(C[u]===c){delete C[u];fire('presence')}return}try{c.send({t:'p'})}catch(e){}}),8000);
-addEventListener('pagehide',()=>{try{peer&&peer.destroy()}catch(e){}peer=null});
+API.live=(u,b)=>{if(up(u))try{C[u].send({t:'l',b})}catch(e){}};
+API.bcast=b=>room.forEach(u=>API.live(u,b));
+API.room=ms=>{room=[...new Set(ms)].filter(u=>u&&me&&u!==me.name);probe()};
+API.peers=()=>room.filter(up);
+API.drop=u=>{const c=C[u];if(c){delete C[u];try{c.close()}catch(e){}fire('presence')}};
+setInterval(probe,4000);
+setInterval(()=>Object.keys(C).forEach(u=>{const c=C[u];if(Date.now()-seenAt[u]>20000){try{c.close()}catch(e){}if(C[u]===c){delete C[u];fire('presence');emit('down',null,u)}return}try{c.send({t:'p'})}catch(e){}}),6000);
+const wake=()=>{if(peer&&peer.disconnected&&!peer.destroyed)try{peer.reconnect()}catch(e){}setTimeout(probe,400)};
+addEventListener('online',wake);addEventListener('offline',()=>setSt('offline'));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)wake()});
+addEventListener('pagehide',()=>{const p=peer;peer=null;try{p&&p.destroy()}catch(e){}});
 addEventListener('pageshow',e=>{if(e.persisted)API.init()});
-/* ---- shared handlers: friend requests, notifications, chat (work on every page) ---- */
-const delReq=u=>{const r=rj('mc_req',{});if(r[me.name]){delete r[me.name][u];wj('mc_req',r)}};
-API.on('note',(m,u)=>{const n=m.n||{};
- if((n.type==='friend_request'||n.type==='project_invite')&&n.from!==u)return;
- const a=rj('mc_notes',{}),l=a[me.name]=a[me.name]||[];
- if(n.type==='friend_request'&&(friends().includes(u)||l.some(x=>x.type==='friend_request'&&x.from===u&&!x.done)))return;
- if(n.proj&&n.type==='project_invite'&&n.proj.owner===u){const ps=rj('mc_projects',[]),i=ps.findIndex(p=>p.id===n.proj.id);i<0?ps.push(n.proj):ps[i]=Object.assign({},ps[i],n.proj);wj('mc_projects',ps)}
- delete n.proj;
- if(n.st&&n.pid){const ps=rj('mc_projects',[]),p=ps.find(q=>q.id===n.pid&&q.owner===me.name),mm=p&&p.members.find(q=>q.user===u);if(mm){mm.status=n.st;wj('mc_projects',ps)}}
- n.id=rid();n.t=n.t||Date.now();n.read=0;l.unshift(n);wj('mc_notes',a);fire('data');
- toast(n.type==='friend_request'?u+' sent you a friend request':n.type==='project_invite'?u+' invited you to '+n.name:n.text||'New notification')});
-API.on('fr+',(m,u)=>{if(!(rj('mc_req',{})[me.name]||{})[u])return;const f=rj('mc_friends',{});f[me.name]=[...new Set([...(f[me.name]||[]),u])];wj('mc_friends',f);delReq(u);fire('data');probe()});
-API.on('fr!',(m,u)=>{delReq(u);fire('data')});
-API.on('fr-',(m,u)=>{const f=rj('mc_friends',{});f[me.name]=(f[me.name]||[]).filter(x=>x!==u);wj('mc_friends',f);fire('data')});
-API.on('chat',(m,u)=>{const k=[me.name,u].sort().join('|'),a=rj('mc_msgs',{}),x=String(m.text||'').slice(0,500);(a[k]=a[k]||[]).push({from:u,text:x,t:m.ts||Date.now()});wj('mc_msgs',a);fire('data');toast(u+': '+x.slice(0,80))});
 API.init();
 })();
 </script>
+
 <script>
 const $=i=>document.getElementById(i),cv=$('cv'),vp=$('vp'),hint=$('hint'),lab=$('labels'),V=(x,y,z)=>new THREE.Vector3(x,y,z),J=window.jscadModeling;
 const dk=matchMedia('(prefers-color-scheme: dark)').matches,edc=dk?0x0a0c10:0x1b2330;
@@ -2563,7 +2553,7 @@ upd();rs();setTool('select');olist();mlist();info();
 (function(){
 const LOBBY='https://arulv123.github.io/Mini-cad-main-ui/',Q=new URLSearchParams(location.search),pid=Q.get('p'),veil=$('veil');
 const rj=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}};
-const me=rj('mc_me',null);let projs=rj('mc_projects',[]),pr=projs.find(p=>p.id===pid)||null;
+const me=(()=>{try{const s=JSON.parse(sessionStorage.getItem('mc_tab'));if(s&&s.name)return s}catch(e){}return rj('mc_me',null)})();let projs=rj('mc_projects',[]),pr=projs.find(p=>p.id===pid)||null;
 const mem=pr&&me&&(pr.owner===me.name?{role:'Owner'}:pr.members.find(m=>m.user===me.name&&m.status==='accepted'));
 const SELF=location.pathname.split('/').pop()||'index.html',LOBBY_IS_SELF=/(^|\/)index\.html$/.test(LOBBY)&&(SELF==='index.html'||SELF==='');
 if(LOBBY_IS_SELF&&pid&&(!pr||!mem)){history.replaceState(null,'',location.pathname);pr=null}
@@ -2588,63 +2578,129 @@ const fix=roots=>{const m={};roots.forEach(r=>r.traverse(n=>m[n.uuid]=n));roots.
 if(v.$ref)m[v.$ref]?u[k]=m[v.$ref]:delete u[k];else if(v.$v)u[k]=V(...v.$v);else if('$c'in v)u[k]=new THREE.Color(v.$c)}}))};
 const thumb=()=>{R.render(S,cam);const c=document.createElement('canvas');c.width=320;c.height=200;const x=c.getContext('2d'),w=cv.width,h=cv.height,s=Math.max(320/w,200/h);x.fillStyle='#e8ebf0';x.fillRect(0,0,320,200);x.drawImage(cv,(320-w*s)/2,(200-h*s)/2,w*s,h*s);return c.toDataURL('image/jpeg',.7)};
 const note=t=>{hint.textContent=t};
-sv.onclick=async()=>{if(!canSave)return;if(!me&&!LOBBY_IS_SELF){location.href=LOBBY;return}
+sv.onclick=async()=>{if(!canSave||window.__mcDead)return;if(!me&&!LOBBY_IS_SELF){location.href=LOBBY;return}
 try{sv.textContent='Saving…';let id=pid;
 if(!pr){const n=prompt('Name this project:','Untitled project');if(!n)return sv.textContent='Save';id='p'+Date.now().toString(36);pr={id,name:n,owner:me.name,members:[],allowHostLeave:false,created:Date.now()};projs.push(pr);history.replaceState(null,'','?p='+id);$('pj').textContent=n+' · Owner'}
 const root=objs.filter(o=>o.parent===S);
 const data={v:1,objs:root.map(ser),cam:{th,ph,dist,t:[tgt.x,tgt.y,tgt.z]}};
 await tx('readwrite',s=>s.put(data,id));
-projs=rj('mc_projects',[]);const i=projs.findIndex(p=>p.id===id);const meta=Object.assign({},pr,{updated:Date.now(),thumb:thumb(),count:root.length,lastBy:me.name});i<0?projs.push(meta):projs[i]=meta;pr=meta;
+projs=rj('mc_projects',[]);const i=projs.findIndex(p=>p.id===id);const meta=Object.assign({},projs[i]||pr,{updated:Date.now(),thumb:thumb(),count:root.length,lastBy:me.name});i<0?projs.push(meta):projs[i]=meta;pr=meta;
 localStorage.setItem('mc_projects',JSON.stringify(projs));base=sig();sv.textContent='Saved ✓';note('Saved to this device – it now shows on your projects page.');setTimeout(()=>sv.textContent='Save',1800)}
 catch(e){console.error(e);sv.textContent='Save';note('Save failed: '+e.message)}};
 addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();sv.click()}});
 if(pid)tx('readonly',s=>s.get(pid)).then(d=>{if(!d)return;const L=new THREE.ObjectLoader(),roots=d.objs.map(j=>L.parse(j));fix(roots);
 roots.forEach(o=>{S.add(o);objs.push(o);own(o)});if(d.cam){th=d.cam.th;ph=d.cam.ph;dist=d.cam.dist;tgt.set(...d.cam.t)}
 upd();olist();mlist();info();base=sig();note('Loaded "'+(pr&&pr.name)+'".')}).catch(e=>{console.error(e);note('Could not load saved scene: '+e.message)});
-/* ---- live collaboration over WebRTC (shared project room) ---- */
+/* ---- live collaboration: owner = host, others = co-owners, owner can kick ---- */
 if(pr&&window.MCNET)try{(()=>{
-const N=MCNET,mems=MC.members.map(m=>m.user),rl=u=>(MC.members.find(m=>m.user===u)||{}).role,rd=role==='Viewer',P=new Map(),chat=[];
+const N=MCNET,OWN=pr.owner,isO=me.name===OWN,P=new Map(),chat=[];
+let R=MC.members.map(m=>({user:m.user,role:m.user===OWN?'Owner':(m.role||'Co-owner')}));
+const rl=u=>(R.find(m=>m.user===u)||{}).role,mem=u=>!!rl(u),mems=()=>R.map(m=>m.user),rd=()=>rl(me.name)==='Viewer',EDIT=u=>{const r=rl(u);return !!r&&r!=='Viewer'};
 const COL=['#e5484d','#30a46c','#f5a623','#8e4ec6','#0ea5e9','#d6409f'],col=u=>COL[[...u].reduce((a,c)=>a+c.charCodeAt(0),0)%COL.length];
 const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
-let applying=0,lastS='',lastC='',last={},follow=null,at=0,unread=0;
-N.room(pr.id,mems);
+let applying=0,lastS='',lastC='',last={},follow=null,at=0,unread=0,sceneTs=+pr.updated||0,dead=0,tick=0;
+const out=(t,m)=>N.bcast(Object.assign({t:'c:'+t,pid:pr.id},m)),to=(u,t,m)=>N.live(u,Object.assign({t:'c:'+t,pid:pr.id},m));
 const xk=o=>[o.position.x,o.position.y,o.position.z,o.rotation.x,o.rotation.y,o.rotation.z,o.scale.x,o.scale.y,o.scale.z],ks=o=>xk(o).map(v=>v.toFixed(3)).join();
 const stS=()=>objs.map(o=>{let g='';o.traverse(n=>{if(n.isMesh)g+=n.geometry.uuid.slice(0,3)});return o.uuid+o.children.length+(o.userData.hole?1:0)+g}).join('|');
 const snap=()=>{last={};objs.forEach(o=>last[o.uuid]=ks(o))};
 const full=()=>objs.filter(o=>o.parent===S).map(ser);
-const out=(t,m)=>N.bcast(Object.assign({t:'c:'+t,pid:pr.id},m));
-const auto=()=>{if(!canSave)return;clearTimeout(at);at=setTimeout(()=>sv.click(),4000)};
+const auto=()=>{if(!canSave||dead)return;clearTimeout(at);at=setTimeout(()=>sv.click(),4000)};
 const marks=()=>{P.forEach((p,u)=>{(p.h||[]).forEach(b=>S.remove(b));p.h=(p.s||[]).map(id=>objs.find(o=>o.uuid===id)).filter(Boolean).map(o=>{const b=new THREE.BoxHelper(o,col(u));S.add(b);return b})})};
 function applyScene(js){applying=1;try{const keep=sel.map(o=>o.uuid),L=new THREE.ObjectLoader(),rs_=js.map(j=>L.parse(j));fix(rs_);
  objs.forEach(o=>S.remove(o));objs=rs_;objs.forEach(o=>{S.add(o);own(o)});hist.length=0;redo.length=0;
  select(objs.filter(o=>keep.includes(o.uuid)));olist();info();lastS=stS();snap();marks()}finally{applying=0}}
-const G=(t,f)=>N.on('c:'+t,(m,u)=>{if(m&&m.pid===pr.id&&mems.includes(u))f(m,u)}),EDIT=u=>rl(u)!=='Viewer';
+/* roster (owner is the single source of truth) */
+const rSig=l=>l.map(m=>m.user+':'+m.role).join();
+const setR=l=>{R=l;N.room(mems());try{$('pj').textContent=pr.name+' · '+(rl(me.name)||role)}catch(e){}draw()};
+const ownerList=()=>{const p=rj('mc_projects',[]).find(x=>x.id===pr.id&&x.owner===me.name);return p?[{user:me.name,role:'Owner'}].concat((p.members||[]).filter(m=>m.status==='accepted').map(m=>({user:m.user,role:m.role||'Co-owner'}))):null};
+const pushR=u=>{const m=R.map(x=>[x.user,x.role]);u?to(u,'ro',{m}):out('ro',{m})};
+function syncOwner(){if(!isO||dead)return;const l=ownerList();if(l&&rSig(l)!==rSig(R)){setR(l);pushR()}}
+const ping=()=>{try{new BroadcastChannel('minicad').postMessage(1)}catch(e){}};
+function kick(us){us.forEach(u=>{if(u===me.name||!mem(u))return;
+ try{const ps=rj('mc_projects',[]),p=ps.find(x=>x.id===pr.id&&x.owner===me.name);if(p){p.members=(p.members||[]).filter(m=>m.user!==u);localStorage.setItem('mc_projects',JSON.stringify(ps))}}catch(e){}
+ [0,250,700].forEach(d=>setTimeout(()=>to(u,'kick',{}),d));setTimeout(()=>N.drop(u),1500)});
+ syncOwner();ping();N.toast('Removed '+us.join(', '))}
+function gone(why){if(dead)return;dead=1;window.__mcDead=1;clearTimeout(at);
+ try{localStorage.setItem('mc_projects',JSON.stringify(rj('mc_projects',[]).filter(p=>p.id!==pr.id)))}catch(e){}
+ N.stop();N.toast(why==='kicked'?'The owner removed you from this project.':'You are no longer a member of this project.');note('Removed from the project – returning to your projects…');
+ setTimeout(()=>{try{go()}catch(e){}setTimeout(()=>{location.href=LOBBY},500)},2600)}
+const G=(t,f)=>N.on('c:'+t,(m,u)=>{if(!dead&&m&&m.pid===pr.id&&mem(u))f(m,u)});
+N.on('c:kick',(m,u)=>{if(!isO&&u===OWN&&m&&m.pid===pr.id)gone('kicked')});
+N.on('c:ro',(m,u)=>{if(isO||u!==OWN||!m||m.pid!==pr.id||!Array.isArray(m.m))return;
+ const l=m.m.filter(a=>Array.isArray(a)&&typeof a[0]==='string').map(a=>({user:a[0],role:String(a[1]||'Co-owner')}));
+ if(!l.some(x=>x.user===me.name))return gone('removed');
+ try{const ps=rj('mc_projects',[]),p=ps.find(x=>x.id===pr.id);if(p){p.members=l.filter(x=>x.user!==OWN).map(x=>({user:x.user,role:x.role,status:'accepted'}));localStorage.setItem('mc_projects',JSON.stringify(ps))}}catch(e){}
+ setR(l)});
 const goCam=c=>{[th,ph,dist]=c;tgt.set(c[3],c[4],c[5]);upd()};
-G('sc',(m,u)=>{if(!EDIT(u)||!Array.isArray(m.d))return;if(m.init&&objs.length)return;applyScene(m.d);note(u+' updated the model');auto();draw()});
-G('xf',(m,u)=>{if(!EDIT(u))return;applying=1;try{m.o.forEach(a=>{const o=objs.find(x=>x.uuid===a[0]);if(!o)return;o.position.set(a[1],a[2],a[3]);o.rotation.set(a[4],a[5],a[6]);o.scale.set(a[7],a[8],a[9]);last[a[0]]=a.slice(1).map(v=>v.toFixed(3)).join()})}finally{applying=0}auto()});
-G('cv',(m,u)=>{const p=P.get(u)||{};p.c=m.c;p.s=m.s||[];P.set(u,p);marks();if(follow===u)goCam(m.c);draw()});
-G('want',(m,u)=>{if(objs.length)N.live(u,{t:'c:sc',pid:pr.id,init:1,d:full()})});
+G('hi',(m,u)=>{if(objs.length&&EDIT(me.name)&&(m.n===0||sceneTs>(+m.ts||0)))to(u,'sc',{d:full(),ts:sceneTs,init:1})});
+G('sc',(m,u)=>{if(!EDIT(u)||!Array.isArray(m.d))return;const ts=+m.ts||Date.now();if(m.init&&objs.length&&ts<=sceneTs)return;applyScene(m.d);sceneTs=ts;note(u+' updated the model');auto();draw()});
+G('xf',(m,u)=>{if(!EDIT(u)||!Array.isArray(m.o))return;m.o.forEach(a=>{const o=objs.find(x=>x.uuid===a[0]);if(!o)return;tw.set(a[0],{p:new THREE.Vector3(a[1],a[2],a[3]),r:[a[4],a[5],a[6]],s:new THREE.Vector3(a[7],a[8],a[9])});last[a[0]]=a.slice(1).map(v=>v.toFixed(3)).join()});sceneTs=Date.now();auto()});
+G('cv',(m,u)=>{const p=P.get(u)||{},ch=(p.s||[]).join()!==(m.s||[]).join();p.c=m.c;p.s=m.s||[];p.d=m.d||[];p.p=m.p||null;P.set(u,p);if(ch){marks();draw()}if(follow===u)goCam(m.c)});
 G('chat',(m,u)=>{chat.push({u,x:String(m.x).slice(0,300)});if($('cbp').hidden)unread++;draw()});
-N.on('up',(m,u)=>{if(!mems.includes(u))return;lastC='';if(!objs.length)N.live(u,{t:'c:want',pid:pr.id});draw()});
-N.on('down',(m,u)=>{((P.get(u)||{}).h||[]).forEach(b=>S.remove(b));P.delete(u);if(follow===u)follow=null;draw()});
-setInterval(()=>{P.forEach(p=>(p.h||[]).forEach(b=>b.update()));if(applying)return;
- const ss=stS();if(ss!==lastS){lastS=ss;snap();if(!rd&&N.peers().length)out('sc',{d:full()});return}
- if(!rd){const ch=[];objs.forEach(o=>{const k=ks(o);if(last[o.uuid]!==k){last[o.uuid]=k;ch.push([o.uuid,...xk(o)])}});if(ch.length&&N.peers().length)out('xf',{o:ch})}
- const c=[th,ph,dist,tgt.x,tgt.y,tgt.z].map(v=>+v.toFixed(3)),s=sel.map(o=>o.uuid),cs=c+'|'+s;if(cs!==lastC){lastC=cs;out('cv',{c,s})}},250);
+N.on('up',(m,u)=>{if(dead)return;if(isO)syncOwner();
+ if(!mem(u)){if(isO)[0,300].forEach(d=>setTimeout(()=>to(u,'kick',{}),d)),setTimeout(()=>N.drop(u),900);return}
+ lastC='';if(isO)pushR(u);to(u,'hi',{ts:sceneTs,n:objs.length});draw()});
+N.on('down',(m,u)=>{((P.get(u)||{}).h||[]).forEach(b=>S.remove(b));P.delete(u);dropRig(u);if(follow===u)follow=null;draw()});
+/* smooth remote presence: tweened models, name-tagged cursors, dotted pointer beam */
+const tw=new Map(),RIG=new Map();let ptr=null;
+const rc2=new THREE.Raycaster(),nd=new THREE.Vector2(),gp0=new THREE.Vector3(),pl0=new THREE.Plane(new THREE.Vector3(0,1,0),0);
+cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();nd.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);rc2.setFromCamera(nd,cam);ptr=rc2.ray.intersectPlane(pl0,gp0)&&Math.abs(gp0.x)<2500&&Math.abs(gp0.z)<2500?[gp0.x,gp0.y,gp0.z]:null});
+cv.addEventListener('pointerleave',()=>{ptr=null});
+function rig(u){let r=RIG.get(u);if(r)return r;const c=col(u),g=new THREE.Group();
+ const ring=new THREE.Mesh(new THREE.RingGeometry(3,4.4,32).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:c,depthTest:false,transparent:true,opacity:.95,side:THREE.DoubleSide}));ring.renderOrder=999;
+ const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3(0,1,0)]);
+ const line=new THREE.Line(geo,new THREE.LineDashedMaterial({color:c,dashSize:3.5,gapSize:3,depthTest:false}));line.renderOrder=998;line.frustumCulled=false;
+ g.add(ring,line);S.add(g);
+ const el=document.createElement('div');el.style.cssText='position:absolute;transform:translate(-50%,-100%);pointer-events:none;font:600 11px system-ui;color:#fff;padding:2px 8px;border-radius:999px;white-space:nowrap;z-index:5;background:'+c;vp.appendChild(el);
+ return RIG.set(u,r={g,ring,geo,line,el,cp:new THREE.Vector3(),eye:new THREE.Vector3(),has:0}),r}
+function dropRig(u){const r=RIG.get(u);if(!r)return;S.remove(r.g);r.el.remove();RIG.delete(u)}
+const eyeOf=c=>new THREE.Vector3(c[3]+c[2]*Math.sin(c[1])*Math.sin(c[0]),c[4]+c[2]*Math.cos(c[1]),c[5]+c[2]*Math.sin(c[1])*Math.cos(c[0]));
+const nmOf=o=>(o.userData&&o.userData.name)||'a model';
+/* fast channel (~14/s): model moves, camera, pointer, what I'm dragging */
+setInterval(()=>{if(dead||applying)return;
+ if(!rd()){const ch=[];objs.forEach(o=>{if(tw.has(o.uuid))return;const k=ks(o);if(last[o.uuid]!==k){last[o.uuid]=k;ch.push([o.uuid,...xk(o)])}});if(ch.length){sceneTs=Date.now();if(N.peers().length)out('xf',{o:ch})}}
+ const c=[th,ph,dist,tgt.x,tgt.y,tgt.z].map(v=>+v.toFixed(3)),s=sel.map(o=>o.uuid),d=(mv&&mv.c&&!rd())?mv.s.map(q=>q.o.uuid):[],p=ptr?ptr.map(v=>+v.toFixed(1)):null,cs=c+'|'+s+'|'+d+'|'+p;
+ if(cs!==lastC){lastC=cs;out('cv',{c,s,d,p})}},70);
+/* per-frame easing + drawing of everyone else */
+(function frame(){requestAnimationFrame(frame);if(dead)return;
+ tw.forEach((a,id)=>{const o=objs.find(x=>x.uuid===id);if(!o||(mv&&mv.s.some(q=>q.o===o))){tw.delete(id);return}
+  if(o.position.distanceTo(a.p)>300){o.position.copy(a.p)}else o.position.lerp(a.p,.3);
+  o.rotation.x+=(a.r[0]-o.rotation.x)*.3;o.rotation.y+=(a.r[1]-o.rotation.y)*.3;o.rotation.z+=(a.r[2]-o.rotation.z)*.3;o.scale.lerp(a.s,.3);
+  if(o.position.distanceTo(a.p)<.02&&Math.abs(a.r[1]-o.rotation.y)<1e-3&&o.scale.distanceTo(a.s)<1e-3){o.position.copy(a.p);o.rotation.set(a.r[0],a.r[1],a.r[2]);o.scale.copy(a.s);last[id]=ks(o);tw.delete(id)}});
+ P.forEach((p,u)=>{(p.h||[]).forEach(b=>b.update());if(!p.c)return;const r=rig(u),eye=eyeOf(p.c);if(!r.has)r.eye.copy(eye);r.eye.lerp(eye,.2);
+  const dO=p.d&&p.d.length?objs.find(o=>o.uuid===p.d[0]):null;let tp=null;
+  if(dO){const b=new THREE.Box3().setFromObject(dO);tp=b.getCenter(new THREE.Vector3());tp.y=b.min.y}else if(p.p)tp=new THREE.Vector3(p.p[0],p.p[1],p.p[2]);
+  if(!tp){r.g.visible=false;r.el.style.display='none';return}
+  if(!r.has){r.cp.copy(tp);r.has=1}r.cp.lerp(tp,.3);
+  r.g.visible=true;r.ring.position.copy(r.cp);r.ring.scale.setScalar(dO?1.6:1);
+  const dir=r.eye.clone().sub(r.cp),L=dir.length(),st=r.cp.clone().add(dir.normalize().multiplyScalar(Math.min(L,140))),a=r.geo.attributes.position;
+  a.setXYZ(0,st.x,st.y,st.z);a.setXYZ(1,r.cp.x,r.cp.y,r.cp.z);a.needsUpdate=true;r.line.computeLineDistances();r.line.visible=!dO; /* dotted beam only while not holding a model */
+  const q=r.cp.clone();q.y+=10;q.project(cam);r.el.style.display=q.z<1?'block':'none';r.el.style.left=((q.x*.5+.5)*vp.clientWidth)+'px';r.el.style.top=((-q.y*.5+.5)*vp.clientHeight)+'px';
+  r.el.textContent=u+(dO?' · dragging '+nmOf(dO):'')})})();
+setInterval(()=>{if(dead)return;if(isO&&++tick%4===0)syncOwner();if(applying)return;
+ const ss=stS();if(ss!==lastS){lastS=ss;snap();sceneTs=Date.now();if(!rd()&&N.peers().length)out('sc',{d:full(),ts:sceneTs})}},250);
 /* panel */
-const css=document.createElement('style');css.textContent='#cb{position:fixed;left:14px;bottom:48px;z-index:60;font:13px system-ui}#cb>button{padding:7px 12px;border-radius:999px;border:1px solid #0003;background:#fff;color:#1f2328;box-shadow:0 4px 14px #0003;cursor:pointer}#cbp{width:290px;margin-bottom:8px;background:#fff;color:#1f2328;border:1px solid #0002;border-radius:12px;box-shadow:0 10px 30px #0004;padding:10px}#cbm .r{display:flex;align-items:center;gap:4px;padding:4px 0}#cbm small{margin-left:auto;color:#667;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#cbm button{font-size:11px;margin-left:6px}#cbl{height:110px;overflow:auto;border-top:1px solid #0002;margin-top:6px;padding-top:6px}#cbi{display:flex;gap:6px;margin-top:6px}#cbi input{flex:1;min-width:0}';document.head.appendChild(css);
+const css=document.createElement('style');css.textContent='#cb{position:fixed;left:14px;bottom:48px;z-index:60;font:13px system-ui}#cb>button{padding:7px 12px;border-radius:999px;border:1px solid #0003;background:#fff;color:#1f2328;box-shadow:0 4px 14px #0003;cursor:pointer}#cbp{width:300px;margin-bottom:8px;background:#fff;color:#1f2328;border:1px solid #0002;border-radius:12px;box-shadow:0 10px 30px #0004;padding:10px}#cbm .r{display:flex;align-items:center;gap:4px;padding:4px 0}#cbm small{margin-left:auto;color:#667;max-width:125px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#cbm button{font-size:11px;margin-left:6px;cursor:pointer}#cbl{height:110px;overflow:auto;border-top:1px solid #0002;margin-top:6px;padding-top:6px}#cbi{display:flex;gap:6px;margin-top:6px}#cbi input{flex:1;min-width:0}';document.head.appendChild(css);
 const box=document.createElement('div');box.id='cb';box.innerHTML='<div id="cbp" hidden><div id="cbm"></div><div id="cbl"></div><div id="cbi"><input id="cbx" placeholder="Message everyone…" maxlength="300"><button id="cbs">Send</button></div></div><button id="cbt"></button>';document.body.appendChild(box);
 box.addEventListener('keydown',e=>e.stopPropagation());
 const act=p=>p&&p.s&&p.s.length?'selected '+((objs.find(o=>o.uuid===p.s[0])||{userData:{}}).userData.name||'object')+(p.s.length>1?' +'+(p.s.length-1):''):'viewing';
-function draw(){const on=mems.filter(u=>u!==me.name&&N.online(u)).length;$('cbt').innerHTML='👥 '+(N.status==='online'?(on?on+' online':'Live'):'Connecting…')+(unread?' <b style="color:#e5484d">●</b>':'');
+const live=u=>u===me.name||N.online(u);
+function draw(){const on=mems().filter(u=>u!==me.name&&N.online(u)).length,s=N.status;
+ $('cbt').innerHTML='👥 '+(s==='online'?(on?on+' online':'Live'):s==='offline'?'Offline – retrying…':'Connecting…')+(unread?' <b style="color:#e5484d">●</b>':'');
  if($('cbp').hidden)return;
- $('cbm').innerHTML=mems.map(u=>{const you=u===me.name,o=you||N.online(u);return `<div class="r"><i class="pd${o?' on':''}"></i><b style="color:${col(u)}">${esc(u)}</b>${you?'<span>&nbsp;(you)</span>':''}<small>${esc(you?role:o?rl(u)+' · '+act(P.get(u)):'offline')}</small>${!you&&o?`<button data-f="${esc(u)}">${follow===u?'Stop':'Follow'}</button>`:''}</div>`}).join('');
+ $('cbm').innerHTML=R.map(({user:u,role:r})=>{const you=u===me.name,o=live(u);return `<div class="r"><i class="pd${o?' on':''}"></i><b style="color:${col(u)}">${u===OWN?'👑 ':''}${esc(u)}</b>${you?'<span>&nbsp;(you)</span>':''}<small>${esc((u===OWN?'Owner':r)+' · '+(o?(you?'you':act(P.get(u))):'offline'))}</small>${!you&&o?`<button data-f="${esc(u)}">${follow===u?'Stop':'Follow'}</button>`:''}${isO&&!you?`<button data-k="${esc(u)}" style="color:#e5484d">Kick</button>`:''}</div>`}).join('')
+  +(isO&&R.length>1?'<div class="r"><button id="cka" style="color:#e5484d;margin:0">Remove everyone</button></div>':'')
+  +(!isO&&!N.online(OWN)?'<div class="r"><small style="margin:0;max-width:none;white-space:normal">The owner is offline – you can keep editing; changes sync when they return.</small></div>':'');
  $('cbl').innerHTML=chat.slice(-40).map(c=>`<div><b style="color:${col(c.u)}">${esc(c.u)}:</b> ${esc(c.x)}</div>`).join('')||'<small style="color:#667">Chat with everyone in this project</small>';$('cbl').scrollTop=1e9}
 $('cbt').onclick=()=>{const p=$('cbp');p.hidden=!p.hidden;unread=0;draw()};
-$('cbm').onclick=e=>{const f=e.target.dataset.f;if(!f)return;follow=follow===f?null:f;const p=P.get(f);if(follow&&p&&p.c)goCam(p.c);draw()};
-const say=()=>{const i=$('cbx'),x=i.value.trim();if(!x)return;i.value='';chat.push({u:me.name,x});out('chat',{x});draw()};
+$('cbm').onclick=e=>{const t=e.target,f=t.dataset&&t.dataset.f,k=t.dataset&&t.dataset.k;
+ if(t.id==='cka'){if(confirm('Remove everyone except you from this project?'))kick(mems().filter(u=>u!==me.name));return}
+ if(k){if(confirm('Remove '+k+' from this project?'))kick([k]);return}
+ if(!f)return;follow=follow===f?null:f;const p=P.get(f);if(follow&&p&&p.c)goCam(p.c);draw()};
+const say=()=>{const i=$('cbx'),x=i.value.trim();if(!x||dead)return;i.value='';chat.push({u:me.name,x});out('chat',{x});draw()};
 $('cbs').onclick=say;$('cbx').onkeydown=e=>{if(e.key==='Enter')say()};
-['presence','status'].forEach(e=>N.ev.addEventListener(e,draw));draw();
+['presence','status'].forEach(e=>N.ev.addEventListener(e,draw));
+N.room(mems());draw();
 })()}catch(e){console.error('collab',e)}
 
 })();
