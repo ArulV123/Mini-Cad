@@ -1902,9 +1902,18 @@ const validG=g=>g&&objs.includes(g)&&isG(g),gearAxis=g=>V(0,1,0).applyQuaternion
 const uiOffset=role=>role==='motor'?{x:+q('pmx').value||0,y:+q('pmy').value||0,z:+q('pmz').value||0}:role==='shaft'?{x:+q('psx').value||0,y:+q('psy').value||0,z:+q('psz').value||0}:{x:(+$('psx').value||0)+(+$('pwx').value||0),y:(+$('psy').value||0)+(+$('pwy').value||0),z:(+$('psz').value||0)+(+$('pwz').value||0)};
 const sideUI=role=>q(role==='motor'?'pmo':role==='shaft'?'psh':'pwh').value|| (role==='motor'?'down':'up');
 function caseLid(g){return [...objs].reverse().find(o=>/Gearbox lid/i.test(nameOf(o))&&o.visible!==false)||[...objs].reverse().find(o=>/Gearbox lid/i.test(nameOf(o)))}
+function lidTopAt(lid,x,z){
+/* height of the lid surface directly above (x,z): raycast straight down onto the lid so the wheel clears only the lid over THIS gear's shaft, not a tall bearing tower built for some other gear (which made the wheel sit too high) */
+try{lid.updateMatrixWorld(true);const ms=[];lid.traverse(n=>{if(n.isMesh&&!n.isLineSegments)ms.push(n)});
+const top=new THREE.Box3().setFromObject(lid).max.y;RC.set(V(x,top+50,z),V(0,-1,0));
+const hits=RC.intersectObjects(ms,false);if(hits.length)return hits[0].point.y}catch(e){}
+return null;
+}
 function wheelFaceLocal(g,side){
 const p=gp(g),axis=gearAxis(g),lid=caseLid(g);
-if(side!=='down'&&lid&&axis.y>.97){const b=bbx(lid);return b.max.y+3-g.position.y}
+if(side!=='down'&&lid&&axis.y>.97){const t=lidTopAt(lid,g.position.x,g.position.z);
+ if(t!=null)return t+3-g.position.y;
+ const b=bbx(lid);return b.max.y+3-g.position.y}
 return side==='down'?-.5-__wheelGap():p.t+.5+__wheelGap();
 }
 function motorKind(m){const r=rotOf(m);return r&&r.userData.kind||'tt'}
@@ -2115,7 +2124,7 @@ const wa=wheel.userData.gearAttach;wa.side=next;wa.flip=next==='down';
 let wy=next==='down'?-0.5-__wheelGap():p.t+0.5+__wheelGap();
 const axis=V(0,1,0).applyQuaternion(g.quaternion).normalize();
 const lid=[...objs].reverse().find(o=>/^Gearbox lid/i.test(nameOf(o)));
-if(next==='up'&&lid&&axis.y>.97)wy=bbx(lid).max.y+3-g.position.y;
+if(next==='up'&&lid&&axis.y>.97){let lt=null;try{lid.updateMatrixWorld(true);const ms=[];lid.traverse(n=>{if(n.isMesh&&!n.isLineSegments)ms.push(n)});RC.set(V(g.position.x,bbx(lid).max.y+50,g.position.z),V(0,-1,0));const h=RC.intersectObjects(ms,false);if(h.length)lt=h[0].point.y}catch(e){}wy=(lt!=null?lt:bbx(lid).max.y)+3-g.position.y}
 wa.base={x:0,y:wy,z:0};wa.gear=g;wa.role='wheel';wa.offset=wa.offset||{x:0,y:0,z:0};__syncGearAttachment(wheel);
 }
 q('psh').value=next;syncShaftFlipUI();info();olist();
@@ -2600,16 +2609,19 @@ $('bk').onclick=async()=>{if(sig()!==base){if(canSave&&!window.__mcDead){try{awa
 const sv=$('sv');sv.disabled=!canSave;if(!canSave)sv.title='Viewers cannot save';
 const idb=()=>new Promise((ok,no)=>{const r=indexedDB.open('minicad',1);r.onupgradeneeded=()=>r.result.createObjectStore('scenes');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
 const tx=async(m,f)=>{const d=await idb();return new Promise((ok,no)=>{const t=d.transaction('scenes',m),rq=f(t.objectStore('scenes'));t.oncomplete=()=>ok(rq&&rq.result);t.onerror=()=>no(t.error)})};
-const clean=u=>{const r={};for(const k in u){const v=u[k],t=typeof v;
-if(v==null||t==='number'||t==='string'||t==='boolean')r[k]=v;
-else if(v.isObject3D)r[k]={$ref:v.uuid};else if(v.isVector3)r[k]={$v:[v.x,v.y,v.z]};else if(v.isColor)r[k]={$c:v.getHex()};
-else if(Array.isArray(v)&&v.every(x=>typeof x==='number'||typeof x==='string'))r[k]=v}return r};
+const cvv=(v,d)=>{const t=typeof v;if(v==null||t==='number'||t==='string'||t==='boolean')return v;if(t!=='object'||d>5)return undefined;
+ if(v.isObject3D)return{$ref:v.uuid};if(v.isVector3)return{$v:[v.x,v.y,v.z]};if(v.isColor)return{$c:v.getHex()};if(v.isQuaternion)return{$q:[v.x,v.y,v.z,v.w]};
+ if(Array.isArray(v)){if(v.length>3000)return undefined;return v.map(x=>{const y=cvv(x,d+1);return y===undefined?null:y})}
+ const pr=Object.getPrototypeOf(v);if(pr!==Object.prototype&&pr!==null)return undefined;const r={};for(const k in v){const x=cvv(v[k],d+1);if(x!==undefined)r[k]=x}return r};
+const clean=u=>{const r={};for(const k in u){const x=cvv(u[k],0);if(x!==undefined)r[k]=x}return r};
 const ser=o=>{const b=[];o.traverse(n=>{b.push([n,n.userData,n.geometry]);n.userData=clean(n.userData);n.userData.ord=n.rotation.order;
  /* parametric geometries (Cylinder/Extrude/Box…) are saved as parameters only and lose any rotate/translate applied to their vertices -> rebuild as plain geometry so orientation survives sync/save */
  const g=n.geometry;if(n.isMesh&&g&&g.parameters!==undefined){const p=new THREE.BufferGeometry();p.uuid=g.uuid;p.attributes=g.attributes;p.index=g.index;p.groups=g.groups;p.drawRange=g.drawRange;p.morphAttributes=g.morphAttributes;n.geometry=p}});
  try{return o.toJSON()}finally{b.forEach(([n,u,g])=>{n.userData=u;if(g)n.geometry=g})}};
-const fix=roots=>{const m={};roots.forEach(r=>r.traverse(n=>m[n.uuid]=n));roots.forEach(r=>r.traverse(n=>{const u=n.userData;if(typeof u.ord==='string'&&u.ord!==n.rotation.order&&/^[XYZ]{3}$/.test(u.ord))n.rotation.reorder(u.ord);for(const k in u){const v=u[k];if(!v||typeof v!=='object'||Array.isArray(v))continue;
-if(v.$ref)m[v.$ref]?u[k]=m[v.$ref]:delete u[k];else if(v.$v)u[k]=V(...v.$v);else if('$c'in v)u[k]=new THREE.Color(v.$c)}}))};
+const rsvV=(v,m)=>{if(v&&typeof v==='object'){if(v.$ref!==undefined)return m[v.$ref];if(v.$v)return V(...v.$v);if('$c'in v)return new THREE.Color(v.$c);if(v.$q)return new THREE.Quaternion(...v.$q);if(Array.isArray(v))return v.map(x=>rsvV(x,m));const o={};for(const k in v){const x=rsvV(v[k],m);if(x!==undefined)o[k]=x}return o}return v};
+const fix=roots=>{const m={};roots.forEach(r=>r.traverse(n=>m[n.uuid]=n));roots.forEach(r=>r.traverse(n=>{const u=n.userData;for(const k in u){const x=rsvV(u[k],m);if(x===undefined)delete u[k];else u[k]=x}
+ /* restore the Euler rotation order saved by ser() so sideways (worm/bevel) gears, their shafts and motors keep their exact tilt on reload and when synced to another peer */
+ if(u.ord){if(n.rotation.order!==u.ord)n.rotation.order=u.ord;delete u.ord}}))};
 const thumb=()=>{R.render(S,cam);const c=document.createElement('canvas');c.width=320;c.height=200;const x=c.getContext('2d'),w=cv.width,h=cv.height,s=Math.max(320/w,200/h);x.fillStyle='#e8ebf0';x.fillRect(0,0,320,200);x.drawImage(cv,(320-w*s)/2,(200-h*s)/2,w*s,h*s);return c.toDataURL('image/jpeg',.7)};
 const note=t=>{hint.textContent=t};
 sv.onclick=async()=>{if(!canSave||window.__mcDead)return;if(!me&&!LOBBY_IS_SELF){location.href=LOBBY;return}
@@ -2634,6 +2646,14 @@ const COL=['#e5484d','#30a46c','#f5a623','#8e4ec6','#0ea5e9','#d6409f'],col=u=>C
 const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 let askPlace=(()=>{try{return localStorage.getItem('mc_ap_'+pr.id)==='1'}catch(e){return false}})();const LOB=new Set();
 setInterval(()=>{if(dead||!N.lobbyCall||document.hidden)return;mems().filter(u=>u!==me.name&&!N.online(u)).forEach(u=>N.lobbyCall(u,{t:'ping'},3500).then(r=>{const w=!!(r&&r.t==='pong'&&r.w==='l');if(w!==LOB.has(u)){w?LOB.add(u):LOB.delete(u);draw()}}))},12000);
+let NMv=null,NMk='',NMt=0;const nodeOf=id=>{if(!NMv||NMk!==lastS){NMv=new Map();objs.forEach(o=>o.traverse(n=>NMv.set(n.uuid,n)));NMk=lastS;NMt=Date.now()}
+ let n=NMv.get(id);if(!n&&Date.now()-NMt>200){NMv=new Map();objs.forEach(o=>o.traverse(q=>NMv.set(q.uuid,q)));NMt=Date.now();n=NMv.get(id)}return n};
+/* part properties (visibility, colour, drive/physics settings…) travel as small per-part updates */
+const PC=new Map(),mat1=n=>n.isMesh?(Array.isArray(n.material)?n.material[0]:n.material):null;
+const psig=n=>{const m=mat1(n);return JSON.stringify({v:n.visible?1:0,c:m&&m.color?m.color.getHex():null,o:m?m.opacity:null,t:m&&m.transparent?1:0,u:clean(n.userData)})};
+setInterval(()=>{if(dead||applying||rd()||!ready)return;const ch=[];
+ objs.forEach(o=>o.traverse(n=>{const g=psig(n),old=PC.get(n.uuid);if(old===undefined){PC.set(n.uuid,g);return}if(old!==g){PC.set(n.uuid,g);ch.push([n.uuid,g])}}));
+ if(ch.length){sceneTs=Date.now();auto();if(N.peers().length)out('pr',{o:ch})}},150);
 let lastPv='',lastPvT=0;const PV=new Map();
 let fwOn=(()=>{try{return localStorage.getItem('mc_fw_'+pr.id)!=='0'}catch(e){return true}})(),ft=null;
 let applying=0,lastS='',lastC='',last={},follow=null,at=0,unread=0,sceneTs=0,dead=0,tick=0,known=new Set(),T0=Date.now(),ready=0,lastSend=0,dirty=0;
@@ -2642,15 +2662,15 @@ function pullLobby(){const us=mems().filter(u=>u!==me.name);if(!N.fetchScene||!u
  us.forEach(u=>N.fetchScene(u,pr.id,7000).then(r=>{if(dead||!r||!r.d||!(r.ts>sceneTs))return;applyScene(r.d);sceneTs=r.ts;note('Loaded the latest version saved by '+u);auto();draw()}).catch(()=>{}).then(()=>{if(--left<=0)window.__mcHideLd()}))}
 window.__mcReady=()=>{if(ready)return;ready=1;known=new Set(objs.map(o=>o.uuid));lastS=stS();snap();out('hi',{ts:sceneTs,n:objs.length,r:1});if(mems().length<=1)return window.__mcHideLd();const t=document.getElementById('ldt');if(t)t.textContent='Syncing the latest version with the others…';pullLobby();setTimeout(window.__mcHideLd,9000)};setTimeout(()=>window.__mcReady(),6000);
 const out=(t,m)=>N.bcast(Object.assign({t:'c:'+t,pid:pr.id},m)),to=(u,t,m)=>N.live(u,Object.assign({t:'c:'+t,pid:pr.id},m));
-const xk=o=>[o.position.x,o.position.y,o.position.z,o.quaternion.x,o.quaternion.y,o.quaternion.z,o.quaternion.w,o.scale.x,o.scale.y,o.scale.z],ks=o=>xk(o).map(v=>v.toFixed(3)).join();
+const xk=o=>[o.position.x,o.position.y,o.position.z,o.quaternion.x,o.quaternion.y,o.quaternion.z,o.quaternion.w,o.scale.x,o.scale.y,o.scale.z],ks=o=>xk(o).map(v=>v.toFixed(5)).join();
 const stS=()=>objs.map(o=>{let g='';o.traverse(n=>{if(n.isMesh)g+=n.geometry.uuid.slice(0,3)});return o.uuid+o.children.length+(o.userData.hole?1:0)+g}).join('|');
-const snap=()=>{last={};objs.forEach(o=>last[o.uuid]=ks(o))};
+const snap=()=>{last={};objs.forEach(o=>o.traverse(n=>{last[n.uuid]=ks(n)}))};
 const full=()=>objs.filter(o=>o.parent===S).map(o=>{try{return ser(o)}catch(e){console.error('sync: could not serialise',o.userData&&o.userData.name,e);return null}}).filter(Boolean);
 const auto=()=>{if(!canSave||dead)return;dirty=1;clearTimeout(at);at=setTimeout(()=>sv.click(),4000)};
 const marks=()=>{P.forEach((p,u)=>{(p.h||[]).forEach(b=>S.remove(b));p.h=(p.s||[]).map(id=>objs.find(o=>o.uuid===id)).filter(Boolean).map(o=>{const b=new THREE.BoxHelper(o,col(u));S.add(b);return b})})};
 function applyScene(js){applying=1;try{const keep=sel.map(o=>o.uuid),L=new THREE.ObjectLoader(),rs_=js.map(j=>L.parse(j));fix(rs_);
  objs.forEach(o=>S.remove(o));objs=rs_;objs.forEach(o=>{S.add(o);own(o)});hist.length=0;redo.length=0;
- select(objs.filter(o=>keep.includes(o.uuid)));olist();info();lastS=stS();snap();marks();known=new Set(objs.map(o=>o.uuid));prune()}finally{applying=0}}
+ select(objs.filter(o=>keep.includes(o.uuid)));olist();info();lastS=stS();snap();marks();known=new Set(objs.map(o=>o.uuid));prune();PC.clear()}finally{applying=0}}
 /* roster (owner is the single source of truth) */
 const rSig=l=>l.map(m=>m.user+':'+m.role).join();
 const setR=l=>{R=l;N.room(mems());try{$('pj').textContent=pr.name+' · '+(rl(me.name)||role)}catch(e){}draw()};
@@ -2678,11 +2698,16 @@ N.on('c:ro',(m,u)=>{if(isO||u!==OWN||!m||m.pid!==pr.id||!Array.isArray(m.m))retu
 const goCam=c=>{ft=c.slice()};
 G('hi',(m,u)=>{const mt=+m.ts||0;if(!(mt>sceneTs&&m.n>0))window.__mcHideLd();if(m.r)to(u,'hi',{ts:sceneTs,n:objs.length});if(objs.length&&EDIT(me.name)&&(sceneTs>mt||(m.n===0&&!mt)))to(u,'sc',{d:full(),ts:sceneTs,init:1})});
 G('sc',(m,u)=>{if(!EDIT(u)||!Array.isArray(m.d))return;const ts=+m.ts||Date.now();if(m.init&&objs.length&&ts<=sceneTs)return;const b4=new Set(objs.map(o=>o.uuid));applyScene(m.d);sceneTs=ts;window.__mcHideLd();if(!m.init&&u!==OWN){const ad=objs.filter(o=>!b4.has(o.uuid));if(ad.length)addPend(u,ad)}note(u+' updated the model');auto();draw()});
-G('xf',(m,u)=>{if(!EDIT(u)||!Array.isArray(m.o))return;m.o.forEach(a=>{const o=objs.find(x=>x.uuid===a[0]);if(!o)return;tw.set(a[0],{p:new THREE.Vector3(a[1],a[2],a[3]),q:new THREE.Quaternion(a[4],a[5],a[6],a[7]).normalize(),s:new THREE.Vector3(a[8],a[9],a[10])});last[a[0]]=a.slice(1).map(v=>v.toFixed(3)).join()});sceneTs=Date.now();auto()});
+G('xf',(m,u)=>{if(!EDIT(u)||!Array.isArray(m.o))return;m.o.forEach(a=>{const o=nodeOf(a[0]);if(!o)return;tw.set(a[0],{p:new THREE.Vector3(a[1],a[2],a[3]),q:new THREE.Quaternion(a[4],a[5],a[6],a[7]).normalize(),s:new THREE.Vector3(a[8],a[9],a[10])});last[a[0]]=a.slice(1).map(v=>v.toFixed(5)).join()});sceneTs=Date.now();auto()});
 G('cv',(m,u)=>{const p=P.get(u)||{},ch=(p.s||[]).join()!==(m.s||[]).join();p.c=m.c;p.s=m.s||[];p.d=m.d||[];p.p=m.p||null;p.at=Date.now();P.set(u,p);if(ch){marks();draw()}if(follow===u)goCam(m.c)});
 G('pv',(m,u)=>{if(!EDIT(u))return;let r=PV.get(u);if(r){S.remove(r.l);r.l.geometry.dispose();PV.delete(u)}
  if(!Array.isArray(m.a)||m.a.length<6||m.a.length>12000)return;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(m.a,3));
  const l=new(m.l===2?THREE.LineSegments:m.l?THREE.LineLoop:THREE.Line)(g,new THREE.LineDashedMaterial({color:col(u),dashSize:3,gapSize:2.5,depthTest:false}));l.computeLineDistances();l.renderOrder=996;l.frustumCulled=false;S.add(l);PV.set(u,{l,at:Date.now()})});
+G('pr',(m,u)=>{if(!EDIT(u)||!Array.isArray(m.o))return;const map={};objs.forEach(o=>o.traverse(n=>map[n.uuid]=n));
+ m.o.forEach(a=>{const n=map[a[0]];if(!n)return;let d;try{d=JSON.parse(a[1])}catch(e){return}
+  n.visible=!!d.v;const mt=mat1(n);if(mt&&d.c!=null&&mt.color)mt.color.setHex(d.c);if(mt&&d.o!=null){mt.opacity=d.o;mt.transparent=!!d.t;mt.needsUpdate=true}
+  if(d.u){for(const k in n.userData)delete n.userData[k];for(const k in d.u){const x=rsvV(d.u[k],map);if(x!==undefined)n.userData[k]=x}}
+  PC.set(n.uuid,psig(n))});sceneTs=Date.now();auto();draw()});
 G('chat',(m,u)=>{chat.push({u,x:String(m.x).slice(0,300)});if($('cbp').hidden)unread++;draw()});
 N.on('up',(m,u)=>{if(dead)return;if(isO)syncOwner();
  if(!mem(u)){if(isO)[0,300].forEach(d=>setTimeout(()=>to(u,'kick',{}),d)),setTimeout(()=>N.drop(u),900);return}
@@ -2712,7 +2737,7 @@ const eyeOf=c=>new THREE.Vector3(c[3]+c[2]*Math.sin(c[1])*Math.sin(c[0]),c[4]+c[
 const nmOf=o=>(o.userData&&o.userData.name)||'a model';
 /* fast channel (~14/s): model moves, camera, pointer, what I'm dragging */
 setInterval(()=>{if(dead||applying)return;
- if(!rd()){const ch=[];objs.forEach(o=>{if(tw.has(o.uuid))return;const k=ks(o);if(last[o.uuid]!==k){last[o.uuid]=k;ch.push([o.uuid,...xk(o)])}});if(ch.length){sceneTs=Date.now();auto();if(N.peers().length)out('xf',{o:ch})}}
+ if(!rd()){const ch=[];objs.forEach(o=>o.traverse(n=>{if(tw.has(n.uuid))return;const k=ks(n);if(last[n.uuid]!==k){last[n.uuid]=k;ch.push([n.uuid,...xk(n)])}}));if(ch.length){sceneTs=Date.now();auto();if(N.peers().length)out('xf',{o:ch})}}
  calcPtr();const c=[th,ph,dist,tgt.x,tgt.y,tgt.z].map(v=>+v.toFixed(3)),s=sel.map(o=>o.uuid),d=(mv&&mv.c&&!rd())?mv.s.map(q=>q.o.uuid):[],p=ptr?ptr.map(v=>+v.toFixed(1)):null,cs=c+'|'+s+'|'+d+'|'+p;
  if(cs!==lastC||Date.now()-lastSend>1500){lastC=cs;lastSend=Date.now();out('cv',{c,s,d,p})}
  if(!rd()){let pa=null,pl=0;if(prev&&prev.geometry&&prev.geometry.attributes.position){pa=Array.from(prev.geometry.attributes.position.array,v=>+v.toFixed(2));pl=prev.isLineLoop?1:0}
@@ -2722,7 +2747,7 @@ setInterval(()=>{if(dead||applying)return;
 (function frame(){requestAnimationFrame(frame);if(dead)return;
  PV.forEach((r,u)=>{if(Date.now()-r.at>4500){S.remove(r.l);r.l.geometry.dispose();PV.delete(u)}});
  if(ft){if(!follow){ft=null}else{const k=.28;let d=ft[0]-th;d-=2*Math.PI*Math.round(d/(2*Math.PI));th+=d*k;ph+=(ft[1]-ph)*k;dist+=(ft[2]-dist)*k;tgt.x+=(ft[3]-tgt.x)*k;tgt.y+=(ft[4]-tgt.y)*k;tgt.z+=(ft[5]-tgt.z)*k;upd()}}
- tw.forEach((a,id)=>{const o=objs.find(x=>x.uuid===id);if(!o||(mv&&mv.s.some(q=>q.o===o))){tw.delete(id);return}
+ tw.forEach((a,id)=>{const o=nodeOf(id);if(!o||(mv&&mv.s.some(q=>q.o===o))){tw.delete(id);return}
   if(o.position.distanceTo(a.p)>300){o.position.copy(a.p)}else o.position.lerp(a.p,.5);
   o.quaternion.slerp(a.q,.5);o.scale.lerp(a.s,.5);
   if(o.position.distanceTo(a.p)<.02&&o.quaternion.angleTo(a.q)<1e-3&&o.scale.distanceTo(a.s)<1e-3){o.position.copy(a.p);o.quaternion.copy(a.q);o.scale.copy(a.s);last[id]=ks(o);tw.delete(id)}});
@@ -2795,6 +2820,198 @@ N.room(mems());draw();
 })()}catch(e){console.error('collab',e);window.__mcHideLd()}if(!pr||!window.MCNET)window.__mcHideLd();
 
 })();
+
+/* ===== v50: captive gear locks (no derail / no slide / no tilt, still spins),
+   print-in-place vs print-separate assembly, shaft + motor extenders, trimmed UI ===== */
+(function(){
+try{
+const Q=id=>document.getElementById(id),
+ axisOf=g=>V(0,1,0).applyQuaternion(g.quaternion).normalize(),
+ gearOfAny=o=>o&&(isG(o)?o:(o.userData&&o.userData.link&&isG(o.userData.link)?o.userData.link:null)),
+ f1=(x,n=1)=>(+x).toFixed(n);
+
+/* assembly mode:
+   inplace  = locks are part of the printed enclosure, with running clearance so the slicer
+              never fuses them to the gear – it spins straight off the printer.
+   separate = each lock is a small snap-on collar part placed in the scene, printed on its own
+              and clipped on after the gears are in. */
+let LOCKMODE=(()=>{try{return localStorage.getItem('mc_lockmode')||'inplace'}catch(e){return 'inplace'}})();
+const setLockMode=v=>{LOCKMODE=v;try{localStorage.setItem('mc_lockmode',v)}catch(e){}};
+
+const CLR=0.42, COL_CAP=0x5f6f87, COL_SEP=0xe0a030, COL_SH=0xcfd4dc;
+
+const baseOf=()=>[...objs].reverse().find(o=>o.userData&&o.userData.container&&/^Gearbox base/i.test(nameOf(o)));
+const lidOf =()=>[...objs].reverse().find(o=>/^Gearbox lid/i.test(nameOf(o)));
+const floorYOf=base=>{const enc=base&&base.userData&&base.userData.enc||{};return Number.isFinite(enc.y0)?enc.y0:(base?bbx(base).min.y+(Number(Q('gfl').value)||2.5):0)};
+
+function hubR(g){const p=gp(g)||{};
+ if(p.dd)return (p.b||TT.hole)/2;
+ if(p.sp&&SV[p.sp])return SV[p.sp].rM+1.2;
+ const rr=p.m*p.N/2-1.25*p.m;
+ return Math.max((p.b||4)/2+1.2, Math.min(rr-0.6, (p.b||4)/2+3.2));
+}
+function halfLen(g){const p=gp(g)||{};return Math.max(1,(+p.t||bbx(g).getSize(V(0,0,0)).y))/2;}
+
+function collarMesh(axis,ri,ro,width,color){
+ const g=new THREE.Group(),tube=M(ext(circ(0,0,ro,48),width,[circ(0,0,ri,40)]),color);
+ tube.position.y=-width/2;tube.userData.noEdges=true;g.add(tube);
+ g.quaternion.copy(new THREE.Quaternion().setFromUnitVectors(V(0,1,0),axis.clone().normalize()));
+ return g;
+}
+
+function clearLocks(){
+ [baseOf(),lidOf()].filter(Boolean).forEach(h=>h.children.filter(c=>c.userData&&c.userData.v50lock).forEach(c=>{h.remove(c);if(c.geometry)c.geometry.dispose()}));
+ objs.slice().filter(o=>o.userData&&o.userData.v50lockPart).forEach(killObj);
+}
+
+/* trap every gear axially so pulling the motor can't drop / derail it, but it still spins */
+function addCaptiveLocks(){
+ const base=baseOf(); if(!base) return 0;
+ const floorY=floorYOf(base), prior=sel.slice();
+ clearLocks();
+ base.updateMatrixWorld(true);
+ const invBase=base.quaternion.clone().invert();
+ let n=0;
+ const addToBase=(mesh,worldPos,worldQuat)=>{
+  mesh.position.copy(base.worldToLocal(worldPos.clone()));
+  mesh.quaternion.copy(invBase.clone().multiply(worldQuat||new THREE.Quaternion()));
+  mesh.userData.v50lock=true;mesh.traverse(c=>{if(c.userData)c.userData.noEdges=true});
+  base.add(mesh);rootOf.set(mesh,base);
+ };
+ const motorOf=g=>objs.find(o=>o.userData&&o.userData.motor&&o.userData.link===g);
+ objs.filter(isG).forEach(g=>{
+  const p=gp(g)||{}; if(p.ty==='ring') return;
+  g.updateMatrixWorld(true);
+  const axis=axisOf(g), upright=Math.abs(axis.y)>0.72,
+        alreadyHeld=upright && typeof window.__brgR==='function' && window.__brgR(g)>0;
+  /* Upright gears that already have a motor-independent bearing hub (v46) are held – don't clash with it.
+     We still protect: every sideways/perpendicular gear (the derail case), and any gear not otherwise captured. */
+  if(alreadyHeld) return;
+  const c=bbx(g).getCenter(V(0,0,0)),
+        ri=hubR(g)+CLR, ro=ri+2.2, hl=halfLen(g), w=1.6,
+        collarQ=new THREE.Quaternion().setFromUnitVectors(V(0,1,0),axis.clone());
+  /* which side the motor sits on (in the gear's own axial frame) so we clear it instead of colliding */
+  const m=motorOf(g); let motorSign=0;
+  if(m){m.updateMatrixWorld(true);const mc=bbx(m).getCenter(V(0,0,0)).sub(c);motorSign=Math.sign(mc.dot(axis))||0;}
+  /* collar offsets along the axis: + and - face. For an upright gear fed by a motor from below,
+     skip the motor-side collar (the floor/boss already stops it there) to avoid a clash. */
+  let offs=[hl+CLR+w/2, -(hl+CLR+w/2)];
+  if(upright && motorSign!==0) offs=offs.filter(o=>Math.sign(o)!==motorSign);
+  if(!offs.length) offs=[hl+CLR+w/2];
+  let made=0;
+  offs.forEach(off=>{
+   const wp=c.clone().addScaledVector(axis,off);
+   if(LOCKMODE==='separate'){
+    const grp=collarMesh(axis,ri,ro,w,COL_SEP),
+          peg=M(new THREE.CylinderGeometry(1.4,1.4,6,16),COL_SEP);
+    peg.position.set(0,-w/2-3,0);peg.userData.noEdges=true;grp.add(peg);
+    const part=place(grp,'Snap-on gear collar (print separately, clip on)',true,[0,0,0]);
+    part.position.copy(wp);part.quaternion.copy(collarQ);
+    part.userData.v50lockPart=true;part.userData.link=g;
+   }else{
+    addToBase(collarMesh(axis,ri,ro,w,COL_CAP),wp,collarQ);
+    /* tie the collar down to the floor so it is rigid */
+    const topY=wp.y-ro*0.2, footH=topY-floorY;
+    if(footH>=1){const foot=new THREE.Mesh(new THREE.BoxGeometry(2.4,footH,2.4),mat(COL_CAP));
+     foot.position.copy(base.worldToLocal(V(wp.x,(topY+floorY)/2,wp.z)));foot.quaternion.copy(invBase);
+     foot.userData.noEdges=true;foot.userData.v50lock=true;base.add(foot);rootOf.set(foot,base);}
+   }
+   made=1;
+  });
+  if(made) n++;
+ });
+ base.updateMatrixWorld(true);own(base);select(prior.filter(o=>objs.includes(o)));
+ return n;
+}
+
+const _enc0=Q('genc').onclick;
+Q('genc').onclick=function(){
+ let r; try{ r=_enc0.apply(this,arguments) } finally {
+  try{ const n=addCaptiveLocks();
+   if(n) hint.textContent+=' Captive gear locks on '+n+' gear(s): '+(LOCKMODE==='separate'
+     ? 'printed as snap-on collars you clip over each hub after assembly'
+     : 'built into the box with '+CLR+' mm running clearance')
+     +' so pulling the motor can\'t let a gear slide, tilt or derail – it still spins freely.';
+  }catch(e){console.warn('v50 captive locks:',e)}
+ }
+ return r;
+};
+
+/* ---------------- shaft extender & motor extender ---------------- */
+const findShaft=g=>objs.find(o=>o!==g&&o.userData&&o.userData.link===g&&!o.userData.motor&&!o.userData.isWheel&&!o.userData.hubOf&&((o.userData.gearAttach&&o.userData.gearAttach.role==='shaft')||o.userData.sr||o.userData.tt));
+const findMotor=g=>objs.find(o=>o.userData&&o.userData.motor&&o.userData.link===g);
+
+function shaftExtend(g,delta){
+ const sh=findShaft(g); if(!sh){hint.textContent='Add a shaft to the gear first, then extend it.';return false;}
+ const tt=!!sh.userData.tt, r=sh.userData.sr||TT.sd/2,
+       L=(+sh.userData.L||10)*Math.abs(sh.scale.y||1),
+       grp=new THREE.Group();
+ if(tt){const e=M(ext(ddPoly(TT.sd,TT.sd-1.7,sh.userData.da||0),delta),COL_SH);e.userData.noEdges=true;grp.add(e);}
+ else{const e=M(new THREE.CylinderGeometry(r,r,delta,32),COL_SH,0,delta/2,0);e.userData.noEdges=true;grp.add(e);}
+ const cc=M(new THREE.CylinderGeometry(r+1.1,r+1.1,1.4,24),COL_SH,0,0.7,0);cc.userData.noEdges=true;grp.add(cc);
+ grp.position.y=L;                 /* shaft geometry runs 0..L along +Y in its own frame; flip is on the parent */
+ grp.userData.v50ext=1; sh.add(grp); own(sh);
+ hint.textContent='Shaft extended by '+f1(delta)+' mm (reinforced) so it reaches further through the gear / out of the box.';
+ return true;
+}
+
+function motorExtend(g,delta){
+ const m=findMotor(g); if(!m){hint.textContent='This gear has no motor to extend.';return false;}
+ const R=rotOf(m); if(!R){hint.textContent='Motor has no output shaft to extend.';return false;}
+ if(R.userData.v50top0==null)R.userData.v50top0=(R.userData.top!=null?R.userData.top:(R.userData.kind==='tt'?TT.H/2+TT.SL:5));
+ R.children.filter(c=>c.userData&&c.userData.v50mot).forEach(c=>{R.remove(c);if(c.geometry)c.geometry.dispose()});
+ const base=R.userData.v50top0, k=R.userData.kind; let seg=null;
+ if(k==='tt') seg=M(ext(ddPoly(TT.sd,TT.sd-1.7,0),delta),COL_SH,0,base-0.02,0);
+ else if(SV[k]){const v=SV[k];seg=M(ext(splinePoly(v.N,v.rM,v.rm),delta,[circ(0,0,v.tap/2,16)]),COL_SH,0,base-0.02,0);}
+ else seg=M(new THREE.CylinderGeometry(TT.sd/2,TT.sd/2,delta,24),COL_SH,0,base,0);
+ if(seg){seg.userData.v50mot=1;seg.userData.noEdges=true;ed(seg);R.add(seg);R.userData.top=base+delta;own(m);}
+ hint.textContent='Motor shaft extended by '+f1(delta)+' mm (reinforced) so it reaches the gear even when the gear sits low in the box.';
+ return true;
+}
+
+function autoReach(g){
+ let did=[];
+ const p=gp(g)||{}, t=+p.t||8, sh=findShaft(g);
+ if(sh){const L=(+sh.userData.L||0)*Math.abs(sh.scale.y||1), need=t+6;
+   if(L>0 && L<need-0.5){ if(shaftExtend(g,need-L)) did.push('shaft'); } }
+ const m=findMotor(g), R=m&&rotOf(m);
+ if(R){ m.updateMatrixWorld(true); const rt=bbx(R).max.y, gb=bbx(g).min.y;
+   if(gb-rt>1.5){ if(motorExtend(g, gb-rt+2)) did.push('motor'); } }
+ return did.join(' + ');
+}
+
+['gshaft','gmadd','gwhl'].forEach(id=>{const b=Q(id); if(!b)return; const f=b.onclick; if(!f)return;
+ b.onclick=function(){const r=f.apply(this,arguments);try{const g=gearOfAny(sel.length===1?sel[0]:null);if(g){const d=autoReach(g);if(d)hint.textContent+=' Auto-added '+d+' extender(s) so everything reaches.';}}catch(e){console.warn('autoReach',e)}return r;};
+});
+{const f=Q('genc').onclick;Q('genc').onclick=function(){const r=f.apply(this,arguments);try{objs.filter(isG).forEach(autoReach)}catch(e){console.warn('autoReach enc',e)}return r;};}
+
+/* ---------------- UI: assembly toggle, manual extenders, hide section 7 ---------------- */
+function injectUI(){
+ const encDet=[...document.querySelectorAll('#p-gears details')].find(d=>/Enclosure/i.test((d.querySelector('summary')||{}).textContent||''));
+ const host=encDet?encDet.querySelector('div'):Q('p-gears');
+ if(host && !Q('v50mode')){
+  host.insertAdjacentHTML('beforeend',
+   '<div class="blk" style="--c:#0e9384;margin-top:10px"><div class="bt"><i>L</i>Gear locks &amp; assembly</div>'
+   +'<div class="fl"><label>How to make the locks</label><select id="v50mode" style="grid-column:2/5" title="Print in place: the locks are part of the box with a running gap so the gear spins straight off the printer. Print separately: the locks come out as snap-on collars you clip over each hub after the gears are in.">'
+   +'<option value="inplace">Print in place (box + locks together, ready to spin)</option>'
+   +'<option value="separate">Print separately, then clip the locks on</option></select></div>'
+   +'<p class="mut" style="margin:6px 0 0">Every gear is trapped between two collars along its own axis, so even a sideways gear facing down can\'t slide, tilt or derail when you pull the motor – it still spins. Press "Make / update enclosure" after changing this.</p>'
+   +'<div class="br" style="margin-top:8px"><button class="btn-o c-teal" id="v50she">＋ Shaft extender (+8 mm)</button><button class="btn-o c-teal" id="v50mte">＋ Motor extender (+8 mm)</button></div></div>');
+  Q('v50mode').value=LOCKMODE;
+  Q('v50mode').onchange=()=>{setLockMode(Q('v50mode').value);hint.textContent='Lock mode set to '+(LOCKMODE==='separate'?'print separately then clip on':'print in place')+'. Press "Make / update enclosure" to apply.';};
+  Q('v50she').onclick=()=>{const g=gearOfAny(sel.length===1?sel[0]:null);if(!g){hint.textContent='Select a gear first.';return}commit();if(shaftExtend(g,8))select([g]);};
+  Q('v50mte').onclick=()=>{const g=gearOfAny(sel.length===1?sel[0]:null);if(!g){hint.textContent='Select a gear first.';return}commit();if(motorExtend(g,8))select([g]);};
+ }
+ [...document.querySelectorAll('#p-gears details')].forEach(d=>{
+  const t=((d.querySelector('summary')||{}).textContent||'');
+  if(/Advanced gearbox|Gearbox generator/i.test(t)) d.style.display='none';
+ });
+}
+injectUI();setTimeout(injectUI,0);setTimeout(injectUI,300);
+
+}catch(e){console.error('v50 module failed:',e);}
+})();
+
 </script><script>
 (()=>{const T=f=>{try{f()}catch(e){console.error(e)}},g=i=>document.getElementById(i),E=(t,h,c)=>{const e=document.createElement(t);if(h)e.innerHTML=h;if(c)e.className=c;return e};
 T(()=>{const pS=g('p-shapes'),pP=g('p-parts'),pT=g('p-text'),pC=g('p-cut'),pE=g('p-era'),pG=g('p-gears'),tabs=document.querySelector('#side .tabs');
