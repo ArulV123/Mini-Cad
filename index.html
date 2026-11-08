@@ -1626,8 +1626,8 @@ if(id==='gshaft'&&g&&isHz(g)&&!(t.userData.drv)){hzShaft(g);return}
 if(g&&isHz(g)&&!(t.userData.drv)){hint.textContent='This gear lies on its side (worm / bevel pinion). Put the wheel or shaft on the UPRIGHT partner (worm wheel / big bevel gear) – that is the output – and the motor on this one.';return}f()}});
 {const _ta=A('gtyadd').onclick;A('gtyadd').onclick=()=>{const ty=A('gty').value;if(ty!=='worm'&&ty!=='bevel'){_ta();return}
 const p=rd(),a=+A('gxa').value,b=+A('gxb').value;commit();let msg;
-if(ty==='worm'){const k=Math.max(1,Math.min(4,Math.round(Math.abs(a||1)))),r=buildWorm(p,k,Math.max(6,b||10),a<0?-1:1);select([r.worm]);msg=`Matched worm + external worm wheel generated: ${k}-start worm, ${p.N}-tooth wheel, ratio ${p.N}:${k}, lead angle ${f1(r.lam)}°, centre distance ${f1(r.centerDist,2)} mm, backlash ${f1(r.backlash,2)} mm. The wheel has relieved teeth and the axes are centred. Select worm → Add motor; put output shaft / wheel on the worm wheel, then run Check before printing.`}
-else{const N2=Math.round(Math.min(150,Math.max(8,a||30))),r=buildBevel(p.N,N2,p.m,p.t,p.b);select([r.hz]);msg=`Bevel pair added as REAL gears: ${p.N}T upright + ${N2}T sideways, ratio ${f1(p.N/N2,2)}:1, ${f1(r.backlash,2)} mm tooth backlash. Put the motor on the sideways gear, the wheel on the upright one.`}
+if(ty==='worm'){const k=Math.max(1,Math.min(4,Math.round(Math.abs(a||1)))),r=buildWorm(p,k,Math.max(6,b||10),a<0?-1:1);select([r.worm]);msg=`Matched worm + external worm wheel generated: ${k}-start worm, ${p.N}-tooth wheel, ratio ${p.N}:${k}, lead angle ${f1(r.lam)}°, centre distance ${f1(r.centerDist,2)} mm, backlash ${f1(r.backlash,2)} mm. The wheel has relieved teeth and the axes are centred. Select worm → Add motor; put output shaft / wheel on the worm wheel, then run Check before printing. The sideways worm floats until you press "Make / update enclosure" – that builds the bearing + lock that actually holds it so it can't fall.`}
+else{const N2=Math.round(Math.min(150,Math.max(8,a||30))),r=buildBevel(p.N,N2,p.m,p.t,p.b);select([r.hz]);msg=`Bevel pair added as REAL gears: ${p.N}T upright + ${N2}T sideways, ratio ${f1(p.N/N2,2)}:1, ${f1(r.backlash,2)} mm tooth backlash. Put the motor on the sideways gear, the wheel on the upright one. The 90° gear floats until you press "Make / update enclosure" – that builds the bearing + lock that holds it so pulling the motor can't drop it.`}
 tab('gears');hint.textContent=msg}}
 {const _gg=A('gbgo').onclick;A('gbgo').onclick=()=>{const k=A('gbk').value;if(k!=='worm'&&k!=='bevel'){_gg();return}
 const p=rd(),R=Math.max(1.2,+A('gbr').value||10),Np=Math.round(Math.max(8,Math.min(60,+A('gbp').value||12))),mk=A('gbm').value,enc=A('gbe').checked;commit();let msg,drv;
@@ -2941,23 +2941,36 @@ Q('genc').onclick=function(){
 const findShaft=g=>objs.find(o=>o!==g&&o.userData&&o.userData.link===g&&!o.userData.motor&&!o.userData.isWheel&&!o.userData.hubOf&&((o.userData.gearAttach&&o.userData.gearAttach.role==='shaft')||o.userData.sr||o.userData.tt));
 const findMotor=g=>objs.find(o=>o.userData&&o.userData.motor&&o.userData.link===g);
 
+/* clear our previous shaft-extender segment so pressing the button / re-running never stacks */
+function clearShaftExt(sh){sh.children.filter(c=>c.userData&&c.userData.v50ext).forEach(c=>{sh.remove(c);c.traverse(x=>x.geometry&&x.geometry.dispose())});}
+/* how far the shaft sticks out along its own axis, measured from the gear centre, in world mm */
+function shaftReach(g,sh){g.updateMatrixWorld(true);sh.updateMatrixWorld(true);
+ const axis=V(0,1,0).applyQuaternion(g.quaternion).normalize(), c=bbx(g).getCenter(V(0,0,0));
+ let far=-1e9;const pos=[];sh.traverse(n=>{if(n.isMesh&&!n.isLineSegments&&n.geometry&&n.geometry.attributes.position)pos.push(n)});
+ pos.forEach(n=>{const a=n.geometry.attributes.position,v=V(0,0,0),st=Math.max(1,Math.floor(a.count/200));
+  for(let i=0;i<a.count;i+=st){v.fromBufferAttribute(a,i).applyMatrix4(n.matrixWorld);far=Math.max(far,v.clone().sub(c).dot(axis));}});
+ return far;}
+
 function shaftExtend(g,delta){
  const sh=findShaft(g); if(!sh){hint.textContent='Add a shaft to the gear first, then extend it.';return false;}
- const tt=!!sh.userData.tt, r=sh.userData.sr||TT.sd/2,
-       L=(+sh.userData.L||10)*Math.abs(sh.scale.y||1),
-       grp=new THREE.Group();
+ delta=Math.max(1,Math.min(40,+delta||0)); if(delta<1)return false;
+ clearShaftExt(sh);
+ const tt=!!sh.userData.tt, r=sh.userData.sr||TT.sd/2, grp=new THREE.Group();
  if(tt){const e=M(ext(ddPoly(TT.sd,TT.sd-1.7,sh.userData.da||0),delta),COL_SH);e.userData.noEdges=true;grp.add(e);}
  else{const e=M(new THREE.CylinderGeometry(r,r,delta,32),COL_SH,0,delta/2,0);e.userData.noEdges=true;grp.add(e);}
  const cc=M(new THREE.CylinderGeometry(r+1.1,r+1.1,1.4,24),COL_SH,0,0.7,0);cc.userData.noEdges=true;grp.add(cc);
- grp.position.y=L;                 /* shaft geometry runs 0..L along +Y in its own frame; flip is on the parent */
- grp.userData.v50ext=1; sh.add(grp); own(sh);
- hint.textContent='Shaft extended by '+f1(delta)+' mm (reinforced) so it reaches further through the gear / out of the box.';
+ /* place the extender at the TRUE far tip of the shaft (in the shaft's local +Y frame) */
+ let tipLocal=-1e9;sh.traverse(n=>{if(n.isMesh&&!n.isLineSegments&&n.geometry){n.geometry.computeBoundingBox&&n.geometry.computeBoundingBox();const bb=n.geometry.boundingBox;if(bb)tipLocal=Math.max(tipLocal,bb.max.y+(n.position?n.position.y:0));}});
+ if(tipLocal<-1e8)tipLocal=(+sh.userData.L||10);
+ grp.position.y=tipLocal; grp.userData.v50ext=1; sh.add(grp); own(sh);
+ hint.textContent='Shaft extended by '+f1(delta)+' mm (reinforced).';
  return true;
 }
 
 function motorExtend(g,delta){
  const m=findMotor(g); if(!m){hint.textContent='This gear has no motor to extend.';return false;}
  const R=rotOf(m); if(!R){hint.textContent='Motor has no output shaft to extend.';return false;}
+ delta=Math.max(1,Math.min(40,+delta||0)); if(delta<1)return false;
  if(R.userData.v50top0==null)R.userData.v50top0=(R.userData.top!=null?R.userData.top:(R.userData.kind==='tt'?TT.H/2+TT.SL:5));
  R.children.filter(c=>c.userData&&c.userData.v50mot).forEach(c=>{R.remove(c);if(c.geometry)c.geometry.dispose()});
  const base=R.userData.v50top0, k=R.userData.kind; let seg=null;
@@ -2965,22 +2978,36 @@ function motorExtend(g,delta){
  else if(SV[k]){const v=SV[k];seg=M(ext(splinePoly(v.N,v.rM,v.rm),delta,[circ(0,0,v.tap/2,16)]),COL_SH,0,base-0.02,0);}
  else seg=M(new THREE.CylinderGeometry(TT.sd/2,TT.sd/2,delta,24),COL_SH,0,base,0);
  if(seg){seg.userData.v50mot=1;seg.userData.noEdges=true;ed(seg);R.add(seg);R.userData.top=base+delta;own(m);}
- hint.textContent='Motor shaft extended by '+f1(delta)+' mm (reinforced) so it reaches the gear even when the gear sits low in the box.';
+ hint.textContent='Motor shaft extended by '+f1(delta)+' mm (reinforced).';
  return true;
 }
 
+/* only fix a GENUINE reach gap, and never grow the shaft past the lid top + a small poke */
 function autoReach(g){
  let did=[];
- const p=gp(g)||{}, t=+p.t||8, sh=findShaft(g);
- if(sh){const L=(+sh.userData.L||0)*Math.abs(sh.scale.y||1), need=t+6;
-   if(L>0 && L<need-0.5){ if(shaftExtend(g,need-L)) did.push('shaft'); } }
+ const sh=findShaft(g);
+ if(sh && !objs.some(o=>o.userData&&o.userData.isWheel&&o.userData.link===g)){ /* if a wheel is on it, the wheel path sized the shaft – leave it */
+  const hl=Math.max(1,(+(gp(g)||{}).t||8))/2, reach=shaftReach(g,sh);
+  const lid=lidOf(), g2c=bbx(g).getCenter(V(0,0,0)), axis=V(0,1,0).applyQuaternion(g.quaternion).normalize();
+  /* target: reach just past the gear's far face; if a lid exists on that side, poke ~4 mm past it, capped */
+  let target=hl+4;
+  if(lid){const lt=bbx(lid).max.y, alongToLidTop=(lt-g2c.y); if(axis.y>0.72 && alongToLidTop>target) target=Math.min(alongToLidTop+4, hl+40);}
+  if(reach>-1e8 && target-reach>1.2){ if(shaftExtend(g, target-reach)) did.push('shaft'); }
+ }
  const m=findMotor(g), R=m&&rotOf(m);
- if(R){ m.updateMatrixWorld(true); const rt=bbx(R).max.y, gb=bbx(g).min.y;
-   if(gb-rt>1.5){ if(motorExtend(g, gb-rt+2)) did.push('motor'); } }
+ if(R){ m.updateMatrixWorld(true);
+  const axis=V(0,1,0).applyQuaternion(g.quaternion).normalize(), gc=bbx(g).getCenter(V(0,0,0));
+  /* how far the rotor tip reaches toward the gear centre, along the gear axis, pointing from motor to gear */
+  const mc=bbx(m).getCenter(V(0,0,0)), dir=gc.clone().sub(mc); const sgn=Math.sign(dir.dot(axis))||1;
+  let tip=-1e9;const rb=new THREE.Box3().setFromObject(R);[rb.min,rb.max].forEach(p=>{tip=Math.max(tip,p.clone().sub(gc).dot(axis.clone().multiplyScalar(-sgn)));});
+  /* tip<0 means the rotor already overlaps the gear – good. Only extend when there's a real >3 mm gap. */
+  const gearFace=(+(gp(g)||{}).t||8)/2 + 1;
+  if(tip> gearFace+3){ if(motorExtend(g, tip-gearFace+2)) did.push('motor'); }
+ }
  return did.join(' + ');
 }
 
-['gshaft','gmadd','gwhl'].forEach(id=>{const b=Q(id); if(!b)return; const f=b.onclick; if(!f)return;
+['gshaft','gmadd'].forEach(id=>{const b=Q(id); if(!b)return; const f=b.onclick; if(!f)return;
  b.onclick=function(){const r=f.apply(this,arguments);try{const g=gearOfAny(sel.length===1?sel[0]:null);if(g){const d=autoReach(g);if(d)hint.textContent+=' Auto-added '+d+' extender(s) so everything reaches.';}}catch(e){console.warn('autoReach',e)}return r;};
 });
 {const f=Q('genc').onclick;Q('genc').onclick=function(){const r=f.apply(this,arguments);try{objs.filter(isG).forEach(autoReach)}catch(e){console.warn('autoReach enc',e)}return r;};}
@@ -3047,7 +3074,11 @@ addEventListener('keydown',e=>{const k=e.key,inp=/INPUT|SELECT|TEXTAREA/.test(e.
 })();
 </script><script>
 (()=>{const g=i=>document.getElementById(i),T=f=>{try{f()}catch(e){console.error(e)}};
-T(()=>{const s=g('gty');[...s.options].forEach(o=>{if(['crown','ratchet','sprocket','rack','ring'].includes(o.value))o.remove()})});
+T(()=>{const s=g('gty');[...s.options].forEach(o=>{if(['rack'].includes(o.value))o.remove()});
+ /* make sure the useful extra gear types stay available in the dropdown (an earlier build stripped them) */
+ const want=[['ring','Internal ring gear'],['sprocket','Chain sprocket'],['ratchet','Ratchet wheel'],['crown','Crown (face) gear']];
+ want.forEach(([v,t])=>{if(!s.querySelector('option[value='+v+']')){const o=document.createElement('option');o.value=v;o.textContent=t;s.appendChild(o)}});
+});
 T(()=>{const P=g('p-gears'),gr=g('grep');P.querySelectorAll(':scope>h4').forEach(h=>h.remove());
 const D=[...P.querySelectorAll(':scope>details')],nm=d=>d.querySelector('summary').textContent,by=t=>D.find(d=>nm(d).includes(t)),hd=t=>{const h=document.createElement('h4');h.innerHTML=t;P.insertBefore(h,gr)};
 const put=(t,title)=>{const d=by(t);if(!d)return;if(title)d.querySelector('summary').textContent=title;P.insertBefore(d,gr);return d};
