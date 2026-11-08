@@ -2699,7 +2699,7 @@ setInterval(()=>{if(dead||applying)return;
   if(!r.has){r.cp.copy(tp);r.has=1}r.cp.lerp(tp,.3);
   r.g.visible=true;r.ring.position.copy(r.cp);r.ring.scale.setScalar(dO?1.6:1);
   const dir=r.eye.clone().sub(r.cp),L=dir.length(),st=r.cp.clone().add(dir.normalize().multiplyScalar(Math.min(L,50))),a=r.geo.attributes.position;
-  a.setXYZ(0,st.x,st.y,st.z);a.setXYZ(1,r.cp.x,r.cp.y,r.cp.z);a.needsUpdate=true;r.line.computeLineDistances();r.line.visible=!dO; /* dotted beam only while not holding a model */
+  a.setXYZ(0,st.x,st.y,st.z);a.setXYZ(1,r.cp.x,r.cp.y,r.cp.z);a.needsUpdate=true;r.line.computeLineDistances();r.line.visible=false; /* dotted beam removed */
   const q=r.cp.clone();q.y+=10;q.project(cam);r.el.style.display=q.z<1?'block':'none';r.el.style.left=((q.x*.5+.5)*vp.clientWidth)+'px';r.el.style.top=((-q.y*.5+.5)*vp.clientHeight)+'px';
   r.el.textContent=u+(dO?' · dragging '+nmOf(dO):'')})})();
 setInterval(()=>{if(dead)return;if(isO&&++tick%4===0)syncOwner();if(applying)return;
