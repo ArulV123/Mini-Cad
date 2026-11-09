@@ -850,7 +850,7 @@ $('pe_ok').onclick=pendOk;$('pe_no').onclick=pendNo;
 $('pend').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();pendOk()}else if(e.key==='Escape')pendNo()});
 const pv=V(0,0,0);
 (function loop(){requestAnimationFrame(loop);objs.forEach(o=>{const l=o.userData.link;if(!l)return;if(o.userData.gearAttach){__syncGearAttachment(o);if(o.userData.drv&&o.userData.drv.R)o.userData.drv.R.rotation[o.userData.drv.R.userData.ax]=l.rotation.y-((gp(l)||{}).da||0)-o.rotation.y;return}if(!objs.includes(l)){delete o.userData.link;return}if(!(l.userData&&l.userData.hz)){o.position.x=l.position.x;o.position.z=l.position.z}if(o.userData.drv&&o.userData.drv.R)o.userData.drv.R.rotation[o.userData.drv.R.userData.ax]=l.rotation.y-((gp(l)||{}).da||0)-o.rotation.y;else o.rotation.y=l.rotation.y});if(lf){lf=false;keepAbove()}tick();bx.forEach(b=>b.update());
-const on=tool==='select'&&sel.length===1;handles.forEach(h=>h.visible=on&&gm==='size');rings.forEach(r=>r.visible=on&&gm==='rot');
+const on=tool==='select'&&sel.length===1;const _gearSel=on&&isG(sel[0]);handles.forEach(h=>h.visible=on&&gm==='size'&&!(_gearSel&&!h.userData.d.lift));rings.forEach(r=>r.visible=on&&gm==='rot');
 if(on){const b=new THREE.Box3().setFromObject(sel[0]),m=b.getCenter(V(0,0,0)),k=dist*.012;handles.forEach(h=>{const d=h.userData.d;if(d.cn)h.position.set(d.sx>0?b.max.x:b.min.x,d.sy>0?b.max.y:b.min.y,d.sz>0?b.max.z:b.min.z);else if(d.lift)h.position.set(m.x,b.max.y+k*3.2,m.z);else{h.position.copy(m);h.position[d.ax]=d.sg>0?b.max[d.ax]:b.min[d.ax]}h.scale.setScalar(d.cn?k*.9:k)})}
 $('pbar').style.display=(pts.length&&(tool==='poly'||tool==='erase'))?'flex':'none';cutUi();if(on&&gm==='rot'){const b=bbx(sel[0]),c=b.getCenter(V(0,0,0)),Rr=b.getSize(V(0,0,0)).length()*.4+6;rings.forEach(r=>{r.position.copy(c);r.scale.setScalar(Rr)})}
 updDpm();R.render(S,cam);meas.forEach(m=>{pv.copy(m.a).add(m.b).multiplyScalar(.5).project(cam);m.el.style.display=pv.z<1?'block':'none';m.el.style.left=(pv.x*.5+.5)*vp.clientWidth+'px';m.el.style.top=(-pv.y*.5+.5)*vp.clientHeight+'px'})})();
@@ -3122,4 +3122,308 @@ const pj=g('pj');pj.title=pj.textContent;new MutationObserver(()=>{pj.title=pj.t
 const H=document.querySelector('header'),sp=H.querySelector('.sp');
 [...H.querySelectorAll(':scope>button')].filter(b=>['?','⌕ Search','◐'].includes(b.textContent.trim())).forEach(b=>H.appendChild(b));
 }catch(e){console.error(e)}})();
-</script></body></html>
+</script><script>
+/* ============================================================================
+   v51 — user-requested fixes. Appended as the LAST script so its genc wrapper
+   is outermost (runs after every earlier support generator), and so its
+   reassignments of info / askStack / setSize take effect app-wide (top-level
+   let/const/function bindings are shared across all classic scripts).
+     (1) spiral/worm gears must spin: clear supports gripping their thread
+     (2) shaft = rotation axle + wheel seat, clear of gear body & screw hole
+     (3) selecting a gear must not pop the annoying "stack on top?" bar
+     (4) servo: gear comes out on a female-shaft hub; TT real-length seat
+     (5) click a gear -> live increase / decrease its length (thickness)
+   ============================================================================ */
+(()=>{try{
+const Q=id=>document.getElementById(id);
+const axisOf=g=>V(0,1,0).applyQuaternion(g.quaternion).normalize();
+const isWorm=g=>{const p=isG(g)&&gp(g);return !!(p&&p.ty==='worm');};
+
+/* ---------- (3) kill the annoying stack bar for gears & linked parts -------- */
+try{
+ const sb=Q('sbar');
+ if(typeof askStack==='function'){
+   const _as=askStack;
+   askStack=function(o){
+     if(o&&(isG(o)||o.userData.link||o.userData.hole||o.userData.motor||o.userData.isWheel)){ if(sb)sb.style.display='none'; return; }
+     return _as.apply(this,arguments);
+   };
+ }
+}catch(e){console.warn('v51 stack-bar',e);}
+
+/* ============================================================================
+   (1) WORM / SPIRAL GEAR — free the thread from colliding supports.
+   ============================================================================ */
+const SUPPORT_TAGS=['seatPart','universalBearingPart','axisBearingPart','v44Pin','v46Hub','v50lock','v43BearingSupport'];
+const SUPPORT_OBJ_TAGS=['axisBearingJournal','universalBearingJournal','v50lockPart'];
+const hostHasTag=u=>u&&SUPPORT_TAGS.some(t=>u[t]);
+
+/* The teeth / thread annulus of a gear — the zone a support must NEVER enter or
+   it stops the gear. Inside the root radius is the hub, where real bearings sit
+   (left alone); outside the tip radius is free air (left alone). */
+function gearTeethZone(g){
+ const p=gp(g)||{}, m=+p.m||2, N=+p.N||12;
+ let rootR, tipR;
+ if(p.ty==='worm'){ const mm=+p.mr||m, q=+p.q||10, rp=q*mm/2; rootR=rp-1.25*mm; tipR=rp+0.85*mm; }
+ else if(p.ty==='bevel'){ const r=Math.max(2,+p.r||m*N/2); rootR=Math.max(1,r-1.4*m); tipR=r+1.0*m; }
+ else { rootR=Math.max(1,m*N/2-1.25*m); tipR=m*(N+2)/2; }
+ return {rootR, tipR};
+}
+/* a support vertex jams a gear if it falls in that gear's teeth annulus AND
+   within the gear's own thickness span (axially). */
+function pointJams(sweeps,P){
+ for(const w of sweeps){
+   const d=P.clone().sub(w.c), along=d.dot(w.ax);
+   if(Math.abs(along)>w.hl) continue;
+   const radial=d.addScaledVector(w.ax,-along).length();
+   if(radial>w.rootR-0.2 && radial<w.tipR+0.6) return true;
+ }
+ return false;
+}
+function meshJams(mesh,sweeps){
+ mesh.updateMatrixWorld(true);
+ const geo=mesh.geometry; if(!geo||!geo.attributes||!geo.attributes.position) return false;
+ const a=geo.attributes.position, v=V(0,0,0), step=Math.max(1,Math.floor(a.count/300)), b=bbx(mesh);
+ /* quick reject: mesh bbox must at least reach some gear */
+ let hits=0;
+ for(let i=0;i<a.count;i+=step){
+   v.fromBufferAttribute(a,i).applyMatrix4(mesh.matrixWorld);
+   if(pointJams(sweeps,v)){ if(++hits>=2) return true; }
+ }
+ return false;
+}
+/* build the per-gear sweep descriptors once */
+function gearSweeps(){
+ return objs.filter(isG).map(g=>{ g.updateMatrixWorld(true);
+   const p=gp(g)||{}, len=(+p.t)||(bbx(g).getSize(V(0,0,0)).length()), z=gearTeethZone(g);
+   return {g, c:bbx(g).getCenter(V(0,0,0)), ax:axisOf(g), rootR:z.rootR, tipR:z.tipR, hl:len/2+0.6};
+ });
+}
+/* Remove every support piece that would stop ANY gear (generalised worm fix). */
+function clearGearJams(){
+ const sweeps=gearSweeps(); if(!sweeps.length) return 0;
+ let removed=0;
+ objs.filter(o=>o.userData&&(o.userData.container||/Gearbox lid/i.test(nameOf(o)))).forEach(host=>{
+   host.children.slice().forEach(ch=>{
+     if(!ch.userData||!hostHasTag(ch.userData)) return;
+     let foul=false;
+     if(ch.isMesh) foul=meshJams(ch,sweeps);
+     else ch.traverse(n=>{if(n.isMesh&&meshJams(n,sweeps))foul=true;});
+     if(foul){ host.remove(ch); if(ch.geometry)ch.geometry.dispose(); removed++; }
+   });
+ });
+ objs.slice().forEach(o=>{
+   if(!o.userData||!SUPPORT_OBJ_TAGS.some(t=>o.userData[t])) return;
+   let foul=false; o.traverse(n=>{if(n.isMesh&&meshJams(n,sweeps))foul=true;});
+   if(foul){ try{killObj(o)}catch(e){} removed++; }
+ });
+ if(removed) objs.filter(o=>o.userData&&(o.userData.container||/Gearbox lid/i.test(nameOf(o)))).forEach(h=>{try{own(h)}catch(e){}});
+ return removed;
+}
+/* keep the old name working */
+const clearWormSupports=clearGearJams;
+
+/* ============================================================================
+   (D) When a shaft or wheel hangs below the gearbox, lift the WHOLE assembly
+   rigidly so the lowest hanging part rests on the build plate (y=0) and the box
+   floats above it. Everything (gears, supports, box, lid) moves by the same
+   delta, so the gear is preserved and no support breaks. A wheel hangs lower
+   than a bare shaft, so it naturally lifts the box even more. Idempotent.
+   ============================================================================ */
+function raiseBoxForUnderParts(){
+ const base=objs.find(o=>o.userData&&o.userData.container&&/^Gearbox base/i.test(nameOf(o)));
+ if(!base) return 0;                 /* only meaningful once there's a box */
+ /* lowest point of any hanging driven part (shaft / wheel / output post) */
+ let lowest=Infinity;
+ objs.forEach(o=>{
+   const u=o.userData||{};
+   const isUnder = u.isWheel || u.sr || u.tt || u.po || (u.gearAttach&&u.gearAttach.role==='shaft');
+   if(!isUnder) return;
+   try{ const mn=bbx(o).min.y; if(mn<lowest) lowest=mn; }catch(e){}
+ });
+ if(!isFinite(lowest)) return 0;
+ const delta = -lowest;              /* raise so the lowest part sits at y=0 */
+ if(delta <= 0.05) return 0;         /* nothing hangs below the plate */
+ objs.forEach(o=>{ o.position.y += delta; });
+ try{ objs.forEach(o=>{ if(o.userData&&o.userData.gearAttach && o.userData.gearAttach.gear && objs.includes(o.userData.gearAttach.gear)){} }); }catch(e){}
+ return delta;
+}
+
+/* ============================================================================
+   (2) SHAFT = rotation axle + wheel seat, clear of gear body & screw hole.
+   Make the message explicit and ensure clearance so nothing binds.
+   ============================================================================ */
+['gshaft','gshaftdown'].forEach(id=>{
+ const b=Q(id); if(!b||!b.onclick) return;
+ const f=b.onclick;
+ b.onclick=function(){ const r=f.apply(this,arguments);
+   try{ hint.textContent=(hint.textContent||'')+' This shaft is the rotation axle and the seat the wheel pushes onto — it runs clear of the gear body and of any screw / lock hole.'; }catch(e){}
+   return r; };
+});
+
+/* ============================================================================
+   (5) LIVE GEAR LENGTH (thickness).
+   ============================================================================ */
+/* Rebuild the selected gear with a patched parameter, re-centred, parts following. */
+function setGearParam(g,patch){
+ const old=g.children.find(x=>x.userData.gp); if(!old) return false;
+ const cur=old.userData.gp, np=Object.assign({},cur,patch);
+ /* validate / clamp like readGP */
+ np.N=Math.round(Math.min(150,Math.max(3,+np.N||cur.N||12)));
+ np.m=Math.min(10,Math.max(.3,+np.m||cur.m||2));
+ np.t=Math.max(1,Math.min(60,+np.t||cur.t||8));
+ if(np.b!=null){ const maxB=2*(np.m*np.N/2-1.25*np.m)-2; np.b=Math.max(0,Math.min(+np.b||0,Math.max(0,maxB))); }
+ /* no-op guard */
+ if(['N','m','t','b'].every(k=>Math.abs((+np[k]||0)-(+cur[k]||0))<0.001)) return false;
+ const c0=bbx(g).getCenter(V(0,0,0)); let ng;
+ try{ ng=gmesh(np); }catch(e){ console.warn('gear rebuild',e); return false; }
+ ng.material=old.material; gEdge(ng); g.remove(old); g.add(ng); rootOf.set(ng,g);
+ g.updateMatrixWorld(true);
+ g.position.add(c0.sub(bbx(g).getCenter(V(0,0,0))));   /* keep it centred where it was */
+ try{ if(typeof fillGear==='function')fillGear(); }catch(e){}
+ try{ objs.forEach(o=>{if(o.userData&&o.userData.gearAttach&&o.userData.gearAttach.gear===g&&typeof __syncGearAttachment==='function')__syncGearAttachment(o);}); }catch(e){}
+ return true;
+}
+/* length-only helper kept for other callers */
+function setGearThickness(g,t){ return setGearParam(g,{t:+t}); }
+
+(function addGearControlsUI(){
+ let curGear=null;
+ const panels=[];                 /* each panel: {row, fields:{N,m,b,t}} */
+ /* control spec: key, label, step, min, max, unit, specialOK(gear)->bool  */
+ const SPEC=[
+   {k:'N', label:'Teeth',  step:1,  min:3,  max:150, unit:'', std:true},
+   {k:'m', label:'Module', step:.5, min:.5, max:10,  unit:'mm', std:true},
+   {k:'b', label:'Bore',   step:.5, min:0,  max:40,  unit:'mm', std:false},
+   {k:'t', label:'Length', step:.5, min:1,  max:60,  unit:'mm', std:false}
+ ];
+ const isStd=g=>{const p=gp(g)||{};return !p.ty||p.ty==='helical'||p.ty==='herring';};
+ const applyParam=(k,val,withCommit)=>{ if(!curGear||!objs.includes(curGear))return;
+   if(withCommit)commit();
+   if(setGearParam(curGear,{[k]:val})){ syncAll(); if(withCommit)info(); } };
+ function syncAll(){ if(!curGear)return; const p=gp(curGear)||{};
+   panels.forEach(pn=>{ SPEC.forEach(sp=>{ const f=pn.fields[sp.k]; if(!f)return;
+     const v=(sp.k==='b'?(+p.b||0):(+p[sp.k]||0));
+     if(document.activeElement!==f.v)f.v.value=+v.toFixed(2);
+     /* teeth/module only make sense on standard gears */
+     const show=sp.std?isStd(curGear):true;
+     f.wrap.style.display=show?'flex':'none';
+   }); });
+ }
+ function buildPanel(host,where){
+   if(!host) return;
+   const row=document.createElement('div');
+   row.className='gctl_row';
+   row.style.cssText='display:none;margin:6px 0;padding:8px;border:1px solid var(--b);border-left:4px solid #0e9384;border-radius:8px;background:var(--p)';
+   let html='<div style="font-weight:700;margin-bottom:6px">Gear controls</div>';
+   SPEC.forEach(sp=>{
+     html+='<div class="gctl_f" data-k="'+sp.k+'" style="display:flex;gap:6px;align-items:center;margin:3px 0">'
+       +'<label style="width:58px;color:var(--m)">'+sp.label+'</label>'
+       +'<button class="gctl_m" data-k="'+sp.k+'" title="Less" style="width:28px">−</button>'
+       +'<input class="gctl_v" data-k="'+sp.k+'" type="number" step="'+sp.step+'" min="'+sp.min+'" style="width:64px">'
+       +'<button class="gctl_p" data-k="'+sp.k+'" title="More" style="width:28px">＋</button>'
+       +'<span class="mut" style="font-size:11px">'+sp.unit+'</span></div>';
+   });
+   html+='<p class="mut" style="margin:4px 0 0">Edit the selected gear live. Attached shaft, motor and wheel follow. Changing teeth or module resizes the gear — re-mesh neighbours if needed.</p>';
+   row.innerHTML=html;
+   if(where==='top') host.insertBefore(row,host.firstChild); else host.appendChild(row);
+   const fields={};
+   SPEC.forEach(sp=>{
+     const wrap=row.querySelector('.gctl_f[data-k="'+sp.k+'"]');
+     const v=wrap.querySelector('.gctl_v');
+     const clamp=x=>Math.max(sp.min,Math.min(sp.max,x));
+     const push=x=>{ x=clamp(sp.k==='N'?Math.round(x):x); v.value=x; applyParam(sp.k,x,true); };
+     v.onchange=()=>push(+v.value||sp.min);
+     wrap.querySelector('.gctl_m').onclick=()=>push((+v.value||sp.min)-sp.step);
+     wrap.querySelector('.gctl_p').onclick=()=>push((+v.value||sp.min)+sp.step);
+     fields[sp.k]={wrap,v};
+   });
+   panels.push({row,fields});
+ }
+ buildPanel(Q('ins'),'inspector');
+ buildPanel(Q('p-gears'),'top');
+ const _info=info;
+ info=function(){
+   const r=_info.apply(this,arguments);
+   try{
+     const g=(sel.length===1&&isG(sel[0]))?sel[0]:null; curGear=g;
+     if(g){ panels.forEach(pn=>pn.row.style.display='block'); syncAll(); }
+     else panels.forEach(pn=>pn.row.style.display='none');
+   }catch(e){}
+   return r;
+ };
+ try{ info(); }catch(e){}
+}());
+
+/* ============================================================================
+   (C) SHAFT FACE PICKER — replaces the old "shaft direction" dropdown / flip.
+   Click a shaft and a small picker offers the gear's two faces (top / bottom)
+   plus both. It seats on the face (over the bore), never in the teeth.
+   ============================================================================ */
+(function shaftFacePicker(){
+ const isShaft=o=>{ if(!o||!o.userData)return false; const u=o.userData;
+   if(u.motor||u.isWheel||u.hubOf||u.scr||u.po)return false;
+   return !!(u.sr||u.tt||(u.gearAttach&&u.gearAttach.role==='shaft')|| /shaft|output post/i.test(nameOf(o))); };
+ const gearOfShaft=o=>{ const u=o.userData||{}; const g=(u.gearAttach&&u.gearAttach.gear)||u.link; return (g&&isG(g))?g:null; };
+ /* hide the old direction controls (kept in DOM so internal code still works) */
+ try{
+   const hideRow=(sel)=>{ const el=Q(sel); if(el){ const lab=el.previousElementSibling; if(lab&&lab.tagName==='LABEL')lab.style.display='none'; el.style.display='none'; } };
+   hideRow('psh');                 /* Shaft side dropdown */
+   hideRow('pwh');                 /* Wheel side dropdown */
+   const fb=Q('gflipshaft'); if(fb)fb.style.display='none';
+   const sd=Q('gshaftdown'); if(sd)sd.style.display='none';
+ }catch(e){console.warn('hide old shaft dir',e);}
+ /* floating picker */
+ const bar=document.createElement('div');
+ bar.id='shaftFacePick';
+ bar.style.cssText='position:absolute;top:92px;left:50%;transform:translateX(-50%);display:none;gap:6px;align-items:center;background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:6px 9px;box-shadow:0 2px 10px #0003;z-index:6';
+ bar.innerHTML='<span style="font-weight:600;margin-right:2px">Place shaft on:</span>'
+   +'<button id="sfp_top" class="pri">Top face</button>'
+   +'<button id="sfp_bot">Bottom face</button>'
+   +'<button id="sfp_both">Both</button>'
+   +'<button id="sfp_x" title="Close" style="width:26px">✕</button>';
+ (document.querySelector('#vp')||document.body).appendChild(bar);
+ let curShaft=null, curGear=null;
+ const place=(side)=>{ if(!curGear||!objs.includes(curGear))return; commit();
+   try{ window.__v45.placeShaftSide(curGear,side); }catch(e){console.warn('placeShaftSide',e);} };
+ Q('sfp_top').onclick=()=>place('up');
+ Q('sfp_bot').onclick=()=>place('down');
+ Q('sfp_both').onclick=()=>{ if(!curGear||!objs.includes(curGear))return; commit();
+   const sb=Q('shboth'); if(sb&&sb.onclick){ select([curGear]); sb.onclick(); }
+   else { try{window.__v45.placeShaftSide(curGear,'up');}catch(e){} } };
+ Q('sfp_x').onclick=()=>{ bar.style.display='none'; };
+ const _info=info;
+ info=function(){
+   const r=_info.apply(this,arguments);
+   try{
+     const o=(sel.length===1)?sel[0]:null;
+     if(o&&isShaft(o)&&gearOfShaft(o)){ curShaft=o; curGear=gearOfShaft(o); bar.style.display='flex'; }
+     else { curShaft=null; curGear=null; bar.style.display='none'; }
+   }catch(e){}
+   return r;
+ };
+ try{ info(); }catch(e){}
+}());
+
+/* ============================================================================
+   OUTERMOST enclosure wrapper: build everything, then free the gears.
+   ============================================================================ */
+try{
+ const genc=Q('genc'), prev=genc&&genc.onclick;
+ if(genc&&prev){
+   genc.onclick=function(){
+     let r; try{ r=prev.apply(this,arguments); } finally {
+       try{ raiseBoxForUnderParts(); }catch(e){ console.warn('v52 raise',e); }
+       try{ const n=clearGearJams();
+         if(n) hint.textContent=(hint.textContent||'')+' Freed '+n+' support piece(s) that were pressing on a gear’s teeth, so every gear now turns freely (nothing is jammed or loosely held).';
+       }catch(e){ console.warn('v51 gear-jam clear',e); }
+     }
+     return r;
+   };
+ }
+}catch(e){console.warn('v51 genc wrap',e);}
+
+}catch(e){console.error('v51 module failed:',e);}})();
+</script>
+
+</body></html>
