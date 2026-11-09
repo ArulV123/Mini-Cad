@@ -733,7 +733,11 @@ if(rr-TT.hole/2<1.3){hint.textContent='This gear is too small for the TT shaft (
 commit();objs.filter(o=>o.userData.motor&&o.userData.link===g).forEach(killObj);
 let bt=0;const ot=objs.filter(o=>isG(o)&&o!==g);if(ot.length){let dx=0,dz=0;ot.forEach(o=>{dx+=o.position.x-g.position.x;dz+=o.position.z-g.position.z});if(Math.hypot(dx,dz)>1e-6)bt=Math.atan2(dz,-dx)}
 const old=g.children.find(c=>c.userData.gp),p=Object.assign({},op,{b:TT.hole,dd:1,da:g.rotation.y-bt,bt:0,hn:0}),nm=gmesh(p);nm.material=old.material;gEdge(nm);g.remove(old);g.add(nm);rootOf.set(nm,g);fillGear();
-const b=bbx(g),SLt=Math.min(TT.ML,b.max.y-b.min.y+fl+cl-.3),w=place(mkTT(TT.sd,SLt,TT.ML),'TT gear motor',false,[g.position.x,b.min.y-cl-fl-TT.H/2,g.position.z]);w.rotation.y=bt;w.userData.link=g;w.userData.motor=1;initDrv(w,200,.078,1e-3);
+/* Use the motor's REAL double-D shaft length (TT.SL = 8.7 mm). A real motor shaft
+   cannot be lengthened, so the shaft reaches only as far as 8.7 mm allows; the gear
+   must sit within that reach (keep the Floor thin). Capped so it does not stick out
+   the top of the gear. */
+const b=bbx(g),SLt=Math.min(TT.SL,b.max.y-b.min.y+fl+cl+1),w=place(mkTT(TT.sd,SLt,TT.SL),'TT gear motor',false,[g.position.x,b.min.y-cl-fl-TT.H/2,g.position.z]);w.rotation.y=bt;w.userData.link=g;w.userData.motor=1;initDrv(w,200,.078,1e-3);
 {const dy=-bbx(w).min.y;if(dy>0)objs.forEach(o=>{if(isG(o)||o.userData.link)o.position.y+=dy})}
 const eng=SLt-fl-cl;select([g]);
 hint.textContent='TT motor fitted with its real double-D shaft (Ø'+TT.sd+', flats '+TT.ff+', '+TT.SL+' mm tall). The gear bore is now a matching double-D (Ø'+TT.hole+' / '+f1(TT.hole-1.7)+' flats) so it only slides on one way.'+(eng<3?' ⚠ Shaft grips only '+f1(eng)+' mm – lower Floor mm.':' Shaft grips '+f1(eng)+' mm of the gear.')};
@@ -2994,16 +2998,10 @@ function autoReach(g){
   if(lid){const lt=bbx(lid).max.y, alongToLidTop=(lt-g2c.y); if(axis.y>0.72 && alongToLidTop>target) target=Math.min(alongToLidTop+4, hl+40);}
   if(reach>-1e8 && target-reach>1.2){ if(shaftExtend(g, target-reach)) did.push('shaft'); }
  }
- const m=findMotor(g), R=m&&rotOf(m);
- if(R){ m.updateMatrixWorld(true);
-  const axis=V(0,1,0).applyQuaternion(g.quaternion).normalize(), gc=bbx(g).getCenter(V(0,0,0));
-  /* how far the rotor tip reaches toward the gear centre, along the gear axis, pointing from motor to gear */
-  const mc=bbx(m).getCenter(V(0,0,0)), dir=gc.clone().sub(mc); const sgn=Math.sign(dir.dot(axis))||1;
-  let tip=-1e9;const rb=new THREE.Box3().setFromObject(R);[rb.min,rb.max].forEach(p=>{tip=Math.max(tip,p.clone().sub(gc).dot(axis.clone().multiplyScalar(-sgn)));});
-  /* tip<0 means the rotor already overlaps the gear – good. Only extend when there's a real >3 mm gap. */
-  const gearFace=(+(gp(g)||{}).t||8)/2 + 1;
-  if(tip> gearFace+3){ if(motorExtend(g, tip-gearFace+2)) did.push('motor'); }
- }
+ /* A real motor's output shaft is a fixed length (TT = 8.7 mm) — it cannot be
+    "extended" to bridge a gap, so we no longer grow it here. The motor-add
+    handler already reports the true engagement ("Shaft grips X mm") and warns
+    when the floor is too thick, so we don't add a second (bbox-based) check. */
  return did.join(' + ');
 }
 
@@ -3408,7 +3406,7 @@ try{
 (function simpleGearAdder(){
  const pane=Q('p-gears'); if(!pane||Q('sga_box'))return;
  const det=document.createElement('details');
- det.id='sga_box'; det.open=true;
+ det.id='sga_box'; det.open=false;
  det.innerHTML='<summary>Add a gear</summary><div>'
    +'<div class="fl"><label>Type</label>'
    +'<select id="sga_type" style="grid-column:2/5">'
