@@ -3287,68 +3287,114 @@ function setGearParam(g,patch){
 /* length-only helper kept for other callers */
 function setGearThickness(g,t){ return setGearParam(g,{t:+t}); }
 
-(function addGearControlsUI(){
- let curGear=null;
- const panels=[];                 /* each panel: {row, fields:{N,m,b,t}} */
- /* control spec: key, label, step, min, max, unit, specialOK(gear)->bool  */
- const SPEC=[
-   {k:'N', label:'Teeth',  step:1,  min:3,  max:150, unit:'', std:true},
-   {k:'m', label:'Module', step:.5, min:.5, max:10,  unit:'mm', std:true},
-   {k:'b', label:'Bore',   step:.5, min:0,  max:40,  unit:'mm', std:false},
-   {k:'t', label:'Length', step:.5, min:1,  max:60,  unit:'mm', std:false}
- ];
+/* ============================================================================
+   (v53) BUTTON-TRIGGERED OPTIONS + AUTO-MESH POPUP
+   Nothing auto-expands. When a single gear OR shaft is selected a small
+   "⚙ options" button appears (top-right of the canvas). Clicking it opens a
+   floating panel with the controls for that part:
+     gear  -> Teeth, Module, Bore, Length
+     shaft -> Length  +  Face direction (Top / Bottom / Both)
+   Selecting a different part closes the panel again (so it never pops up on its
+   own). A separate top-centre popup offers Auto-mesh when two overlapping gears
+   are not meshed (or warns when they cannot mesh). Popups never touch the side
+   panel layout.
+   ============================================================================ */
+/* --- shaft length via persistent scale.y (sync keeps position/quat, not scale) --- */
+function shaftBaseL(sh){ return Math.max(0.5,+sh.userData.L||10); }
+function shaftLength(sh){ return shaftBaseL(sh)*(sh.scale.y||1); }
+function setShaftLength(sh,L){ L=Math.max(2,Math.min(120,+L||0)); if(!(L>0))return false;
+ sh.scale.y=Math.max(0.1,L/shaftBaseL(sh)); sh.updateMatrixWorld(true); return true; }
+
+/* hide the old shaft-direction controls (kept in DOM so internal code works) */
+try{
+ const hideRow=(id)=>{ const el=Q(id); if(el){ const lab=el.previousElementSibling; if(lab&&lab.tagName==='LABEL')lab.style.display='none'; el.style.display='none'; } };
+ hideRow('psh'); hideRow('pwh');
+ const fb=Q('gflipshaft'); if(fb)fb.style.display='none';
+ const sd=Q('gshaftdown'); if(sd)sd.style.display='none';
+}catch(e){console.warn('hide old shaft dir',e);}
+
+(function optionsButton(){
+ const isShaft=o=>{ if(!o||!o.userData)return false; const u=o.userData;
+   if(u.motor||u.isWheel||u.hubOf||u.scr||u.po)return false;
+   return !!(u.sr||u.tt||(u.gearAttach&&u.gearAttach.role==='shaft')|| /shaft|output post/i.test(nameOf(o))); };
+ const gearOfShaft=o=>{ const u=o.userData||{}; const g=(u.gearAttach&&u.gearAttach.gear)||u.link; return (g&&isG(g))?g:null; };
  const isStd=g=>{const p=gp(g)||{};return !p.ty||p.ty==='helical'||p.ty==='herring';};
- const applyParam=(k,val,withCommit)=>{ if(!curGear||!objs.includes(curGear))return;
-   if(withCommit)commit();
-   if(setGearParam(curGear,{[k]:val})){ syncAll(); if(withCommit)info(); } };
- function syncAll(){ if(!curGear)return; const p=gp(curGear)||{};
-   panels.forEach(pn=>{ SPEC.forEach(sp=>{ const f=pn.fields[sp.k]; if(!f)return;
-     const v=(sp.k==='b'?(+p.b||0):(+p[sp.k]||0));
-     if(document.activeElement!==f.v)f.v.value=+v.toFixed(2);
-     /* teeth/module only make sense on standard gears */
-     const show=sp.std?isStd(curGear):true;
-     f.wrap.style.display=show?'flex':'none';
-   }); });
+ const host=document.querySelector('#vp')||document.body;
+
+ /* the small button */
+ const btn=document.createElement('button');
+ btn.id='optBtn';
+ btn.style.cssText='position:absolute;top:54px;right:16px;display:none;z-index:7;background:var(--a,#1f6feb);color:#fff;border:0;border-radius:8px;padding:6px 11px;font-weight:600;box-shadow:0 2px 8px #0003;cursor:pointer';
+ host.appendChild(btn);
+ /* the panel */
+ const panel=document.createElement('div');
+ panel.id='optPanel';
+ panel.style.cssText='position:absolute;top:90px;right:16px;display:none;z-index:7;width:235px;background:var(--bg,#fff);border:1px solid var(--b,#ccc);border-radius:10px;padding:10px;box-shadow:0 4px 16px #0004';
+ host.appendChild(panel);
+
+ let mode=null,curGear=null,curShaft=null,open=false,lastSel=null;
+
+ const row=(label,k,val,step,unit,extra)=>
+   '<div style="display:flex;gap:6px;align-items:center;margin:4px 0" data-k="'+k+'">'
+   +'<label style="width:58px;color:var(--m,#777)">'+label+'</label>'
+   +'<button class="op_m" data-k="'+k+'" style="width:28px">−</button>'
+   +'<input class="op_v" data-k="'+k+'" type="number" step="'+step+'" value="'+val+'" style="width:60px">'
+   +'<button class="op_p" data-k="'+k+'" style="width:28px">＋</button>'
+   +'<span class="mut" style="font-size:11px">'+(unit||'')+'</span></div>'+(extra||'');
+
+ function renderGear(){
+   if(!curGear||!objs.includes(curGear))return;
+   const p=gp(curGear)||{}, std=isStd(curGear);
+   let h='<div style="font-weight:700;margin-bottom:6px">Gear controls</div>';
+   if(std){ h+=row('Teeth','N',Math.round(+p.N||12),1,''); h+=row('Module','m',+(+p.m||2).toFixed(2),0.5,'mm'); }
+   h+=row('Bore','b',+(+p.b||0).toFixed(2),0.5,'mm');
+   h+=row('Length','t',+(+p.t||8).toFixed(2),0.5,'mm');
+   h+='<p class="mut" style="margin:6px 0 0;font-size:11px">Edits the selected gear live; shaft, motor and wheel follow. Changing teeth/module resizes it — re-mesh neighbours if needed.</p>';
+   panel.innerHTML=h;
+   const clampN=x=>Math.max(3,Math.min(150,Math.round(x)));
+   const handler=(k)=>{ const inp=panel.querySelector('.op_v[data-k="'+k+'"]');
+     const apply=x=>{ if(k==='N')x=clampN(x); x=Math.max(0,x); inp.value=x; commit(); if(setGearParam(curGear,{[k]:x}))info(); };
+     inp.onchange=()=>apply(+inp.value||0);
+     panel.querySelector('.op_m[data-k="'+k+'"]').onclick=()=>apply((+inp.value||0)-(k==='N'?1:0.5));
+     panel.querySelector('.op_p[data-k="'+k+'"]').onclick=()=>apply((+inp.value||0)+(k==='N'?1:0.5));
+   };
+   ['N','m','b','t'].forEach(k=>{ if(panel.querySelector('.op_v[data-k="'+k+'"]'))handler(k); });
  }
- function buildPanel(host,where){
-   if(!host) return;
-   const row=document.createElement('div');
-   row.className='gctl_row';
-   row.style.cssText='display:none;margin:6px 0;padding:8px;border:1px solid var(--b);border-left:4px solid #0e9384;border-radius:8px;background:var(--p)';
-   let html='<div style="font-weight:700;margin-bottom:6px">Gear controls</div>';
-   SPEC.forEach(sp=>{
-     html+='<div class="gctl_f" data-k="'+sp.k+'" style="display:flex;gap:6px;align-items:center;margin:3px 0">'
-       +'<label style="width:58px;color:var(--m)">'+sp.label+'</label>'
-       +'<button class="gctl_m" data-k="'+sp.k+'" title="Less" style="width:28px">−</button>'
-       +'<input class="gctl_v" data-k="'+sp.k+'" type="number" step="'+sp.step+'" min="'+sp.min+'" style="width:64px">'
-       +'<button class="gctl_p" data-k="'+sp.k+'" title="More" style="width:28px">＋</button>'
-       +'<span class="mut" style="font-size:11px">'+sp.unit+'</span></div>';
-   });
-   html+='<p class="mut" style="margin:4px 0 0">Edit the selected gear live. Attached shaft, motor and wheel follow. Changing teeth or module resizes the gear — re-mesh neighbours if needed.</p>';
-   row.innerHTML=html;
-   if(where==='top') host.insertBefore(row,host.firstChild); else host.appendChild(row);
-   const fields={};
-   SPEC.forEach(sp=>{
-     const wrap=row.querySelector('.gctl_f[data-k="'+sp.k+'"]');
-     const v=wrap.querySelector('.gctl_v');
-     const clamp=x=>Math.max(sp.min,Math.min(sp.max,x));
-     const push=x=>{ x=clamp(sp.k==='N'?Math.round(x):x); v.value=x; applyParam(sp.k,x,true); };
-     v.onchange=()=>push(+v.value||sp.min);
-     wrap.querySelector('.gctl_m').onclick=()=>push((+v.value||sp.min)-sp.step);
-     wrap.querySelector('.gctl_p').onclick=()=>push((+v.value||sp.min)+sp.step);
-     fields[sp.k]={wrap,v};
-   });
-   panels.push({row,fields});
+ function renderShaft(){
+   if(!curShaft||!objs.includes(curShaft))return;
+   const L=shaftLength(curShaft), side=(curShaft.userData.gearAttach&&curShaft.userData.gearAttach.side)||'up';
+   let h='<div style="font-weight:700;margin-bottom:6px">Shaft controls</div>';
+   h+=row('Length','L',+L.toFixed(1),1,'mm');
+   h+='<div style="margin-top:8px;font-weight:600">Direction (gear face)</div>'
+     +'<div style="display:flex;gap:5px;margin-top:4px">'
+     +'<button class="op_face" data-s="up" '+(side==='up'?'style="background:var(--a,#1f6feb);color:#fff"':'')+'>Top</button>'
+     +'<button class="op_face" data-s="down" '+(side==='down'?'style="background:var(--a,#1f6feb);color:#fff"':'')+'>Bottom</button>'
+     +'<button class="op_face" data-s="both">Both</button></div>'
+     +'<p class="mut" style="margin:6px 0 0;font-size:11px">The shaft is the rotation axle and wheel seat. It sits on the gear face, never in the teeth.</p>';
+   panel.innerHTML=h;
+   const inp=panel.querySelector('.op_v[data-k="L"]');
+   const applyL=x=>{ x=Math.max(2,x); inp.value=x; commit(); setShaftLength(curShaft,x); };
+   inp.onchange=()=>applyL(+inp.value||2);
+   panel.querySelector('.op_m[data-k="L"]').onclick=()=>applyL((+inp.value||2)-1);
+   panel.querySelector('.op_p[data-k="L"]').onclick=()=>applyL((+inp.value||2)+1);
+   panel.querySelectorAll('.op_face').forEach(b=>{ b.style.flex='1';
+     b.onclick=()=>{ const s=b.dataset.s; if(!curGear||!objs.includes(curGear))return; commit();
+       try{ if(s==='both'){ const sb=Q('shboth'); if(sb&&sb.onclick){select([curGear]);sb.onclick();} else window.__v45.placeShaftSide(curGear,'up'); }
+            else window.__v45.placeShaftSide(curGear,s); }catch(e){console.warn(e);} }; });
  }
- buildPanel(Q('ins'),'inspector');
- buildPanel(Q('p-gears'),'top');
+ function renderPanel(){ if(mode==='gear')renderGear(); else if(mode==='shaft')renderShaft(); }
+
+ btn.onclick=()=>{ open=!open; panel.style.display=open?'block':'none'; if(open)renderPanel(); };
+
  const _info=info;
  info=function(){
    const r=_info.apply(this,arguments);
    try{
-     const g=(sel.length===1&&isG(sel[0]))?sel[0]:null; curGear=g;
-     if(g){ panels.forEach(pn=>pn.row.style.display='block'); syncAll(); }
-     else panels.forEach(pn=>pn.row.style.display='none');
+     const o=(sel.length===1)?sel[0]:null;
+     if(o!==lastSel){ open=false; panel.style.display='none'; lastSel=o; }   /* new selection => require a click */
+     if(o&&isG(o)){ mode='gear'; curGear=o; curShaft=null; btn.textContent='⚙ Gear options'; btn.style.display='block'; if(open)renderGear(); }
+     else if(o&&isShaft(o)&&gearOfShaft(o)){ mode='shaft'; curShaft=o; curGear=gearOfShaft(o); btn.textContent='⚙ Shaft options'; btn.style.display='block'; if(open)renderShaft(); }
+     else { mode=null; curGear=curShaft=null; btn.style.display='none'; panel.style.display='none'; open=false; }
    }catch(e){}
    return r;
  };
@@ -3356,53 +3402,109 @@ function setGearThickness(g,t){ return setGearParam(g,{t:+t}); }
 }());
 
 /* ============================================================================
-   (C) SHAFT FACE PICKER — replaces the old "shaft direction" dropdown / flip.
-   Click a shaft and a small picker offers the gear's two faces (top / bottom)
-   plus both. It seats on the face (over the bore), never in the teeth.
+   SIMPLE-MODE GEAR ADDER — place any gear type without leaving Simple mode.
+   Injected last, so it carries no .adv class and shows in both Simple & Advanced.
    ============================================================================ */
-(function shaftFacePicker(){
- const isShaft=o=>{ if(!o||!o.userData)return false; const u=o.userData;
-   if(u.motor||u.isWheel||u.hubOf||u.scr||u.po)return false;
-   return !!(u.sr||u.tt||(u.gearAttach&&u.gearAttach.role==='shaft')|| /shaft|output post/i.test(nameOf(o))); };
- const gearOfShaft=o=>{ const u=o.userData||{}; const g=(u.gearAttach&&u.gearAttach.gear)||u.link; return (g&&isG(g))?g:null; };
- /* hide the old direction controls (kept in DOM so internal code still works) */
- try{
-   const hideRow=(sel)=>{ const el=Q(sel); if(el){ const lab=el.previousElementSibling; if(lab&&lab.tagName==='LABEL')lab.style.display='none'; el.style.display='none'; } };
-   hideRow('psh');                 /* Shaft side dropdown */
-   hideRow('pwh');                 /* Wheel side dropdown */
-   const fb=Q('gflipshaft'); if(fb)fb.style.display='none';
-   const sd=Q('gshaftdown'); if(sd)sd.style.display='none';
- }catch(e){console.warn('hide old shaft dir',e);}
- /* floating picker */
- const bar=document.createElement('div');
- bar.id='shaftFacePick';
- bar.style.cssText='position:absolute;top:92px;left:50%;transform:translateX(-50%);display:none;gap:6px;align-items:center;background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:6px 9px;box-shadow:0 2px 10px #0003;z-index:6';
- bar.innerHTML='<span style="font-weight:600;margin-right:2px">Place shaft on:</span>'
-   +'<button id="sfp_top" class="pri">Top face</button>'
-   +'<button id="sfp_bot">Bottom face</button>'
-   +'<button id="sfp_both">Both</button>'
-   +'<button id="sfp_x" title="Close" style="width:26px">✕</button>';
- (document.querySelector('#vp')||document.body).appendChild(bar);
- let curShaft=null, curGear=null;
- const place=(side)=>{ if(!curGear||!objs.includes(curGear))return; commit();
-   try{ window.__v45.placeShaftSide(curGear,side); }catch(e){console.warn('placeShaftSide',e);} };
- Q('sfp_top').onclick=()=>place('up');
- Q('sfp_bot').onclick=()=>place('down');
- Q('sfp_both').onclick=()=>{ if(!curGear||!objs.includes(curGear))return; commit();
-   const sb=Q('shboth'); if(sb&&sb.onclick){ select([curGear]); sb.onclick(); }
-   else { try{window.__v45.placeShaftSide(curGear,'up');}catch(e){} } };
- Q('sfp_x').onclick=()=>{ bar.style.display='none'; };
- const _info=info;
- info=function(){
-   const r=_info.apply(this,arguments);
+(function simpleGearAdder(){
+ const pane=Q('p-gears'); if(!pane||Q('sga_box'))return;
+ const det=document.createElement('details');
+ det.id='sga_box'; det.open=true;
+ det.innerHTML='<summary>Add a gear</summary><div>'
+   +'<div class="fl"><label>Type</label>'
+   +'<select id="sga_type" style="grid-column:2/5">'
+     +'<option value="spur">Spur gear (plain)</option>'
+     +'<option value="helical">Helical gear</option>'
+     +'<option value="herring">Herringbone</option>'
+     +'<option value="bevel">Bevel pair (90°)</option>'
+     +'<option value="worm">Worm + worm wheel</option>'
+     +'<option value="rack">Rack &amp; pinion</option>'
+     +'<option value="ring">Internal ring gear</option>'
+     +'<option value="pulley">Timing pulley</option>'
+     +'<option value="sprocket">Chain sprocket</option>'
+     +'<option value="ratchet">Ratchet wheel</option>'
+     +'<option value="crown">Crown (face) gear</option></select>'
+   +'<label>Teeth</label><input id="sga_N" type="number" value="20">'
+   +'<label>Module</label><input id="sga_m" type="number" value="2" step=".25">'
+   +'<label>Thickness</label><input id="sga_t" type="number" value="8"></div>'
+   +'<p class="mut" id="sga_hint" style="margin:6px 0 0">Pick a type and press Add. Fine-tune helix / starts etc. in Advanced → “More gear types”.</p>'
+   +'<div class="br"><button class="pri" id="sga_add">Add gear</button></div></div>';
+ const seg=pane.querySelector('.seg');
+ if(seg) seg.after(det); else pane.insertBefore(det,pane.firstChild);
+ const typeSel=Q('sga_type');
+ /* brief note per type */
+ typeSel.onchange=()=>{ const t=typeSel.value;
+   Q('sga_hint').textContent = t==='spur' ? 'A plain spur gear — the standard type that meshes with any same-module spur gear.'
+     : t==='bevel'||t==='worm'||t==='rack' ? 'Adds a matched pair for '+typeSel.options[typeSel.selectedIndex].text+'. Fine-tune in Advanced → “More gear types”.'
+     : 'Adds a '+typeSel.options[typeSel.selectedIndex].text+'. Fine-tune in Advanced → “More gear types”.'; };
+ Q('sga_add').onclick=()=>{
+   const t=typeSel.value;
    try{
-     const o=(sel.length===1)?sel[0]:null;
-     if(o&&isShaft(o)&&gearOfShaft(o)){ curShaft=o; curGear=gearOfShaft(o); bar.style.display='flex'; }
-     else { curShaft=null; curGear=null; bar.style.display='none'; }
-   }catch(e){}
-   return r;
+     if(Q('gn'))Q('gn').value=Q('sga_N').value;
+     if(Q('gm'))Q('gm').value=Q('sga_m').value;
+     if(Q('gt'))Q('gt').value=Q('sga_t').value;
+     if(t==='spur'){ Q('gadd').click(); }
+     else { Q('gty').value=t; if(Q('gty').onchange)Q('gty').onchange(); Q('gtyadd').click(); }
+   }catch(e){ console.warn('simple add gear',e); hint.textContent='Could not add that gear type.'; }
  };
- try{ info(); }catch(e){}
+}());
+
+/* ============================================================================
+   AUTO-MESH POPUP — when two overlapping gears are not meshed.
+   ============================================================================ */
+(function autoMesh(){
+ const host=document.querySelector('#vp')||document.body;
+ const bar=document.createElement('div');
+ bar.id='autoMeshPop';
+ bar.style.cssText='position:absolute;top:54px;left:50%;transform:translateX(-50%);display:none;gap:8px;align-items:center;background:var(--bg,#fff);border:1px solid var(--b,#ccc);border-radius:9px;padding:7px 11px;box-shadow:0 3px 12px #0003;z-index:8;max-width:92%';
+ bar.innerHTML='<span id="am_txt" style="font-size:13px"></span>'
+   +'<button id="am_go" class="pri" style="display:none">Auto-mesh</button>'
+   +'<button id="am_x" title="Dismiss" style="width:24px">✕</button>';
+ host.appendChild(bar);
+ let dismissedKey=null, curKey=null;
+ Q('am_x').onclick=()=>{ bar.style.display='none'; dismissedKey=curKey; };
+ Q('am_go').onclick=()=>{ try{ commit(); Q('gfix').onclick();
+   /* re-sync any attached parts of all gears after repositioning */
+   objs.forEach(o=>{if(o.userData&&o.userData.gearAttach&&typeof __syncGearAttachment==='function')__syncGearAttachment(o);});
+   bar.style.display='none'; dismissedKey=null; hint.textContent='Auto-meshed: overlapping gears moved to the correct centre distance and tooth phase aligned.';
+ }catch(e){console.warn('auto-mesh',e);} };
+
+ /* find a problem pair: overlapping teeth but not properly meshed */
+ function findPair(){
+   let A; try{ A=analyze(); }catch(e){ return null; }
+   if(!A||!A.E)return null;
+   const selG=(sel.length===1&&isG(sel[0]))?sel[0]:(sel.length===1&&sel[0]&&sel[0].userData&&isG(sel[0].userData.link)?sel[0].userData.link:null);
+   const bad=A.E.filter(e=>e.k==='bad'||e.k==='phase');
+   if(!bad.length)return null;
+   const pick=bad.find(e=>selG&&(e.a===selG||e.b===selG))||bad[0];
+   const pa=gp(pick.a)||{}, pb=gp(pick.b)||{};
+   return {a:pick.a,b:pick.b,k:pick.k,sameMod:pa.m===pb.m};
+ }
+ /* the live check — called on selection change AND on a timer so it catches
+    gears being dragged into each other automatically. */
+ function updateAutoMesh(){
+   try{
+     const pr=findPair();
+     if(!pr){ bar.style.display='none'; curKey=null; dismissedKey=null; return; }
+     curKey=[pr.a.id,pr.b.id].sort().join('-');     /* pair identity only, so it stays stable while dragging */
+     if(curKey===dismissedKey){ bar.style.display='none'; return; }
+     const txt=Q('am_txt'), go=Q('am_go');
+     if(pr.sameMod){ txt.textContent='These two gears overlap but aren’t meshed.'; go.style.display='inline-block'; }
+     else { txt.textContent='⚠ These gears overlap but can’t mesh — different module (tooth size). Match one gear’s module in ⚙ Gear options.'; go.style.display='none'; }
+     bar.style.display='flex';
+   }catch(e){}
+ }
+ const _info=info;
+ info=function(){ const r=_info.apply(this,arguments); updateAutoMesh(); return r; };
+ /* automatic continuous check (covers dragging, generator output, param edits) */
+ let lastSig='';
+ setInterval(()=>{
+   try{
+     const G=objs.filter(isG);
+     const sig=G.map(g=>g.id+':'+g.position.x.toFixed(1)+','+g.position.z.toFixed(1)+','+(gp(g).m)+','+(gp(g).N)).join('|');
+     if(sig!==lastSig){ lastSig=sig; updateAutoMesh(); }
+   }catch(e){}
+ },300);
+ try{ updateAutoMesh(); }catch(e){}
 }());
 
 /* ============================================================================
