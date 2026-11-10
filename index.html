@@ -670,8 +670,8 @@ const head=bad?['bad','✗ This gear train will NOT spin – fix the red items.'
 box.innerHTML=`<div class="ln ${head[0]}"><b>${head[1]}</b></div>`+L.map(l=>`<div class="ln ${l[0]}">${l[1]}</div>`).join('')+`<div class="ln ok">Drive: ${nameOf(drive)}<br>${lines}</div>`;
 hint.textContent=head[1];return{bad,over,W,pk,tm:worst,pm:PM,fm:FM}}
 $('gchk').onclick=report;
-$('gfix').onclick=()=>{const{G,E}=analyze();G.forEach(o=>{o.rotation.x=0;o.rotation.z=0});const drive=dm()||sel.find(isG)||G[0];if(!drive)return;commit();const seen=new Set([drive]),q=[drive];
-while(q.length){const c=q.shift();E.forEach(e=>{if((!['ok','phase','axle'].includes(e.k)&&!(e.k==='bad'&&gp(e.a).m===gp(e.b).m))||(e.a!==c&&e.b!==c))return;const n=e.a===c?e.b:e.a;if(seen.has(n))return;seen.add(n);const pc=gp(c),pn=gp(n);if(e.k==='bad'){const dx=n.position.x-c.position.x,dz=n.position.z-c.position.z,d=Math.hypot(dx,dz)||1,a0=pc.m*(pc.N+pn.N)/2+(+$('gbl').value||0);n.position.x=c.position.x+dx/d*a0;n.position.z=c.position.z+dz/d*a0}
+$('gfix').onclick=()=>{const{G,E}=analyze();G.forEach(o=>{o.rotation.x=0;o.rotation.z=0});const drive=dm()||sel.find(isG)||G[0];if(!drive)return;commit();const seen=new Set([drive]),q=[drive],moved=new Set();
+while(q.length){const c=q.shift();E.forEach(e=>{if((!['ok','phase','axle'].includes(e.k)&&!(e.k==='bad'&&gp(e.a).m===gp(e.b).m))||(e.a!==c&&e.b!==c))return;const n=e.a===c?e.b:e.a;if(seen.has(n))return;seen.add(n);const pc=gp(c),pn=gp(n);if(e.k==='bad'&&!moved.has(n)){const dx=n.position.x-c.position.x,dz=n.position.z-c.position.z,d=Math.hypot(dx,dz)||1,a0=pc.m*(pc.N+pn.N)/2+(+$('gbl').value||0),ox=n.position.x,oz=n.position.z,mates=G.filter(o=>o!==n&&Math.hypot(o.position.x-ox,o.position.z-oz)<.3);n.position.x=c.position.x+dx/d*a0;n.position.z=c.position.z+dz/d*a0;/* gears stacked on the same shaft move together, so a stack never comes apart */mates.forEach(o=>{o.position.x+=n.position.x-ox;o.position.z+=n.position.z-oz;moved.add(o)});moved.add(n)}
 if(e.k==='axle')n.rotation.y=c.rotation.y;else{const b=Math.atan2(n.position.z-c.position.z,n.position.x-c.position.x),e1=(b+c.rotation.y)/(2*Math.PI/pc.N);n.rotation.y=(.5-e1)*(2*Math.PI/pn.N)-b-Math.PI}q.push(n)})}report()};
 let spin=null,lt=performance.now();let simRun=false,simSig='',simT0=0,simCache=[],statT=0;const simW=new Map(),simSvs=new Map();
 function tick(){const n=performance.now(),dt=Math.min(.05,(n-lt)/1000);lt=n;motTick(dt);simTick(dt)}
@@ -3556,16 +3556,19 @@ function worldTris(m){const c=TRC.get(m.uuid);if(c)return c;const r=worldTris0(m
 function worldTris0(m){m.updateMatrixWorld(true);const p=m.geometry.attributes.position,ix=m.geometry.index,n=ix?ix.count:p.count,o=new Float32Array(n*3),v=V3(0,0,0);
  for(let i=0;i<n;i++){v.fromBufferAttribute(p,ix?ix.getX(i):i).applyMatrix4(m.matrixWorld);o[3*i]=v.x;o[3*i+1]=v.y;o[3*i+2]=v.z}return o}
 /* call fn(x,y,z) for points spread over every triangle of T that touches box (fn returns true to stop) */
-function sampleTris(T,box,step,fn){const mn=box.min,mx=box.max,st=[],s2=step*step;
- for(let i=0;i<T.length;i+=9){st.length=0;st.push(T[i],T[i+1],T[i+2],T[i+3],T[i+4],T[i+5],T[i+6],T[i+7],T[i+8]);
-  while(st.length){const cz=st.pop(),cy=st.pop(),cx=st.pop(),bz=st.pop(),by=st.pop(),bx_=st.pop(),az=st.pop(),ay=st.pop(),ax=st.pop();
+const SST=new Float64Array(9*2048);
+function sampleTris(T,box,step,fn){const mn=box.min,mx=box.max,s2=step*step,st=SST;
+ for(let i=0;i<T.length;i+=9){const x0=T[i],y0=T[i+1],z0=T[i+2],x1=T[i+3],y1=T[i+4],z1=T[i+5],x2=T[i+6],y2=T[i+7],z2=T[i+8];if(Math.max(x0,x1,x2)<mn.x||Math.min(x0,x1,x2)>mx.x||Math.max(y0,y1,y2)<mn.y||Math.min(y0,y1,y2)>mx.y||Math.max(z0,z1,z2)<mn.z||Math.min(z0,z1,z2)>mx.z)continue;
+  st[0]=x0;st[1]=y0;st[2]=z0;st[3]=x1;st[4]=y1;st[5]=z1;st[6]=x2;st[7]=y2;st[8]=z2;let sp=9;
+  while(sp>0){sp-=9;const ax=st[sp],ay=st[sp+1],az=st[sp+2],bx_=st[sp+3],by=st[sp+4],bz=st[sp+5],cx=st[sp+6],cy=st[sp+7],cz=st[sp+8];
    if(Math.max(ax,bx_,cx)<mn.x||Math.min(ax,bx_,cx)>mx.x||Math.max(ay,by,cy)<mn.y||Math.min(ay,by,cy)>mx.y||Math.max(az,bz,cz)<mn.z||Math.min(az,bz,cz)>mx.z)continue;
    const ab=(bx_-ax)**2+(by-ay)**2+(bz-az)**2,bc=(cx-bx_)**2+(cy-by)**2+(cz-bz)**2,ca=(ax-cx)**2+(ay-cy)**2+(az-cz)**2;
    if(Math.max(ab,bc,ca)<=s2){const x=(ax+bx_+cx)/3,y=(ay+by+cy)/3,z=(az+bz+cz)/3;if(x>=mn.x&&x<=mx.x&&y>=mn.y&&y<=mx.y&&z>=mn.z&&z<=mx.z&&fn(x,y,z))return true;continue}
    /* split the longest edge */
-   if(ab>=bc&&ab>=ca){const mx_=(ax+bx_)/2,my=(ay+by)/2,mz=(az+bz)/2;st.push(ax,ay,az,mx_,my,mz,cx,cy,cz,mx_,my,mz,bx_,by,bz,cx,cy,cz)}
-   else if(bc>=ca){const mx_=(bx_+cx)/2,my=(by+cy)/2,mz=(bz+cz)/2;st.push(ax,ay,az,bx_,by,bz,mx_,my,mz,ax,ay,az,mx_,my,mz,cx,cy,cz)}
-   else{const mx_=(cx+ax)/2,my=(cy+ay)/2,mz=(cz+az)/2;st.push(ax,ay,az,bx_,by,bz,mx_,my,mz,mx_,my,mz,bx_,by,bz,cx,cy,cz)}}}
+   if(ab>=bc&&ab>=ca){const mx_=(ax+bx_)/2,my=(ay+by)/2,mz=(az+bz)/2;st[sp]=ax;st[sp+1]=ay;st[sp+2]=az;st[sp+3]=mx_;st[sp+4]=my;st[sp+5]=mz;st[sp+6]=cx;st[sp+7]=cy;st[sp+8]=cz;st[sp+9]=mx_;st[sp+10]=my;st[sp+11]=mz;st[sp+12]=bx_;st[sp+13]=by;st[sp+14]=bz;st[sp+15]=cx;st[sp+16]=cy;st[sp+17]=cz}
+   else if(bc>=ca){const mx_=(bx_+cx)/2,my=(by+cy)/2,mz=(bz+cz)/2;st[sp]=ax;st[sp+1]=ay;st[sp+2]=az;st[sp+3]=bx_;st[sp+4]=by;st[sp+5]=bz;st[sp+6]=mx_;st[sp+7]=my;st[sp+8]=mz;st[sp+9]=ax;st[sp+10]=ay;st[sp+11]=az;st[sp+12]=mx_;st[sp+13]=my;st[sp+14]=mz;st[sp+15]=cx;st[sp+16]=cy;st[sp+17]=cz}
+   else{const mx_=(cx+ax)/2,my=(cy+ay)/2,mz=(cz+az)/2;st[sp]=ax;st[sp+1]=ay;st[sp+2]=az;st[sp+3]=bx_;st[sp+4]=by;st[sp+5]=bz;st[sp+6]=mx_;st[sp+7]=my;st[sp+8]=mz;st[sp+9]=mx_;st[sp+10]=my;st[sp+11]=mz;st[sp+12]=bx_;st[sp+13]=by;st[sp+14]=bz;st[sp+15]=cx;st[sp+16]=cy;st[sp+17]=cz}
+   sp+=18}}
  return false}
 function edgesOn(m){if(m.geometry.attributes.position.count<40000)m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry,25),new THREE.LineBasicMaterial({color:edc})))}
 /* swap a mesh for a new one carrying JSCAD geometry given in WORLD coordinates (undo keeps the old mesh) */
@@ -3658,7 +3661,9 @@ function audit(g,hosts,seen){const E=env(g,'audit'),p=gp(g)||{},da=Math.max(1.2,
 /* ------------------------------ geometry utils ------------------------------ */
 const segD=(p,a,b)=>{const dx=b.x-a.x,dz=b.z-a.z,L=dx*dx+dz*dz||1e-9,t=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.z-a.z)*dz)/L));return Math.hypot(p.x-a.x-t*dx,p.z-a.z-t*dz)};
 const edgeD=(p,P)=>{let d=1e9;for(let i=0;i<P.length;i++)d=Math.min(d,segD(p,P[i],P[(i+1)%P.length]));return d};
-const clearOf=(p,H,d)=>H.every(h=>!inPoly(p.x,p.z,h)&&edgeD(p,h)>=d);
+const nearEdge=(p,P,d)=>{const d2=d*d,px=p.x,pz=p.z;for(let i=0,n=P.length;i<n;i++){const a=P[i],b=P[i+1===n?0:i+1],dx=b.x-a.x,dz=b.z-a.z,L=dx*dx+dz*dz||1e-9;let t=((px-a.x)*dx+(pz-a.z)*dz)/L;t=t<0?0:t>1?1:t;const ex=px-a.x-t*dx,ez=pz-a.z-t*dz;if(ex*ex+ez*ez<d2)return true}return false};
+const bbOfPoly=h=>h._bb||(h._bb=(()=>{let a=1e9,b=-1e9,c=1e9,e=-1e9;for(const q of h){if(q.x<a)a=q.x;if(q.x>b)b=q.x;if(q.z<c)c=q.z;if(q.z>e)e=q.z}return[a,b,c,e]})());
+const clearOf=(p,H,d)=>H.every(h=>{const B=bbOfPoly(h);if(p.x<B[0]-d||p.x>B[1]+d||p.z<B[2]-d||p.z>B[3]+d)return true;return !inPoly(p.x,p.z,h)&&!nearEdge(p,h,d)});
 const rayY=(host,x,y,z,dir)=>{RC.set(V3(x,y,z),V3(0,dir,0));const h=RC.intersectObjects(meshList(host),false);return h.length?h[0].point.y:null};
 function encInfo(base){const e=base&&base.userData.enc;if(!e||!e.out)return null;const dx=base.position.x-e.px,dy=base.position.y-e.py,dz=base.position.z-e.pz,sh=P=>P.map(p=>({x:p.x+dx,z:p.z+dz}));
  return{out:sh(e.out),inn:sh(e.inn),yb:e.yb+dy,y0:e.y0+dy,yt:e.yt+dy,lt:e.lt,real:true}}
@@ -3713,7 +3718,7 @@ function dropCut(base,gears,info,clr){const yTop=info.yt+3;let n=0;
 function colSpec(s,ty,sink){const rh=(ty==='tap'?s.tap:ty==='ins'?s.ins:s.clear)/2,wall=Math.max(1.6,.5*s.d),hexR=(s.af+.3)/2/Math.cos(Math.PI/6);
  return{rh,Rb:Math.max(rh+wall,ty==='nut'?hexR+1.1:0),hexR,headR:s.capD/2+.3,wall}}
 function freeSpots(info,H,Rb,gap,lid,headR){const X=info.out.map(p=>p.x),Z=info.out.map(p=>p.z),x0=Math.min(...X),x1=Math.max(...X),z0=Math.min(...Z),z1=Math.max(...Z),C={x:(x0+x1)/2,z:(z0+z1)/2},diag=Math.hypot(x1-x0,z1-z0),ok=[];
- for(let x=x0+Rb;x<=x1-Rb;x+=.6)for(let z=z0+Rb;z<=z1-Rb;z+=.6){const p={x,z};if(!inPoly(x,z,info.out)||edgeD(p,info.out)<Rb)continue;if(!clearOf(p,H,Rb+gap))continue;ok.push(p)}
+ for(let x=x0+Rb;x<=x1-Rb;x+=.6)for(let z=z0+Rb;z<=z1-Rb;z+=.6){const p={x,z};if(!inPoly(x,z,info.out)||nearEdge(p,info.out,Rb))continue;if(!clearOf(p,H,Rb+gap))continue;ok.push(p)}
  if(!ok.length)return null;
  const good=p=>{if(!lid||!info.real)return true;const top=info.yt+info.lt;for(let k=-1;k<6;k++){const r=k<0?0:Math.max(headR,Rb),y=rayY(lid,p.x+r*Math.cos(k*1.047),top+60,p.z+r*Math.sin(k*1.047),-1);if(y==null||Math.abs(y-top)>.35)return false}return true};
  const sep=Math.max(2*Rb+3,.22*diag),pk=[];
@@ -3768,7 +3773,8 @@ function snapLatches(base,lid,info,H,clr){const P=info.inn,cand=[],yc=info.yt-3.
   addW(lid,new THREE.CylinderGeometry(.75,.75,4.6,20),gx,yc,gz,COLL,'v60latch',qq)});
  return pk.length}
 /* ------------------------------ enclosure UI ------------------------------ */
-let feasT=0,feasSig='';
+let feasT=0,feasSig='',feasKey='';
+const feasKeyOf=(o,base,G)=>{const e=(base&&base.userData.enc)||{};return[o.ty,o.clr,o.fast,o.sz,Q('gw').value,Q('gemode').value,base?[base.uuid,base.position.x,base.position.y,base.position.z,e.out&&e.out.length,e.yb,e.yt].join():'-',G.map(g=>{const z=gp(g)||{};return[g.uuid,g.position.x,g.position.y,g.position.z,g.rotation.y,z.N,z.m,z.t,z.b].join()}).join(';'),objs.filter(q=>q.userData.link||q.userData.hubOf).map(q=>[q.uuid,q.position.x,q.position.y,q.position.z,q.scale.y,q.rotation.y].join()).join(';')].join('|')};
 (function encUI(){const genc=Q('genc');if(!genc||Q('v6blk'))return;const row=genc.closest('.br');
  row.insertAdjacentHTML('beforebegin','<div class="blk" id="v6blk" style="--c:#0e9384"><div class="bt"><i>✓</i>Printing &amp; lid</div>'
  +'<div class="v9f"><label>How will you print it?</label><select id="v6mode"><option value="inplace">Print in place – gears printed inside the box, ready to spin</option><option value="assemble">Assemble after printing – separate parts, gears drop in</option></select></div>'
@@ -3792,13 +3798,13 @@ const encOpts=()=>({asm:Q('v6mode').value==='assemble',clr:Math.max(.2,Math.min(
 function feasSoon(){clearTimeout(feasT);feasT=setTimeout(feas,250)}
 function feas(){try{const o=encOpts(),opt=Q('v6fast').querySelector('option[value=inside]'),note=Q('v6note'),base=newestBase(),G=base?gearsOf(base):objs.filter(isG);
  if(!G.length||!J){opt.disabled=false;opt.textContent='Screws inside the box (box stays the same size)';note.textContent='';return}
- ENVC=new Map();TRC=new Map();const info=base?encInfo(base):predInfo(G),lid=base&&[...objs].reverse().find(q=>/^Gearbox lid/.test(nameOf(q)));
- const fits=[2,2.5,3,4,5].filter(d=>{const cs=colSpec(scr(d),o.ty);return!!freeSpots(info,footprints(G,o.ty==='nut'),cs.Rb,o.clr+.5,null,cs.headR)}),ok=fits.includes(o.sz);
+ const fk=feasKeyOf(o,base,G);if(fk===feasKey)return;feasKey=fk;ENVC=new Map();TRC=new Map();const info=base?encInfo(base):predInfo(G),lid=base&&[...objs].reverse().find(q=>/^Gearbox lid/.test(nameOf(q)));
+ const H0=footprints(G,o.ty==='nut'),fits=[2,2.5,3,4,5].filter(d=>{const cs=colSpec(scr(d),o.ty);return!!freeSpots(info,H0,cs.Rb,o.clr+.5,null,cs.headR)}),ok=fits.includes(o.sz);
  opt.disabled=!ok;opt.textContent=ok?'Screws inside the box (box stays the same size)':'Screws inside – NO FREE SPACE for M'+o.sz;
  if(o.fast==='inside'&&!ok){Q('v6fast').value=fits.length?'inside':'snap';if(fits.length){Q('v6sz').value=String(fits[fits.length-1]);opt.disabled=false;opt.textContent='Screws inside the box (box stays the same size)'}
   note.textContent='No free space left between the gears for M'+o.sz+' screws inside the box. '+(fits.length?'Switched to M'+fits[fits.length-1]+', which fits.':'Switched to the snap-fit lid (print and place) – or pick “tabs outside”.');document.querySelectorAll('#v6blk .v6scr').forEach(e=>e.style.display=Q('v6fast').value==='snap'?'none':'');return}
  note.textContent=Q('v6fast').value==='snap'?'Snap-fit lid: locating lip plus small latches that click into the wall.':Q('v6fast').value==='outside'?'Tabs add about '+f1(2*colSpec(scr(o.sz),o.ty).Rb)+' mm at four corners.':'Inside screws fit: '+(fits.length?fits.map(d=>'M'+d).join(', '):'none')+'. Columns go only where no gear, shaft or wheel passes.'}catch(e){console.warn('v60 feas',e)}}
-setInterval(()=>{try{if(!Q('p-gears').classList.contains('on')||!Q('v6blk').closest('details').open)return;const s=objs.filter(isG).map(g=>g.id+':'+g.position.x.toFixed(1)+','+g.position.z.toFixed(1)+','+gp(g).N+','+gp(g).m).join('|')+objs.length;if(s!==feasSig){feasSig=s;feas()}}catch(e){}},1200);
+setInterval(()=>{try{if(!Q('p-gears').classList.contains('on')||!Q('v6blk').closest('details').open)return;const s=objs.filter(isG).map(g=>g.id+':'+g.position.x.toFixed(1)+','+g.position.z.toFixed(1)+','+gp(g).N+','+gp(g).m).join('|')+objs.filter(q=>isG(q)||q.userData.link||q.userData.hubOf||q.userData.container||/^Gearbox|^Pin caps/.test(nameOf(q))).length;if(s!==feasSig){feasSig=s;feas()}}catch(e){}},1200);
 
 /* ------------------------------ the finishing pass ------------------------------ */
 let encRep='',depth=0;
