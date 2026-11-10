@@ -2661,6 +2661,9 @@ setInterval(()=>{if(dead||applying||rd()||!ready)return;const ch=[];
  if(ch.length){sceneTs=Date.now();auto();if(N.peers().length)out('pr',{o:ch})}},150);
 let lastPv='',lastPvT=0;const PV=new Map();
 let fwOn=(()=>{try{return localStorage.getItem('mc_fw_'+pr.id)!=='0'}catch(e){return true}})(),ft=null;
+let kabOn=isO?(()=>{try{return localStorage.getItem('mc_kab_'+pr.id)==='1'}catch(e){return false}})():false;
+const kabApply=()=>{const c=document.getElementById('kab');if(!c)return;c.checked=kabOn;c.disabled=!isO;const l=c.closest('label');if(l){l.title=isO?'Stops any model sinking below the base plate':'Only the host can change this';l.style.opacity=isO?'':'.6'}};
+kabApply();{const c=document.getElementById('kab');if(c&&isO)c.addEventListener('change',()=>{kabOn=c.checked;try{localStorage.setItem('mc_kab_'+pr.id,kabOn?'1':'0')}catch(x){}pushR();draw()})}
 let applying=0,lastS='',lastC='',last={},follow=null,at=0,unread=0,sceneTs=0,dead=0,tick=0,known=new Set(),T0=Date.now(),ready=0,lastSend=0,dirty=0;
 window.__mcSetTs=t=>{sceneTs=+t||0};window.__mcGetTs=()=>sceneTs||Date.now();
 function pullLobby(){const us=mems().filter(u=>u!==me.name);if(!N.fetchScene||!us.length)return;let left=us.length;
@@ -2680,7 +2683,7 @@ function applyScene(js){applying=1;try{const keep=sel.map(o=>o.uuid),L=new THREE
 const rSig=l=>l.map(m=>m.user+':'+m.role).join();
 const setR=l=>{R=l;N.room(mems());try{$('pj').textContent=pr.name+' · '+(rl(me.name)||role)}catch(e){}draw()};
 const ownerList=()=>{const p=rj('mc_projects',[]).find(x=>x.id===pr.id&&x.owner===me.name);return p?[{user:me.name,role:'Owner'}].concat((p.members||[]).filter(m=>m.status==='accepted').map(m=>({user:m.user,role:m.role||'Co-owner'}))):null};
-const pushR=u=>{const m=R.map(x=>[x.user,x.role]);u?to(u,'ro',{m,fw:fwOn?1:0,ap:askPlace?1:0}):out('ro',{m,fw:fwOn?1:0,ap:askPlace?1:0})};
+const pushR=u=>{const m=R.map(x=>[x.user,x.role]),o={m,fw:fwOn?1:0,ap:askPlace?1:0,kb:kabOn?1:0};u?to(u,'ro',o):out('ro',o)};
 function syncOwner(){if(!isO||dead)return;const l=ownerList();if(l&&rSig(l)!==rSig(R)){setR(l);pushR()}}
 const ping=()=>{try{new BroadcastChannel('minicad').postMessage(1)}catch(e){}};
 function kick(us){us.forEach(u=>{if(u===me.name||!mem(u))return;
@@ -2696,6 +2699,7 @@ N.on('c:kick',(m,u)=>{if(!isO&&u===OWN&&m&&m.pid===pr.id)gone('kicked')});
 N.on('c:ro',(m,u)=>{if(isO||u!==OWN||!m||m.pid!==pr.id||!Array.isArray(m.m))return;
  if(m.ap!==undefined){askPlace=!!m.ap;if(!askPlace){clearIds([...PEND.keys()]);prune()}}
  if(m.fw!==undefined){fwOn=!!m.fw;if(!fwOn&&follow){follow=null;ft=null;note('The owner turned off Follow')}}
+ if(m.kb!==undefined){kabOn=!!m.kb;kabApply()}
  const l=m.m.filter(a=>Array.isArray(a)&&typeof a[0]==='string').map(a=>({user:a[0],role:String(a[1]||'Co-owner')}));
  if(!l.some(x=>x.user===me.name))return gone('removed');
  try{const ps=rj('mc_projects',[]),p=ps.find(x=>x.id===pr.id);if(p){p.members=l.filter(x=>x.user!==OWN).map(x=>({user:x.user,role:x.role,status:'accepted'}));localStorage.setItem('mc_projects',JSON.stringify(ps))}}catch(e){}
@@ -2796,25 +2800,91 @@ function localAdds(){const ad=objs.filter(o=>!known.has(o.uuid));known=new Set(o
  const a=p.ls.geometry.attributes.position,c=[];for(let i=0;i<8;i++)c.push([i&1?b.max.x:b.min.x,i&2?b.max.y:b.min.y,i&4?b.max.z:b.min.z]);
  E12.forEach((e,k)=>{a.setXYZ(k*2,...c[e[0]]);a.setXYZ(k*2+1,...c[e[1]])});a.needsUpdate=true;p.ls.computeLineDistances()})})();
 /* panel */
-const css=document.createElement('style');css.textContent='#cb{position:fixed;left:14px;bottom:48px;z-index:60;font:13px system-ui}#cb>button{padding:7px 12px;border-radius:999px;border:1px solid #0003;background:#fff;color:#1f2328;box-shadow:0 4px 14px #0003;cursor:pointer}#cbp{width:300px;margin-bottom:8px;background:#fff;color:#1f2328;border:1px solid #0002;border-radius:12px;box-shadow:0 10px 30px #0004;padding:10px}#cbm .r{display:flex;align-items:center;gap:4px;padding:4px 0}#cbm small{margin-left:auto;color:#667;max-width:125px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#cbm button{font-size:11px;margin-left:6px;cursor:pointer}#cbl{height:110px;overflow:auto;border-top:1px solid #0002;margin-top:6px;padding-top:6px}#cbi{display:flex;gap:6px;margin-top:6px}#cbi input{flex:1;min-width:0}';document.head.appendChild(css);
-const box=document.createElement('div');box.id='cb';box.innerHTML='<div id="cbp" hidden><div id="cbm"></div><div id="cbl"></div><div id="cbi"><input id="cbx" placeholder="Message everyone…" maxlength="300"><button id="cbs">Send</button></div></div><button id="cbt"></button>';document.body.appendChild(box);
+const css=document.createElement('style');css.textContent=`
+#cb{position:fixed;left:14px;bottom:48px;z-index:60;font:13px/1.35 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--t,#1f2328)}
+#cb *{box-sizing:border-box}
+#cb button{height:auto;font:inherit}
+#cb #cbt{display:inline-flex;align-items:center;gap:9px;padding:7px 12px 7px 11px;border-radius:999px;border:1px solid var(--b,#0002);background:var(--p,#fff);color:var(--t,#1f2328);box-shadow:0 4px 14px #0003;cursor:pointer;position:relative;font-weight:700;font-size:11.5px;letter-spacing:.09em}
+#cb #cbt:hover{background:var(--h,#f3f5f8)}
+#cb .lv{position:relative;width:9px;height:9px;border-radius:50%;background:#22c55e;flex:none}
+#cb .lv::after{content:"";position:absolute;inset:0;border-radius:50%;background:#22c55e;animation:cblp 1.8s ease-out infinite}
+#cb .lv.c,#cb .lv.c::after{background:#f59e0b}#cb .lv.c::after{animation-duration:.9s}
+#cb .lv.x,#cb .lv.x::after{background:#ef4444}#cb .lv.x::after{animation:none;display:none}
+@keyframes cblp{0%{transform:scale(1);opacity:.65}100%{transform:scale(3.2);opacity:0}}
+#cb .lt.g{color:#16a34a}#cb .lt.c{color:#d97706}#cb .lt.x{color:#dc2626}
+#cb .lc{display:inline-flex;align-items:center;gap:4px;padding:2px 8px 2px 6px;border-radius:999px;background:var(--h,#eef1f5);color:var(--t,#1f2328);letter-spacing:0;font-weight:600;font-size:11.5px}
+#cb .lc svg{width:12px;height:12px;opacity:.7}
+#cb .ub{position:absolute;top:-3px;right:-2px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#e5484d;color:#fff;font:700 10px/16px system-ui;text-align:center;letter-spacing:0;border:2px solid var(--p,#fff);box-sizing:content-box}
+#cbp{width:330px;max-width:calc(100vw - 28px);max-height:calc(100vh - 120px);overflow:auto;margin-bottom:10px;background:var(--p,#fff);color:var(--t,#1f2328);border:1px solid var(--b,#0002);border-radius:16px;box-shadow:0 18px 44px #0005}
+#cb .ch{display:flex;align-items:center;gap:8px;padding:13px 14px 11px;border-bottom:1px solid var(--b,#0002)}
+#cb .ch b{font-size:14px;flex:1}
+#cb .ch .pill{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;letter-spacing:.08em;padding:3px 9px;border-radius:999px;background:#22c55e1f;color:#16a34a}
+#cb .ch .pill.c{background:#f59e0b24;color:#d97706}#cb .ch .pill.x{background:#ef44441f;color:#dc2626}
+#cb .cs{padding:12px 12px 6px}
+#cb .cst{display:flex;align-items:center;justify-content:space-between;font:700 10.5px system-ui;letter-spacing:.09em;text-transform:uppercase;color:var(--m,#667);margin:0 2px 8px}
+#cb .cst em{font-style:normal;letter-spacing:0;text-transform:none;font-weight:600;font-size:10.5px;padding:2px 8px;border-radius:999px;background:var(--h,#eef1f5)}
+#cb .mr{display:flex;align-items:center;gap:10px;padding:7px 6px;border-radius:10px}
+#cb .mr:hover{background:var(--h,#f3f5f8)}
+#cb .av{position:relative;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;flex:none}
+#cb .av i{position:absolute;right:-2px;bottom:-2px;width:11px;height:11px;border-radius:50%;border:2px solid var(--p,#fff);background:#9aa3b2}
+#cb .av i.on{background:#22c55e}#cb .av i.st{background:#f59e0b}
+#cb .mi{min-width:0;flex:1}
+#cb .mn{display:flex;align-items:center;gap:6px;font-weight:600;min-width:0}
+#cb .mn>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#cb .rb{font:600 10px system-ui;padding:1px 7px;border-radius:999px;background:var(--h,#eef1f5);color:var(--m,#667);flex:none}
+#cb .rb.o{background:#f5a6231f;color:#b7791f}
+#cb .ms{font-size:11.5px;color:var(--m,#667);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#cb .ma{display:flex;gap:5px;flex:none}
+#cb .ma button,#cb .dg{padding:4px 10px;border-radius:7px;border:1px solid var(--b,#0003);background:var(--p,#fff);color:var(--t,#1f2328);cursor:pointer;font-size:11.5px;font-weight:600}
+#cb .ma button:hover{background:var(--h,#f3f5f8)}
+#cb .ma button.k,#cb .dg{color:#e5484d;border-color:#e5484d55}
+#cb .ma button.k:hover,#cb .dg:hover{background:#e5484d14}
+#cb .pm{display:flex;align-items:center;gap:12px;padding:10px 11px;border-radius:12px;border:1px solid var(--b,#0002);background:var(--bg,#f7f8fa);margin-bottom:7px}
+#cb .pm .pt{flex:1;min-width:0}
+#cb .pm b{display:block;font-size:12.5px;font-weight:600}
+#cb .pm small{display:block;color:var(--m,#667);font-size:11px;line-height:1.3;margin-top:1px}
+#cb .sw{position:relative;width:40px;height:23px;border-radius:999px;border:0;background:#c3cad6;padding:0;cursor:pointer;flex:none;transition:background .18s}
+#cb .sw::after{content:"";position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0005;transition:transform .18s}
+#cb .sw[aria-checked=true]{background:#22c55e}#cb .sw[aria-checked=true]::after{transform:translateX(17px)}
+#cb .sw:disabled{opacity:.5;cursor:not-allowed}
+#cb .dg{width:100%;padding:8px 10px;border-radius:10px;margin:2px 0 8px}
+#cb .ow{font-size:11.5px;color:var(--m,#667);padding:8px 10px;border-radius:10px;background:var(--bg,#f7f8fa);margin-bottom:8px}
+#cb .cc{border-top:1px solid var(--b,#0002);padding:10px 12px 12px}
+#cbl{height:112px;overflow:auto;display:flex;flex-direction:column;gap:5px;padding:2px 0 8px}
+#cbl .em{margin:auto;color:var(--m,#667);font-size:12px}
+#cbl .bb{align-self:flex-start;max-width:90%;padding:5px 10px;border-radius:12px;background:var(--h,#eef1f5);word-break:break-word}
+#cbl .bb.me{align-self:flex-end;background:var(--a,#4c8dff);color:#fff}
+#cbl .bb b{font-size:11px;display:block;margin-bottom:1px}
+#cbi{display:flex;gap:6px}
+#cbi input{flex:1;min-width:0;height:34px;border-radius:10px;padding:0 12px}
+#cbi button{height:34px;padding:0 14px;border-radius:10px;border:0;background:var(--a,#4c8dff);color:#fff;font-weight:600;cursor:pointer}
+`;document.head.appendChild(css);
+const box=document.createElement('div');box.id='cb';box.innerHTML='<div id="cbp" hidden><div class="ch"><b>Live session</b><span class="pill" id="cbpl"></span></div><div class="cs" id="cbm"></div><div class="cc"><div id="cbl"></div><div id="cbi"><input id="cbx" placeholder="Message everyone…" maxlength="300"><button id="cbs">Send</button></div></div></div><button id="cbt"></button>';document.body.appendChild(box);
 box.addEventListener('keydown',e=>e.stopPropagation());
 const act=p=>p&&p.s&&p.s.length?'selected '+((objs.find(o=>o.uuid===p.s[0])||{userData:{}}).userData.name||'object')+(p.s.length>1?' +'+(p.s.length-1):''):'viewing';
 const live=u=>u===me.name||N.online(u);
-function draw(){const on=mems().filter(u=>u!==me.name&&N.online(u)).length,s=N.status;
- $('cbt').innerHTML='👥 '+(s==='online'?(on?on+' online':'Live'):s==='offline'?'Offline – retrying…':'Connecting…')+(unread?' <b style="color:#e5484d">●</b>':'');
+const sw=(id,on,dis)=>`<button class="sw" id="${id}" role="switch" aria-checked="${on?'true':'false'}"${dis?' disabled':''}></button>`;
+const pmr=(id,t,d,on)=>`<div class="pm"><div class="pt"><b>${t}</b><small>${d}</small></div>${sw(id,on,!isO)}</div>`;
+function draw(){const on=mems().filter(u=>u!==me.name&&N.online(u)).length,s=N.status,st=s==='online'?'g':s==='offline'?'x':'c',lb=s==='online'?'LIVE':s==='offline'?'OFFLINE':'CONNECTING';
+ $('cbt').innerHTML='<i class="lv'+(st==='g'?'':' '+st)+'"></i><span class="lt '+st+'">'+lb+'</span>'+(s==='online'?'<span class="lc" title="'+(on+1)+' in this session"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-3.6 3.2-5.5 6.5-5.5s6 1.9 6.5 5.5"/><path d="M16 4.7a3.5 3.5 0 0 1 0 6.6M18.5 14.8c1.7.7 2.8 2.4 3 5.2"/></svg>'+(on+1)+'</span>':'')+(unread?'<span class="ub">'+(unread>9?'9+':unread)+'</span>':'');
+ $('cbt').title=s==='online'?'Live – connected':s==='offline'?'Offline – retrying…':'Connecting…';
  if($('cbp').hidden)return;
- $('cbm').innerHTML=R.map(({user:u,role:r})=>{const you=u===me.name,o=live(u);return `<div class="r"><i class="pd${o?' on':!you&&LOB.has(u)?' st':''}"></i><b style="color:${col(u)}">${u===OWN?'👑 ':''}${esc(u)}</b>${you?'<span>&nbsp;(you)</span>':''}<small>${esc((u===OWN?'Owner':r)+' · '+(o?(you?'you':act(P.get(u))):LOB.has(u)?'on start page':'offline'))}</small>${!you&&!o&&LOB.has(u)?`<button data-i="${esc(u)}">Invite</button>`:''}${!you&&o&&(isO||fwOn)?`<button data-f="${esc(u)}">${follow===u?'Stop':'Follow'}</button>`:''}${isO&&!you?`<button data-k="${esc(u)}" style="color:#e5484d">Kick</button>`:''}</div>`}).join('')
-  +(isO?`<div class="r"><button id="cap" style="margin:0">Ask permission to place: ${askPlace?'On':'Off'}</button></div>`:'')
-  +(isO?`<div class="r"><button id="cfw" style="margin:0">Follow: ${fwOn?'On':'Off'} (for everyone)</button></div>`:'')
-  +(isO&&R.length>1?'<div class="r"><button id="cka" style="color:#e5484d;margin:0">Remove everyone</button></div>':'')
-  +(!isO&&!N.online(OWN)?'<div class="r"><small style="margin:0;max-width:none;white-space:normal">The owner is offline – you can keep editing; changes sync when they return.</small></div>':'');
- $('cbl').innerHTML=chat.slice(-40).map(c=>`<div><b style="color:${col(c.u)}">${esc(c.u)}:</b> ${esc(c.x)}</div>`).join('')||'<small style="color:#667">Chat with everyone in this project</small>';$('cbl').scrollTop=1e9}
+ $('cbpl').className='pill'+(st==='g'?'':' '+st);$('cbpl').innerHTML='<i class="lv'+(st==='g'?'':' '+st)+'"></i>'+(s==='online'?(on+1)+' online':lb);
+ $('cbm').innerHTML='<div class="cst">Members<em>'+R.length+'</em></div>'+R.map(({user:u,role:r})=>{const you=u===me.name,o=live(u),sub=o?(you?'Online now':act(P.get(u))):LOB.has(u)?'On start page':'Offline';
+  return `<div class="mr"><div class="av" style="background:${col(u)}">${esc(u.charAt(0).toUpperCase())}<i class="${o?'on':!you&&LOB.has(u)?'st':''}"></i></div><div class="mi"><div class="mn"><span style="color:${col(u)}">${esc(u)}</span>${you?'<span style="color:var(--m,#667);font-weight:500">(you)</span>':''}<span class="rb${u===OWN?' o':''}">${u===OWN?'👑 Host':esc(r)}</span></div><div class="ms">${esc(sub)}</div></div><div class="ma">${!you&&!o&&LOB.has(u)?`<button data-i="${esc(u)}">Invite</button>`:''}${!you&&o&&(isO||fwOn)?`<button data-f="${esc(u)}">${follow===u?'Stop':'Follow'}</button>`:''}${isO&&!you?`<button class="k" data-k="${esc(u)}">Kick</button>`:''}</div></div>`}).join('')
+  +'<div class="cst" style="margin-top:12px">Host controls'+(isO?'':'<em>🔒 Host only</em>')+'</div>'
+  +pmr('cap','Ask permission to place','Members’ new parts wait for your approval.',askPlace)
+  +pmr('cfw','Allow Follow','Members can follow each other’s camera.',fwOn)
+  +pmr('ckb','Stay above plate','Stops any model sinking below the base plate.',kabOn)
+  +(isO&&R.length>1?'<button class="dg" id="cka">Remove everyone</button>':'')
+  +(!isO&&!N.online(OWN)?'<div class="ow">The host is offline – you can keep editing; changes sync when they return.</div>':'');
+ $('cbl').innerHTML=chat.slice(-40).map(c=>`<div class="bb${c.u===me.name?' me':''}">${c.u===me.name?'':`<b style="color:${col(c.u)}">${esc(c.u)}</b>`}${esc(c.x)}</div>`).join('')||'<div class="em">Chat with everyone in this project</div>';$('cbl').scrollTop=1e9}
 $('cbt').onclick=()=>{const p=$('cbp');p.hidden=!p.hidden;unread=0;draw()};
-$('cbm').onclick=e=>{const t=e.target,f=t.dataset&&t.dataset.f,k=t.dataset&&t.dataset.k;
+$('cbm').onclick=e=>{const t=e.target.closest('button')||e.target,f=t.dataset&&t.dataset.f,k=t.dataset&&t.dataset.k;
  if(t.dataset&&t.dataset.i){const u=t.dataset.i;t.disabled=true;t.textContent='Sent…';N.lobbyCall(u,{t:'binv',pid:pr.id},4000).then(r=>{t.textContent=r?'Invited':'Failed';setTimeout(draw,1800)});return}
  if(t.id==='cap'&&isO){askPlace=!askPlace;try{localStorage.setItem('mc_ap_'+pr.id,askPlace?'1':'0')}catch(x){}if(!askPlace)BAT.filter(b=>!b.done).forEach(b=>resolveB(b,true));pushR();draw();return}
  if(t.id==='cfw'&&isO){fwOn=!fwOn;try{localStorage.setItem('mc_fw_'+pr.id,fwOn?'1':'0')}catch(x){}pushR();draw();return}
+ if(t.id==='ckb'&&isO){kabOn=!kabOn;try{localStorage.setItem('mc_kab_'+pr.id,kabOn?'1':'0')}catch(x){}kabApply();pushR();draw();return}
  if(t.id==='cka'){if(confirm('Remove everyone except you from this project?'))kick(mems().filter(u=>u!==me.name));return}
  if(k){if(confirm('Remove '+k+' from this project?'))kick([k]);return}
  if(!f)return;if(!isO&&!fwOn)return;follow=follow===f?null:f;if(!follow)ft=null;const p=P.get(f);if(follow&&p&&p.c)goCam(p.c);draw()};
