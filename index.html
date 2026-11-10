@@ -314,7 +314,7 @@ const handles=HD.map(d=>{const h=new THREE.Mesh(d.cn?new THREE.SphereGeometry(.6
 const sn=v=>snap?Math.round(v/snap)*snap:v,mat=c=>new THREE.MeshStandardMaterial({color:c,roughness:.65,metalness:.05,side:THREE.DoubleSide});
 const circ=(cx,cz,r,n=64)=>[...Array(n)].map((_,i)=>({x:cx+r*Math.cos(i/n*6.2832),z:cz+r*Math.sin(i/n*6.2832)}));
 const rc=(x0,z0,x1,z1)=>[{x:x0,z:z0},{x:x1,z:z0},{x:x1,z:z1},{x:x0,z:z1}];
-function ext(p,h,holes=[]){const s=new THREE.Shape(p.map(a=>new THREE.Vector2(a.x,-a.z)));holes.forEach(hp=>s.holes.push(new THREE.Path(hp.map(a=>new THREE.Vector2(a.x,-a.z)))));const g=new THREE.ExtrudeGeometry(s,{depth:h,bevelEnabled:false});g.rotateX(-Math.PI/2);return g}
+function ext(p,h,holes=[]){const s=new THREE.Shape(p.map(a=>new THREE.Vector2(a.x,-a.z))),sa=P=>P.reduce((t,q,i)=>{const n=P[(i+1)%P.length];return t+q.x*n.z-n.x*q.z},0),s0=sa(p);holes.forEach(hp=>{if(sa(hp)*s0>0)hp=hp.slice().reverse();s.holes.push(new THREE.Path(hp.map(a=>new THREE.Vector2(a.x,-a.z))))});const g=new THREE.ExtrudeGeometry(s,{depth:h,bevelEnabled:false});g.rotateX(-Math.PI/2);return g}
 const prof=(a,d)=>new THREE.ExtrudeGeometry(new THREE.Shape(a.map(p=>new THREE.Vector2(...p))),{depth:d,bevelEnabled:false});
 const M=(g,c=0x4f8cff,x=0,y=0,z=0)=>{const m=new THREE.Mesh(g,mat(c));m.position.set(x,y,z);return m};
 const cyl=(r,h,x,y,z,c)=>M(new THREE.CylinderGeometry(r,r,h,32),c,x,y+h/2,z);
@@ -762,7 +762,7 @@ lugs.forEach(l=>{const c=circ(l.x,l.z,3.4,24),h=circ(l.x,l.z,1.3,16);base.add(M(
 hs.forEach(h=>{const bh=h.y-fl;if(!h.hn&&bh-.5>.25)base.add(M(ext(circ(h.x,h.z,fr(h)+2.2,32),bh-.5,h.th?[circ(h.x,h.z,fr(h),24)]:[]),col,0,fl,0));
 if(!h.th){base.add(cyl(pr(h),h.top+1.8-fl,h.x,fl,h.z,0xcfd4dc));caps.add(M(ext(circ(h.x,h.z,pr(h)+1.8,24),1.2,[circ(h.x,h.z,pr(h)-.05,20)]),0xe0a030,0,h.top+.6,0))}});
 const lid=new THREE.Group();lid.add(M(ext(out,t,lh),0x9aa6b8));if(lidMode==='screw')lugs.forEach(l=>lid.add(M(ext(circ(l.x,l.z,3.4,24),t,[circ(l.x,l.z,1.7,16)]),0x9aa6b8)));else{const lipDepth=Math.min(2.4,Math.max(1.8,t*.8)),lipOuter=offs(inn,-.25),lipInner=offs(lipOuter,-Math.max(.8,t*.5));if(lipOuter.length>=3&&lipInner.length>=3)lid.add(M(ext(lipOuter,lipDepth,[lipInner]),0x9aa6b8,0,-lipDepth,0))}lid.position.y=H+fy;base.position.y=fy;caps.position.y=fy;
-const X=inn.map(p=>p.x),Z=inn.map(p=>p.z),W=Math.max(...X)-Math.min(...X),D=Math.max(...Z)-Math.min(...Z),wb=place(base,'Gearbox base',true);wb.userData.container=true;wb.userData.enc={t:fl,y0:fy+fl,span:Math.min(W,D),mode:hs.every(h=>h.th)?'thru':'pin'};
+const X=inn.map(p=>p.x),Z=inn.map(p=>p.z),W=Math.max(...X)-Math.min(...X),D=Math.max(...Z)-Math.min(...Z),wb=place(base,'Gearbox base',true);wb.userData.container=true;wb.userData.enc={t:fl,y0:fy+fl,span:Math.min(W,D),mode:hs.every(h=>h.th)?'thru':'pin',out,inn,yb:fy,yt:fy+H,lt:t,px:wb.position.x,py:wb.position.y,pz:wb.position.z};
 const wl=place(lid,'Gearbox lid',true);if(caps.children.length)place(caps,'Pin caps (print separately, press on)',true);select([wb,wl]);report();
 hint.textContent=`Gear enclosure only (${md==='fit'?'fitted':md==='box'?'box':'from your shape'}): ${f1(W+2*t)} × ${f1(D+2*t)} × ${f1(H+t)} mm, floor ${f1(fl)} mm, walls ${f1(t)} mm. ${MT.length?'The real '+TT.SL+' mm double-D motor shaft goes through a Ø'+f1(TT.sd+1.2)+' hole in the floor and stays inside the box – no sleeve, no hole in the lid. ':''}${lidMode==='screw'?'Screwable lid: use four M3 self-tapping screws (Ø3.4 mm lid clearance, Ø2.6 mm pilot bosses).':'Print-and-place lid: no screws; a 2.4 mm locating skirt seats inside the enclosure.'} Use “Hide / show lid” to look inside.`+msg};
 let fh=null;
@@ -1549,6 +1549,7 @@ ys.push(t*u);
 return loft(L,ys,bore(p));
 }
 const bevRoot=p=>{const r=p.m*p.N/2,d=Math.atan(p.N/p.nm);return(r-1.25*p.m)*(1-p.Fa*Math.tan(d)/r)};
+window.bevRoot=bevRoot;
 function bevelGeo(p){const N=p.N,m=p.m,r=m*N/2,d=Math.atan(N/p.nm),pp=rotP(gearPoly(N,m,Math.max(0,+p.bevelBacklash||0)),p.ph),bb=Math.max(0,Math.min(p.b,2*bevRoot(p)-2)),L=[pp,pp],ys=[0,p.hb];
 for(let k=1;k<=8;k++){const y=p.Fa*k/8;L.push(scP(pp,1-y*Math.tan(d)/r));ys.push(p.hb+y)}return loft(L,ys,bore(Object.assign({},p,{b:bb})))}
 const _g1=gmesh;gmesh=function(p){
@@ -1638,7 +1639,7 @@ const p=rd(),R=Math.max(1.2,+A('gbr').value||10),Np=Math.round(Math.max(8,Math.m
 if(k==='worm'){const N=Math.round(Math.max(8,Math.min(150,R))),r=buildWorm(Object.assign({},p,{N}),1,10,1);drv=r.worm;msg=`Worm gearbox: 1-start worm + ${N}T wheel, ratio ${N}:1, lead angle ${f1(r.lam)}°.`}
 else{const N2=Math.round(Math.max(8,Math.min(150,Np*R))),r=buildBevel(N2,Np,p.m,p.t,p.b);drv=r.hz;msg=`Bevel gearbox ${Np}:${N2}, ratio ${f1(N2/Np,2)}:1, shaft turned 90°, ${f1(r.backlash,2)} mm tooth backlash.`}
 if(mk!=='none'){const w=hzMotor(drv);if(w)msg+=mk==='tt'?' TT motor attached.':' (TT motor used – servos only fit upright gears.)'}
-if(enc)hzEnc();select([drv]);tab('gears');msg+=' Press Spin.';hint.textContent=msg;A('gbi').textContent=msg}}
+if(enc)A('genc').onclick();select([drv]);tab('gears');msg+=' Press Spin.';hint.textContent=msg;A('gbi').textContent=msg}}
 function hzEnc(G0){
 const G=G0||objs.filter(isG);if(!G.length)return;
 commit();
@@ -1676,7 +1677,7 @@ up.forEach(g=>{if(mot(g)||shf(g)||(gp(g)&&gp(g).ty==='ring'))return;const p=gp(g
 hzs.forEach(g=>{const p=gp(g),d=g.userData.hz,s=Math.max(2,Math.min(p.b||5,5.6)*.55),b=bbx(g),L=Math.min(7,(b.max.x-b.min.x)*.4),zc=g.position.z,yc=g.position.y,bk=g.position.x-d*(cl+hzExtra(g)),fr=(d>0?b.max.x:b.min.x)+d*cl;
 if(!hMot.some(h=>h.g===g&&h.bk)&&vEdge(bk,zc)>=0){const xa=d>0?bk:bk-L,xb=d>0?bk+L:bk;ms.push(bxy(xa,zc-s/2,xb,zc+s/2,yc-s/2,yc+s/2))}
 if(p.ty==='worm'&&!hMot.some(h=>h.g===g&&!h.bk)&&vEdge(fr,zc)>=0){const xa=d>0?fr-L:fr,xb=d>0?fr:fr+L;ms.push(bxy(xa,zc-s/2,xb,zc+s/2,yc-s/2,yc+s/2))}});
-const X=inn.map(p=>p.x),Z=inn.map(p=>p.z),W=Math.max(...X)-Math.min(...X),D=Math.max(...Z)-Math.min(...Z),base=place(grp(...ms),'Gearbox base',true);base.userData.container=true;base.userData.enc={t:fl,y0:fb+fl,span:Math.min(W,D),mode:'thru'};base.userData.encFor=G.map(g=>g.id);
+const X=inn.map(p=>p.x),Z=inn.map(p=>p.z),W=Math.max(...X)-Math.min(...X),D=Math.max(...Z)-Math.min(...Z),base=place(grp(...ms),'Gearbox base',true);base.userData.container=true;base.userData.enc={t:fl,y0:fb+fl,span:Math.min(W,D),mode:'thru',out,inn,yb:fb,yt:yBaseTop,lt:t,px:base.position.x,py:base.position.y,pz:base.position.z};base.userData.encFor=G.map(g=>g.id);
 const lidGeo=new THREE.Group(),lidHoles=(stepHoods?[...lh,...hoodData.map(h=>h.inner)]:lh).concat(__brgHoles());
 lidGeo.add(M(ext(out,t,lidHoles),0x9aa6b8,0,yBaseTop,0));
 if(lidMode==='screw')lugs.forEach(l=>lidGeo.add(M(ext(circ(l.x,l.z,3.4,24),t,[circ(l.x,l.z,1.7,16)]),0x9aa6b8,0,yBaseTop,0)));
@@ -3526,4 +3527,468 @@ try{
 }catch(e){console.error('v51 module failed:',e);}})();
 </script>
 
+<script>
+/* ============================================================================
+   v60 — free-spin guarantee, drop-in assembly, lid fasteners, precise holes,
+         bolt & nut generator, screw joints / tight fits, simpler gear panel.
+   ============================================================================ */
+(()=>{try{
+const Q=id=>document.getElementById(id),V3=(x,y,z)=>new THREE.Vector3(x,y,z);
+const ENCRX=/^(Gearbox base|Gearbox lid|Pin caps)/;
+const LS=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:v}catch(e){return d}},LSS=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+const COLB=0x8a96a8,COLL=0x9aa6b8,COLS=0x5f7fa8;
+
+/* ------------------------------ screw data ------------------------------ */
+/* d: [pitch, hex across-flats, nut height, cap-head Ø, cap socket, button socket] */
+const SCT={1:[.25,2.5,.8,2,.9,.7],1.2:[.25,3,1,2.3,.9,.7],1.4:[.3,3,1.2,2.6,1.3,.9],1.6:[.35,3.2,1.3,3,1.5,.9],2:[.4,4,1.6,3.8,1.5,1.3],2.5:[.45,5,2,4.5,2,1.5],3:[.5,5.5,2.4,5.5,2.5,2],4:[.7,7,3.2,7,3,2.5],5:[.8,8,4,8.5,4,3],6:[1,10,5,10,5,4],8:[1.25,13,6.5,13,6,5],10:[1.5,16,8,16,8,6],12:[1.75,18,10,18,10,8],16:[2,24,13,24,14,10],20:[2.5,30,16,30,17,12]};
+const SIZES=Object.keys(SCT).map(Number).sort((a,b)=>a-b);
+function scr(d,P){d=Math.max(.6,+d||3);const t=SCT[d]||[+(Math.max(.2,d*.15+.05)).toFixed(2),+(d*1.7).toFixed(1),+(d*.8).toFixed(1),+(d*1.5).toFixed(1),+(d*.8).toFixed(1),+(d*.6).toFixed(1)];
+ return{d,P:+P>0?+P:t[0],af:t[1],nutH:t[2],capD:t[3],sock:t[4],bsock:t[5],clear:+(d*1.1+.1).toFixed(2),tap:+(d*.85+.05).toFixed(2),ins:+(d*1.27+.4).toFixed(2),csk:2*d}}
+const STDL=[3,4,5,6,8,10,12,14,16,18,20,25,30,35,40,45,50,60,70,80];
+const stdLen=L=>{let b=STDL[0];STDL.forEach(x=>{if(x<=L+.01)b=x});return b};
+const sizeOpts=(sel,list)=>(list||SIZES).map(d=>`<option value="${d}"${d===sel?' selected':''}>M${d}</option>`).join('');
+const hexPoly=(af,rot)=>{const R=af/2/Math.cos(Math.PI/6);return[...Array(6)].map((_,i)=>({x:R*Math.cos(i*Math.PI/3+(rot||0)),z:R*Math.sin(i*Math.PI/3+(rot||0))}))};
+
+/* ------------------------------ CSG helpers ------------------------------ */
+const meshList=o=>{const a=[];o.traverse(n=>{if(n.isMesh)a.push(n)});return a};
+let TRC=new Map(),AP=new Map();
+function worldTris(m){const c=TRC.get(m.uuid);if(c)return c;const r=worldTris0(m);TRC.set(m.uuid,r);return r}
+function worldTris0(m){m.updateMatrixWorld(true);const p=m.geometry.attributes.position,ix=m.geometry.index,n=ix?ix.count:p.count,o=new Float32Array(n*3),v=V3(0,0,0);
+ for(let i=0;i<n;i++){v.fromBufferAttribute(p,ix?ix.getX(i):i).applyMatrix4(m.matrixWorld);o[3*i]=v.x;o[3*i+1]=v.y;o[3*i+2]=v.z}return o}
+/* call fn(x,y,z) for points spread over every triangle of T that touches box (fn returns true to stop) */
+function sampleTris(T,box,step,fn){const mn=box.min,mx=box.max,st=[],s2=step*step;
+ for(let i=0;i<T.length;i+=9){st.length=0;st.push(T[i],T[i+1],T[i+2],T[i+3],T[i+4],T[i+5],T[i+6],T[i+7],T[i+8]);
+  while(st.length){const cz=st.pop(),cy=st.pop(),cx=st.pop(),bz=st.pop(),by=st.pop(),bx_=st.pop(),az=st.pop(),ay=st.pop(),ax=st.pop();
+   if(Math.max(ax,bx_,cx)<mn.x||Math.min(ax,bx_,cx)>mx.x||Math.max(ay,by,cy)<mn.y||Math.min(ay,by,cy)>mx.y||Math.max(az,bz,cz)<mn.z||Math.min(az,bz,cz)>mx.z)continue;
+   const ab=(bx_-ax)**2+(by-ay)**2+(bz-az)**2,bc=(cx-bx_)**2+(cy-by)**2+(cz-bz)**2,ca=(ax-cx)**2+(ay-cy)**2+(az-cz)**2;
+   if(Math.max(ab,bc,ca)<=s2){const x=(ax+bx_+cx)/3,y=(ay+by+cy)/3,z=(az+bz+cz)/3;if(x>=mn.x&&x<=mx.x&&y>=mn.y&&y<=mx.y&&z>=mn.z&&z<=mx.z&&fn(x,y,z))return true;continue}
+   /* split the longest edge */
+   if(ab>=bc&&ab>=ca){const mx_=(ax+bx_)/2,my=(ay+by)/2,mz=(az+bz)/2;st.push(ax,ay,az,mx_,my,mz,cx,cy,cz,mx_,my,mz,bx_,by,bz,cx,cy,cz)}
+   else if(bc>=ca){const mx_=(bx_+cx)/2,my=(by+cy)/2,mz=(bz+cz)/2;st.push(ax,ay,az,bx_,by,bz,mx_,my,mz,ax,ay,az,mx_,my,mz,cx,cy,cz)}
+   else{const mx_=(cx+ax)/2,my=(cy+ay)/2,mz=(cz+az)/2;st.push(ax,ay,az,bx_,by,bz,mx_,my,mz,mx_,my,mz,bx_,by,bz,cx,cy,cz)}}}
+ return false}
+function edgesOn(m){if(m.geometry.attributes.position.count<40000)m.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry,25),new THREE.LineBasicMaterial({color:edc})))}
+/* swap a mesh for a new one carrying JSCAD geometry given in WORLD coordinates (undo keeps the old mesh) */
+function replaceMesh(m,jg){const par=m.parent;if(!par)return null;const root=rootOf.get(m);m.updateMatrixWorld(true);
+ let geo=null;try{if(jg&&jg.polygons&&jg.polygons.length<6000){try{jg=J.modifiers.generalize({snap:true,triangulate:true},jg)}catch(e){}}geo=jg?jGeo(jg):null}catch(e){geo=null}
+ par.remove(m);if(!geo)return null;
+ geo.applyMatrix4(new THREE.Matrix4().copy(m.matrixWorld).invert());geo.computeVertexNormals();
+ const nm=new THREE.Mesh(geo,m.material);nm.position.copy(m.position);nm.quaternion.copy(m.quaternion);nm.scale.copy(m.scale);nm.userData=Object.assign({},m.userData);nm.renderOrder=m.renderOrder;
+ m.children.filter(c=>!c.isLineSegments).forEach(c=>nm.add(c));
+ if(m.children.some(c=>c.isLineSegments)&&!nm.userData.noEdges)edgesOn(nm);
+ par.add(nm);if(root)rootOf.set(nm,root);return nm}
+const boxOfJ=g=>{const b=J.measurements.measureBoundingBox(g);return new THREE.Box3(V3(b[0][0],b[0][1],b[0][2]),V3(b[1][0],b[1][1],b[1][2]))};
+function cutObj(host,cutJ,pre){if(!cutJ)return 0;const cb=boxOfJ(cutJ);let n=0;
+ meshList(host).forEach(m=>{if(!new THREE.Box3().setFromObject(m).intersectsBox(cb))return;if(pre&&!pre(m))return;
+  let r;try{const jm=toJ(m);if(!jm)return;r=J.booleans.subtract(jm,cutJ)}catch(e){console.warn('v60 cut',e);return}
+  replaceMesh(m,r);n++});if(n)own(host);return n}
+/* stationary mesh added to a host object, given in world coordinates */
+function addW(host,geo,x,y,z,col,tag,quat){host.updateMatrixWorld(true);const m=new THREE.Mesh(geo,mat(col));
+ m.position.copy(host.worldToLocal(V3(x,y,z)));const hq=host.getWorldQuaternion(new THREE.Quaternion()).invert();m.quaternion.copy(quat?hq.multiply(quat):hq);
+ m.userData.noEdges=true;m.userData[tag||'v60']=true;host.add(m);rootOf.set(m,host);m.updateMatrixWorld(true);return m}
+const ring=(ro,ri,h,n)=>ext(circ(0,0,ro,n||48),h,ri>.05?[circ(0,0,ri,Math.max(16,(n||48)*.75|0))]:[]);
+
+/* ------------------- rotating envelope of a gear (slabs) ------------------- */
+function rotParts(g,mode){const a=[g];objs.forEach(o=>{if(o===g)return;const u=o.userData;if(u.v50lockPart||u.motor||u.rack||u.hole)return;
+ if(u.link!==g&&u.hubOf!==g)return;
+ if(mode==='drop'&&!(u.axisBearingJournal||u.hubOf===g||(u.gearAttach&&u.gearAttach.role==='hub')))return;
+ if(mode==='audit'&&u.isWheel)return;a.push(o)});return a}
+let ENVC=new Map();
+function env(g,mode){mode=mode||'all';const key=g.uuid+mode;if(ENVC.has(key))return ENVC.get(key);
+ g.updateMatrixWorld(true);const p=V3(0,0,0),q=new THREE.Quaternion(),s=V3(0,0,0);g.matrixWorld.decompose(p,q,s);
+ const F=new THREE.Matrix4().compose(p,q,V3(1,1,1)),I=new THREE.Matrix4().copy(F).invert(),axis=V3(0,1,0).applyQuaternion(q).normalize(),S=[],v=V3(0,0,0),box=new THREE.Box3();
+ let gy0=1e9,gy1=-1e9,rTip=0,rBore=1e9;
+ rotParts(g,mode).forEach(o=>{box.expandByObject(o);meshList(o).forEach(m=>{m.updateMatrixWorld(true);const pa=m.geometry.attributes.position,L=new Map();
+  for(let i=0;i<pa.count;i++){v.fromBufferAttribute(pa,i).applyMatrix4(m.matrixWorld).applyMatrix4(I);const r=Math.hypot(v.x,v.z),k=Math.round(v.y*10);let e=L.get(k);if(!e)L.set(k,{y:v.y,lo:r,hi:r});else{if(r<e.lo)e.lo=r;if(r>e.hi)e.hi=r}}
+  const lv=[...L.values()].sort((a,b)=>a.y-b.y);if(lv.length<2)return;const y0=lv[0].y,y1=lv[lv.length-1].y;if(y1-y0<.05)return;
+  /* where does the axis pass through solid material? */
+  const sol=[];try{const sd=m.material.side;m.material.side=THREE.DoubleSide;RC.set(V3(.031,y0-5,.017).applyMatrix4(F),axis);const hs=RC.intersectObject(m,false).map(h=>h.distance+y0-5).sort((a,b)=>a-b);m.material.side=sd;
+   for(let i=0;i+1<hs.length;i+=2)sol.push([hs[i],hs[i+1]])}catch(e){}
+  const nb=lv.length>2?Math.min(6,lv.length-1):1;
+  for(let b=0;b<nb;b++){const a=y0+(y1-y0)*b/nb,c=y0+(y1-y0)*(b+1)/nb;let lo=1e9,hi=0;lv.forEach(e=>{lo=Math.min(lo,e.lo);if(e.y>=a-.06&&e.y<=c+.06)hi=Math.max(hi,e.hi)});
+   if(hi<=0)lv.forEach(e=>{hi=Math.max(hi,e.hi)});
+   if(sol.some(iv=>Math.min(iv[1],c)-Math.max(iv[0],a)>.05))lo=0;if(hi-lo<.02)lo=0;
+   S.push({y0:a,y1:c,ri:lo,ro:hi});
+   if(o===g){gy0=Math.min(gy0,a);gy1=Math.max(gy1,c);if(m.userData.gp){rTip=Math.max(rTip,hi);rBore=Math.min(rBore,lo)}}}})});
+ /* drop slabs fully contained in another */
+ const K=S.filter((a,i)=>!S.some((b,j)=>j!==i&&b.y0<=a.y0+1e-6&&b.y1>=a.y1-1e-6&&b.ri<=a.ri+1e-6&&b.ro>=a.ro-1e-6&&(j<i||!(b.y0===a.y0&&b.y1===a.y1&&b.ri===a.ri&&b.ro===a.ro))));
+ if(gy0>gy1){gy0=0;gy1=+(gp(g)||{}).t||8}if(!rTip)rTip=K.reduce((m,s)=>Math.max(m,s.ro),0);if(rBore>1e8)rBore=0;
+ const pp=gp(g)||{},mm=+pp.m||2;let rRoot=pp.ty==='worm'?(+pp.q||10)*(+pp.mr||mm)/2-1.25*(+pp.mr||mm):pp.ty==='bevel'?(+pp.r||mm*pp.N/2)-1.4*mm:mm*(+pp.N||12)/2-1.25*mm;rRoot=Math.max(rBore+1,Math.min(rRoot,rTip));
+ const E={g,F,I,q,axis,S:K,box,gy0,gy1,rTip,rBore,rRoot,c:V3(0,(gy0+gy1)/2,0).applyMatrix4(F),len:gy1-gy0,cut:new Map()};ENVC.set(key,E);return E}
+function slabAt(E,x,y,z,cr,ca){const e=E.I.elements,lx=e[0]*x+e[4]*y+e[8]*z+e[12],ly=e[1]*x+e[5]*y+e[9]*z+e[13],lz=e[2]*x+e[6]*y+e[10]*z+e[14],r=Math.hypot(lx,lz);
+ for(let i=0;i<E.S.length;i++){const s=E.S[i];if(ly>s.y0-ca&&ly<s.y1+ca&&r<s.ro+cr&&r>s.ri-cr)return i}return-1}
+/* one closed solid of revolution per gear (no coincident faces between slices – keeps the boolean engine stable) */
+function revolve(P,n){const pos=[],N=P.length;n=n||72;const pt=(p,k)=>{const a=k/n*2*Math.PI;return[p.r*Math.cos(a),p.y,p.r*Math.sin(a)]};
+ for(let i=0;i<N;i++){const p=P[i],q=P[(i+1)%N];if(Math.abs(p.r-q.r)<1e-6&&Math.abs(p.y-q.y)<1e-6)continue;
+  for(let k=0;k<n;k++){const A=pt(p,k),B=pt(q,k),C=pt(q,k+1),D=pt(p,k+1);pos.push(...A,...B,...C,...A,...C,...D)}}
+ let v=0;for(let i=0;i<pos.length;i+=9)v+=pos[i]*(pos[i+4]*pos[i+8]-pos[i+5]*pos[i+7])-pos[i+1]*(pos[i+3]*pos[i+8]-pos[i+5]*pos[i+6])+pos[i+2]*(pos[i+3]*pos[i+7]-pos[i+4]*pos[i+6]);
+ if(v<0)for(let i=0;i<pos.length;i+=9){for(let k=0;k<3;k++){const t=pos[i+3+k];pos[i+3+k]=pos[i+6+k];pos[i+6+k]=t}}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));return g}
+function bandsOf(E,c){const ys=[...new Set(E.S.flatMap(s=>[+(s.y0-c).toFixed(3),+(s.y1+c).toFixed(3)]))].sort((a,b)=>a-b),B=[];
+ for(let i=0;i+1<ys.length;i++){const a=ys[i],b=ys[i+1],md=(a+b)/2;let ri=1e9,ro=0;E.S.forEach(s=>{if(md>s.y0-c&&md<s.y1+c){ri=Math.min(ri,s.ri-c);ro=Math.max(ro,s.ro+c)}});B.push(ro>0?{a,b,ri:ri<.2?0:ri,ro}:{a,b,gap:1})}return B}
+function runSolid(E,run,sg){const k=1/Math.cos(Math.PI/72),P=[];run.forEach(b=>{P.push({r:b.ro*k,y:sg*b.a},{r:b.ro*k,y:sg*b.b})});for(let i=run.length-1;i>=0;i--){const b=run[i];P.push({r:b.ri,y:sg*b.b},{r:b.ri,y:sg*b.a})}
+ const m=new THREE.Mesh(revolve(P,72));m.matrixAutoUpdate=false;m.matrix.copy(E.F);return toJ(m)}
+function gearCutters(E,c){const k='g'+c;if(E.cut.has(k))return E.cut.get(k);const out=[];let run=[];bandsOf(E,c).forEach(b=>{if(b.gap){if(run.length)out.push(runSolid(E,run,1));run=[]}else run.push(b)});if(run.length)out.push(runSolid(E,run,1));E.cut.set(k,out);return out}
+/* carve every stationary piece so nothing is closer than `clr` to anything that turns */
+function shave(hosts,gears,clr){let n=0;
+ gears.forEach(g=>{const E=env(g,'all'),box=E.box.clone().expandByScalar(clr+.3);
+  hosts.forEach(h=>meshList(h).forEach(m=>{if(!new THREE.Box3().setFromObject(m).intersectsBox(box))return;
+   if(!sampleTris(worldTris(m),box,.7,(x,y,z)=>slabAt(E,x,y,z,clr-.005,clr-.005)>=0))return;
+   let jm;try{jm=toJ(m);if(!jm)return;const cb=new THREE.Box3().setFromObject(m);gearCutters(E,clr+.04).forEach(cj=>{if(boxOfJ(cj).intersectsBox(cb))jm=J.booleans.subtract(jm,cj)})}catch(e){console.warn('v60 shave',e);return}
+   replaceMesh(m,jm);n++}))});
+ hosts.forEach(h=>{try{own(h)}catch(e){}});return n}
+/* smallest gap between a gear's turning envelope and the stationary pieces (for the report / tests) */
+function minGap(hosts,g,lim){const E=env(g,'all'),box=E.box.clone().expandByScalar(lim);let best=lim;
+ hosts.forEach(h=>meshList(h).forEach(m=>{if(!new THREE.Box3().setFromObject(m).intersectsBox(box))return;
+  sampleTris(worldTris(m),box,.8,(x,y,z)=>{let lo=0,hi=best;if(slabAt(E,x,y,z,hi,hi)<0)return false;for(let k=0;k<12;k++){const md=(lo+hi)/2;if(slabAt(E,x,y,z,md,md)>=0)hi=md;else lo=md}best=hi;return false})}));return best}
+
+/* can the gear slide / lift / shift out of place?  (enclosure pieces only – motors don't count) */
+function audit(g,hosts,seen){const E=env(g,'audit'),p=gp(g)||{},da=Math.max(1.2,Math.min(3,.35*(E.len||8))),dr=Math.max(1.2,Math.min(2.5,.6*(+p.m||2))),dm=Math.max(da,dr)+.1,box=E.box.clone().expandByScalar(dm+.5);let P=AP.get(g.uuid);
+ if(!P){P=[];hosts.forEach(h=>meshList(h).forEach(m=>{if(!new THREE.Box3().setFromObject(m).intersectsBox(box))return;sampleTris(worldTris(m),box,.95,(x,y,z)=>{if(slabAt(E,x,y,z,dm,dm)>=0&&slabAt(E,x,y,z,-.04,-.04)<0)P.push(x,y,z);return false})}));AP.set(g.uuid,P)}
+ const test=d=>{for(let i=0;i<P.length;i+=3)if(slabAt(E,P[i]-d.x,P[i+1]-d.y,P[i+2]-d.z,-.04,-.04)>=0)return true;return false};
+ const a=E.axis,u=Math.abs(a.y)>.9?V3(1,0,0):V3(0,1,0);u.addScaledVector(a,-u.dot(a)).normalize();const w=V3(0,0,0).crossVectors(a,u).normalize();
+ /* meshing partners stop movement towards them */
+ const nb=[];objs.forEach(h=>{if(h===g||!isG(h))return;const d=env(h,'audit').c.clone().sub(E.c);const al=d.dot(a);d.addScaledVector(a,-al);const L=d.length();if(L>.5&&L<E.rTip+env(h,'audit').rTip+1.5&&Math.abs(al)<E.len/2+env(h,'audit').len/2+env(h,'audit').rTip)nb.push(d.normalize())});
+ const rad=[];for(let k=0;k<8;k++){const d=u.clone().multiplyScalar(Math.cos(k*Math.PI/4)).addScaledVector(w,Math.sin(k*Math.PI/4));rad.push({d,ok:test(d.clone().multiplyScalar(dr))||nb.some(n=>n.dot(d)>.5)})}
+ /* gears stacked on one shaft move as one body: a stack partner passes the question on */
+ const part=sg=>{if(seen&&seen.has(g))return false;let r=false;objs.forEach(h=>{if(r||h===g||!isG(h))return;const H=env(h,'audit');if(Math.abs(H.axis.dot(a))<.99)return;const d=H.c.clone().sub(E.c),al=d.dot(a);d.addScaledVector(a,-al);
+   if(d.length()>.4||al*sg<=0||Math.abs(al)-(E.len+H.len)/2>1.2)return;const s2=new Set(seen||[]);s2.add(g);const q=audit(h,hosts,s2);r=(sg>0)===(H.axis.dot(a)>0)?q.up:q.dn})
+  return r};
+ return{E,up:test(a.clone().multiplyScalar(da))||part(1),dn:test(a.clone().multiplyScalar(-da))||part(-1),rad,ok:function(){return this.up&&this.dn&&this.rad.every(r=>r.ok)}}}
+/* ------------------------------ geometry utils ------------------------------ */
+const segD=(p,a,b)=>{const dx=b.x-a.x,dz=b.z-a.z,L=dx*dx+dz*dz||1e-9,t=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.z-a.z)*dz)/L));return Math.hypot(p.x-a.x-t*dx,p.z-a.z-t*dz)};
+const edgeD=(p,P)=>{let d=1e9;for(let i=0;i<P.length;i++)d=Math.min(d,segD(p,P[i],P[(i+1)%P.length]));return d};
+const clearOf=(p,H,d)=>H.every(h=>!inPoly(p.x,p.z,h)&&edgeD(p,h)>=d);
+const rayY=(host,x,y,z,dir)=>{RC.set(V3(x,y,z),V3(0,dir,0));const h=RC.intersectObjects(meshList(host),false);return h.length?h[0].point.y:null};
+function encInfo(base){const e=base&&base.userData.enc;if(!e||!e.out)return null;const dx=base.position.x-e.px,dy=base.position.y-e.py,dz=base.position.z-e.pz,sh=P=>P.map(p=>({x:p.x+dx,z:p.z+dz}));
+ return{out:sh(e.out),inn:sh(e.inn),yb:e.yb+dy,y0:e.y0+dy,yt:e.yt+dy,lt:e.lt,real:true}}
+function predInfo(G){const t=Math.max(2,+Q('gw').value||3),inn=fitOutline(G,1,Q('gemode').value==='box');return{inn,out:offs(inn,t),lt:t,real:false}}
+const newestBase=()=>[...objs].reverse().find(o=>o.userData&&o.userData.container&&/^Gearbox base/i.test(nameOf(o))&&o.userData.enc&&o.userData.enc.out);
+function gearsOf(base){const b=bbx(base).expandByScalar(3);return objs.filter(o=>{if(!isG(o))return false;const c=bbx(o).getCenter(V3(0,0,0));return c.x>b.min.x&&c.x<b.max.x&&c.z>b.min.z&&c.z<b.max.z})}
+function footprints(gears,motors){const H=[],v=V3(0,0,0);gears.forEach(g=>{const E=env(g,'all'),pts=[];E.S.forEach(s=>[s.y0,s.y1].forEach(y=>{for(let k=0;k<24;k++){v.set(s.ro*Math.cos(k*Math.PI/12),y,s.ro*Math.sin(k*Math.PI/12)).applyMatrix4(E.F);pts.push({x:v.x,z:v.z})}}));if(pts.length>2)H.push(hull(pts))});
+ objs.forEach(o=>{const u=o.userData;if(u.rack||u.pl||(motors&&u.motor)){const b=bbx(o);H.push(rc(b.min.x,b.min.z,b.max.x,b.max.z))}});return H}
+
+/* ------------------- gear stops where the audit finds a gap ------------------- */
+function addStops(g,res,base,lid,info,clr,asm){const E=res.E,a=E.axis,yF=info.y0,e0=V3(0,E.gy0,0).applyMatrix4(E.F),e1=V3(0,E.gy1,0).applyMatrix4(E.F);let n=0;
+ if(Math.abs(a.y)>.9){const top=Math.max(e0.y,e1.y),bot=Math.min(e0.y,e1.y),cx=E.c.x,cz=E.c.z,upFree=a.y>0?!res.up:!res.dn,dnFree=a.y>0?!res.dn:!res.up;
+  const occ=wUp=>{const loc=(a.y>0)===wUp;let r=0;E.S.forEach(s=>{if((loc?s.y1>E.gy1+.3:s.y0<E.gy0-.3)&&s.ro<E.rRoot-.5)r=Math.max(r,s.ro)});return r};
+  const radii=o=>{let ri=o?o+clr+.3:E.rBore+.6,ro=Math.min(E.rRoot-.2,ri+2.4);if(ro-ri<.9)ro=Math.min(E.rTip,ri+2.4);return ro-ri>=.6?[ri,ro]:null};
+  if(upFree&&lid){const rr=radii(occ(true));if(rr){const rm=(rr[0]+rr[1])/2,hs=[];for(let k=0;k<8;k++){const y=rayY(lid,cx+rm*Math.cos(k*.785+.2),top+.05,cz+rm*Math.sin(k*.785+.2),1);if(y!=null)hs.push(y)}
+    if(hs.length){const H=Math.max(...hs)+.4-(top+clr);if(H>.25){addW(lid,ring(rr[1],rr[0],H),cx,top+clr,cz,COLS,'v60stop');n++}}}}
+  if(dnFree&&base){let o=occ(false);const m=objs.find(q=>q.userData.motor&&q.userData.link===g);if(m&&bbx(m).min.y<bot){const R=rotOf(m),k=R&&R.userData.kind;o=Math.max(o,SV[k]?SV[k].bR+.6:TT.sd/2+1)}
+   const rr=radii(o),H=bot-clr-(yF-.2);if(rr&&H>.25){addW(base,ring(rr[1],rr[0],H),cx,yF-.2,cz,COLS,'v60stop');n++}}
+  if(res.rad.some(r=>!r.ok)&&base){const R=E.rTip+clr+1.7,ok=[],oth=objs.filter(h=>h!==g&&isG(h)).map(h=>env(h,'all'));
+   for(let k=0;k<18;k++){const an=k*Math.PI/9,p={x:cx+R*Math.cos(an),z:cz+R*Math.sin(an)};
+    if(info.inn&&(!inPoly(p.x,p.z,info.inn)||edgeD(p,info.inn)<1.2))continue;
+    if(oth.some(O=>slabAt(O,p.x,bot+.5,p.z,2.4+clr,1)>=0||slabAt(O,p.x,top-.5,p.z,2.4+clr,1)>=0))continue;ok.push(an)}
+   const pk=[];ok.forEach(an=>{if(pk.every(q=>Math.abs(Math.atan2(Math.sin(an-q),Math.cos(an-q)))>=.95))pk.push(an)});
+   const yb=yF-.2,H=Math.min(top,bot+Math.max(3,E.len*.7))-yb;if(H>1)pk.forEach(an=>{addW(base,new THREE.CylinderGeometry(1.6,1.6,H,20),cx+R*Math.cos(an),yb+H/2,cz+R*Math.sin(an),COLS,'v60stop');n++})}
+ }else{const h=V3(a.x,0,a.z).normalize(),qy=new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),Math.atan2(-h.z,h.x)),La=Math.max(3,Math.min(8,.3*E.len)),W=E.rTip,c=E.c,lat=V3(-h.z,0,h.x),
+   bad=res.rad.filter(r=>!r.ok),upF=bad.some(r=>r.d.y>.3),dnF=bad.some(r=>r.d.y<=.3),b0=yF-.2;
+  if(upF&&lid){const hs=[];[-.6,0,.6].forEach(k=>{const y=rayY(lid,c.x+lat.x*k*W,c.y,c.z+lat.z*k*W,1);if(y!=null)hs.push(y)});
+   if(hs.length){const tp=Math.max(...hs)+.4;if(tp-c.y>1){addW(lid,new THREE.BoxGeometry(La,tp-c.y,2*W),c.x,(tp+c.y)/2,c.z,COLS,'v60stop',qy);n++}}}
+  if(dnF&&base&&c.y-b0>1){addW(base,new THREE.BoxGeometry(La,c.y-b0,2*W),c.x,(c.y+b0)/2,c.z,COLS,'v60stop',qy);n++}
+  [[res.up,1],[res.dn,-1]].forEach(([ok,sg])=>{if(ok||!base||c.y-b0<1.5)return;const d=sg*(E.len/2+clr+.8),w=2*Math.min(E.rRoot,.8*E.rTip);
+   addW(base,new THREE.BoxGeometry(1.6,c.y-b0,w),c.x+h.x*d,(c.y+b0)/2,c.z+h.z*d,COLS,'v60stop',qy);n++})}
+ return n}
+
+/* ------------- assemble-after-printing: open the base so every gear drops in from above ------------- */
+function dropCut(base,gears,info,clr){const yTop=info.yt+3;let n=0;
+ gears.forEach(g=>{const E=env(g,'drop'),a=E.axis,py=E.F.elements[13],up=Math.abs(a.y)>.9,box0=E.box.clone().expandByScalar(clr+.3);box0.max.y=yTop+1;
+  const uL=V3(0,1,0).transformDirection(E.I),u2=Math.hypot(uL.x,uL.z)||1,ux=uL.x/u2,uz=uL.z/u2,e=E.I.elements,sg=a.y>0?1:-1,lt=(yTop-py)/a.y;
+  const test=(x,y,z)=>{const lx=e[0]*x+e[4]*y+e[8]*z+e[12],ly=e[1]*x+e[5]*y+e[9]*z+e[13],lz=e[2]*x+e[6]*y+e[10]*z+e[14],r=Math.hypot(lx,lz);
+   for(const s of E.S){const R=s.ro+clr-.05,ri=s.ri-clr+.05;
+    if(up){if(sg*ly>(sg>0?s.y0:-s.y1)-clr+.05&&sg*ly<sg*lt&&r<R&&r>ri)return true}
+    else if(ly>s.y0-clr+.05&&ly<s.y1+clr-.05){const al=lx*ux+lz*uz,pp=lx*uz-lz*ux;if(Math.abs(pp)<R&&al>-Math.sqrt(Math.max(0,R*R-pp*pp)))return true}}return false};
+  let CJ=null;const mk=()=>{if(up){ /* envelope swept straight up: radii only ever widen on the way out */
+     const B=bandsOf(E,clr).map(b=>sg>0?b:{a:-b.b,b:-b.a,ri:b.ri,ro:b.ro,gap:b.gap}).sort((p,q)=>p.a-q.a),run=[];let ri=1e9,ro=0;
+     B.forEach(b=>{if(!b.gap){ri=Math.min(ri,b.ri);ro=Math.max(ro,b.ro)}if(ro>0)run.push({a:b.a,b:b.b,ri,ro})});
+     const last=run[run.length-1];if(last&&sg*lt>last.b+.01)run.push({a:last.b,b:sg*lt,ri,ro});return run.length?[runSolid(E,run,sg)]:[]}
+    return gearCutters(E,clr).map(j=>J.hulls.hull(j,J.transforms.translate([0,Math.max(2,yTop-E.c.y+E.rTip),0],j)))};
+  meshList(base).forEach(m=>{if(!new THREE.Box3().setFromObject(m).intersectsBox(box0))return;if(!sampleTris(worldTris(m),box0,.7,test))return;
+   try{CJ=CJ||mk();let jm=toJ(m);if(!jm)return;CJ.forEach(cj=>{jm=J.booleans.subtract(jm,cj)});replaceMesh(m,jm);n++}catch(er){console.warn('v60 drop',er)}})});
+ if(n)own(base);return n}
+
+/* ------------------------------ lid fasteners ------------------------------ */
+function colSpec(s,ty,sink){const rh=(ty==='tap'?s.tap:ty==='ins'?s.ins:s.clear)/2,wall=Math.max(1.6,.5*s.d),hexR=(s.af+.3)/2/Math.cos(Math.PI/6);
+ return{rh,Rb:Math.max(rh+wall,ty==='nut'?hexR+1.1:0),hexR,headR:s.capD/2+.3,wall}}
+function freeSpots(info,H,Rb,gap,lid,headR){const X=info.out.map(p=>p.x),Z=info.out.map(p=>p.z),x0=Math.min(...X),x1=Math.max(...X),z0=Math.min(...Z),z1=Math.max(...Z),C={x:(x0+x1)/2,z:(z0+z1)/2},diag=Math.hypot(x1-x0,z1-z0),ok=[];
+ for(let x=x0+Rb;x<=x1-Rb;x+=.6)for(let z=z0+Rb;z<=z1-Rb;z+=.6){const p={x,z};if(!inPoly(x,z,info.out)||edgeD(p,info.out)<Rb)continue;if(!clearOf(p,H,Rb+gap))continue;ok.push(p)}
+ if(!ok.length)return null;
+ const good=p=>{if(!lid||!info.real)return true;const top=info.yt+info.lt;for(let k=-1;k<6;k++){const r=k<0?0:Math.max(headR,Rb),y=rayY(lid,p.x+r*Math.cos(k*1.047),top+60,p.z+r*Math.sin(k*1.047),-1);if(y==null||Math.abs(y-top)>.35)return false}return true};
+ const sep=Math.max(2*Rb+3,.22*diag),pk=[];
+ [[1,1],[-1,-1],[1,-1],[-1,1],[1,0],[-1,0],[0,1],[0,-1]].forEach(([a,b])=>{if(pk.length>=4)return;const c=ok.filter(p=>pk.every(q=>Math.hypot(p.x-q.x,p.z-q.z)>=sep)).sort((p,q)=>(a*(q.x-C.x)+b*(q.z-C.z))-(a*(p.x-C.x)+b*(p.z-C.z)));
+  for(let i=0;i<c.length&&i<40;i++)if(good(c[i])){pk.push(c[i]);break}});
+ if(pk.length<2)return null;if(pk.length===2&&Math.hypot(pk[0].x-pk[1].x,pk[0].z-pk[1].z)<.4*diag)return null;return pk}
+const stackAt=(host,parts,x,y,z,col,tag)=>{let yy=y;parts.forEach(([geo,h])=>{if(h>.01)addW(host,geo,x,yy,z,col,tag);yy+=h})};
+const cutterJ=parts=>{const g=new THREE.Group();parts.forEach(([geo,x,y,z,q])=>{const m=new THREE.Mesh(geo);m.position.set(x,y,z);if(q)m.quaternion.copy(q);g.add(m)});return toJ(g)};
+const cylY=(r,y0,y1,n)=>[new THREE.CylinderGeometry(r,r,y1-y0,n||28),(y0+y1)/2];
+function fasten(base,lid,info,gears,o){const s=scr(o.sz),cs=colSpec(s,o.ty),H=footprints(gears,o.ty==='nut'),msg=[];let mode=o.fast;
+ const sd=o.sink?Math.min(info.lt-1.2,s.d+.2):0,sink=sd>=.6,hexP=hexPoly(s.af+.3);
+ const colParts=(R,h,withNut)=>{const pd=withNut?Math.min(s.nutH+.3,h-1.5):0;
+  if(o.ty==='ins'){const id=Math.min(h-1,1.4*s.d+.6);return[[ring(R,cs.rh>s.tap/2?s.tap/2:cs.rh,h-id,40),h-id],[ring(R,s.ins/2,id,40),id]]}
+  if(o.ty==='nut'&&withNut)return[[ext(circ(0,0,R,40),pd,[hexP]),pd],[ring(R,s.clear/2,h-pd,40),h-pd]];
+  return[[ring(R,cs.rh,h,40),h]]};
+ if(mode==='inside'){const sp=lid?freeSpots(info,H,cs.Rb,o.clr+.5,lid,sink?cs.headR:s.clear/2):null;
+  if(!sp){mode='snap';msg.push('⚠ No free space left between the gears for M'+s.d+' screws inside the box – made a snap-fit lid instead (try a smaller screw or outside tabs).')}
+  else{sp.forEach(p=>{
+    if(o.ty==='nut'){const pd=Math.max(.8,Math.min(s.nutH+.3,info.y0-info.yb-.8)),c1=cylY(s.clear/2,info.yb-1,info.y0+.5),c2=[new THREE.CylinderGeometry(cs.hexR,cs.hexR,pd+.5,6),info.yb-.5+(pd+.5)/2];
+     cutObj(base,cutterJ([[c1[0],p.x,c1[1],p.z],[c2[0],p.x,c2[1],p.z]]))}
+    stackAt(base,colParts(cs.Rb,info.yt-info.y0+.3,false),p.x,info.y0-.3,p.z,COLB,'v60col');
+    const L=[[...cylY(s.clear/2,info.yt-7,info.yt+info.lt+1)],[...cylY(cs.Rb+.35,info.yt-7,info.yt-.02,36)]];if(sink)L.push([...cylY(cs.headR,info.yt+info.lt-sd,info.yt+info.lt+1,36)]);
+    cutObj(lid,cutterJ(L.map(([g,y])=>[g,p.x,y,p.z])))});
+   const hgt=info.yt-info.y0,need=o.ty==='nut'?info.lt-sd+hgt+(info.y0-info.yb):info.lt-sd+Math.min(hgt-.5,o.ty==='ins'?1.4*s.d:Math.max(6,3*s.d));
+   msg.push('Lid: '+sp.length+' × M'+s.d+' screw columns INSIDE the box, in free space the gears never touch (box size unchanged, '+f1(cs.Rb-cs.rh)+' mm of plastic round each hole). Use M'+s.d+'×'+stdLen(need)+(o.ty==='nut'?' machine screws + M'+s.d+' nuts (hex pockets under the floor)':o.ty==='ins'?' screws into M'+s.d+' heat-set inserts (Ø'+s.ins+' holes)':' self-tapping screws (Ø'+s.tap+' pilot)')+(sink?'; heads sit flush in the lid.':'.'))}}
+ if(mode==='outside'){const R=Math.max(cs.Rb,sink?cs.headR+.9:0),hgt=info.yt-info.yb,done=[],X=info.out.map(p=>p.x),Z=info.out.map(p=>p.z),C={x:(Math.min(...X)+Math.max(...X))/2,z:(Math.min(...Z)+Math.max(...Z))/2};
+  [[1,1],[1,-1],[-1,-1],[-1,1]].forEach(([a,b])=>{const v=info.out.reduce((m,p)=>a*p.x+b*p.z>a*m.x+b*m.z?p:m),dx=v.x-C.x,dz=v.z-C.z,l=Math.hypot(dx,dz)||1,p={x:v.x+dx/l*(R-.9),z:v.z+dz/l*(R-.9)};
+   if(done.some(q=>Math.hypot(q.x-p.x,q.z-p.z)<2*R+1))return;done.push(p);
+   stackAt(base,colParts(R,hgt,true),p.x,info.yb,p.z,COLB,'v60col');
+   stackAt(lid,sink?[[ring(R,s.clear/2,info.lt-sd,40),info.lt-sd],[ring(R,cs.headR,sd,40),sd]]:[[ring(R,s.clear/2,info.lt,40),info.lt]],p.x,info.yt,p.z,COLL,'v60col')});
+  const need=o.ty==='nut'?info.lt-sd+hgt:info.lt-sd+Math.min(hgt-1,o.ty==='ins'?1.4*s.d:Math.max(6,3*s.d));
+  msg.push('Lid: '+done.length+' × M'+s.d+' screw tabs outside the box. Use M'+s.d+'×'+stdLen(need)+(o.ty==='nut'?' machine screws + nuts (hex pockets under the tabs).':o.ty==='ins'?' screws into heat-set inserts.':' self-tapping screws.'))}
+ if(mode==='snap'){const n=lid?snapLatches(base,lid,info,H,o.clr):0;
+  msg.push(n>=2?'Lid: no screws – it sits on its locating lip and '+n+' snap latches click into grooves in the wall (pull a corner up to open).':'Lid: no screws – locating lip only (no clear wall space next to the gears for snap latches; a strip of tape or a rubber band will hold it).')}
+ own(base);if(lid)own(lid);return{mode,msg}}
+function snapLatches(base,lid,info,H,clr){const P=info.inn,cand=[],yc=info.yt-3.6;
+ let A=0;P.forEach((p,i)=>{const q=P[(i+1)%P.length];A+=p.x*q.z-q.x*p.z});const sgn=A>0?1:-1;
+ /* base surfaces near the wall, to keep latches out of posts and supports */
+ const BT=meshList(base).filter(m=>!m.userData.v60col||true).map(worldTris);
+ for(let i=0;i<P.length;i++){const p=P[i],q=P[(i+1)%P.length],L=Math.hypot(q.x-p.x,q.z-p.z);if(L<2)continue;const tx=(q.x-p.x)/L,tz=(q.z-p.z)/L,nx=sgn*tz,nz=-sgn*tx; /* outward normal */
+  for(let d=Math.min(4,L/2);d<=L-Math.min(4,L/2)+1e-6;d+=2){const b={x:p.x+tx*d,z:p.z+tz*d},c={x:b.x-nx*.95,z:b.z-nz*.95};
+   if(![-3.4,0,3.4].every(k=>{const s={x:c.x+tx*k,z:c.z+tz*k};return clearOf(s,H,.65+clr+.5)&&inPoly(s.x,s.z,P)&&edgeD(s,P)>.25}))continue;
+   cand.push({b,c,tx,tz,nx,nz})}}
+ const okBase=k=>{const bx_=new THREE.Box3(V3(k.c.x-3.6,info.yt-5.3,k.c.z-3.6),V3(k.c.x+3.6,info.yt+.5,k.c.z+3.6));
+  return!BT.some(T=>sampleTris(T,bx_,.6,(x,y,z)=>{const dx=x-k.c.x,dz=z-k.c.z;return Math.abs(dx*k.tx+dz*k.tz)<3.3&&Math.abs(dx*k.nx+dz*k.nz)<.85}))};
+ const pk=[];while(pk.length<4&&cand.length){let best=-1,bd=-1;cand.forEach((k,i)=>{const d=pk.length?Math.min(...pk.map(q=>Math.hypot(q.b.x-k.b.x,q.b.z-k.b.z))):Math.hypot(k.b.x-P[0].x,k.b.z-P[0].z);if(d>bd){bd=d;best=i}});
+  if(pk.length&&bd<12)break;const k=cand.splice(best,1)[0];if(okBase(k))pk.push(k)}
+ if(pk.length<2)return 0;
+ pk.forEach(k=>{const qy=new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),Math.atan2(-k.tz,k.tx)),qz=new THREE.Quaternion().setFromAxisAngle(V3(0,0,1),Math.PI/2),qq=qy.clone().multiply(qz),gx=k.b.x-k.nx*.3,gz=k.b.z-k.nz*.3;
+  cutObj(base,cutterJ([[new THREE.CylinderGeometry(.95,.95,5.6,20),gx,yc,gz,qq]]));
+  addW(lid,new THREE.BoxGeometry(6,5.2,1.3),k.c.x,info.yt-2.4,k.c.z,COLL,'v60latch',qy);
+  addW(lid,new THREE.CylinderGeometry(.75,.75,4.6,20),gx,yc,gz,COLL,'v60latch',qq)});
+ return pk.length}
+/* ------------------------------ enclosure UI ------------------------------ */
+let feasT=0,feasSig='';
+(function encUI(){const genc=Q('genc');if(!genc||Q('v6blk'))return;const row=genc.closest('.br');
+ row.insertAdjacentHTML('beforebegin','<div class="blk" id="v6blk" style="--c:#0e9384"><div class="bt"><i>✓</i>Printing &amp; lid</div>'
+ +'<div class="v9f"><label>How will you print it?</label><select id="v6mode"><option value="inplace">Print in place – gears printed inside the box, ready to spin</option><option value="assemble">Assemble after printing – separate parts, gears drop in</option></select></div>'
+ +'<div class="v9f"><label>Running gap around every gear (mm)</label><input id="v6clr" type="number" step=".05" min=".2" max="1"></div>'
+ +'<div class="v9f"><label>Lid fastening</label><select id="v6fast"><option value="inside">Screws inside the box (box stays the same size)</option><option value="outside">Screws on tabs outside the box</option><option value="snap">No screws – snap-fit lid</option></select></div>'
+ +'<div class="v9r v6scr"><div class="v9f"><label>Screw size</label><select id="v6sz">'+sizeOpts(3,[2,2.5,3,4,5])+'</select></div><div class="v9f"><label>Held by</label><select id="v6ty"><option value="tap">Self-tapping (bites plastic)</option><option value="nut">Nut in hex pocket</option><option value="ins">Heat-set insert</option></select></div></div>'
+ +'<label class="chk v6scr" style="margin:4px 0"><input type="checkbox" id="v6sink" checked> Sink the screw heads into the lid</label>'
+ +'<p class="mut" id="v6note" style="margin:6px 0 0"></p><div class="br" id="v6ext"></div></div>');
+ const hide=el=>{if(el)el.style.display='none'};
+ const gl=Q('glidmode');if(gl){hide(gl);hide(gl.previousElementSibling)}
+ const vb=Q('v50mode')&&Q('v50mode').closest('.blk');if(vb){['v50she','v50mte'].forEach(i=>Q(i)&&Q('v6ext').appendChild(Q(i)));hide(vb)}
+ const st={mode:LS('mc6_mode','inplace'),fast:LS('mc6_fast','inside'),sz:LS('mc6_sz','3'),ty:LS('mc6_ty','tap'),clr:LS('mc6_clr','')};
+ Q('v6mode').value=st.mode;Q('v6fast').value=st.fast;Q('v6sz').value=st.sz;Q('v6ty').value=st.ty;Q('v6clr').value=st.clr||(st.mode==='assemble'?.3:.4);
+ const sync=()=>{document.querySelectorAll('#v6blk .v6scr').forEach(e=>e.style.display=Q('v6fast').value==='snap'?'none':'');LSS('mc6_mode',Q('v6mode').value);LSS('mc6_fast',Q('v6fast').value);LSS('mc6_sz',Q('v6sz').value);LSS('mc6_ty',Q('v6ty').value);feasSoon()};
+ Q('v6mode').onchange=()=>{Q('v6clr').value=Q('v6mode').value==='assemble'?.3:.4;LSS('mc6_clr','');sync();hint.textContent=Q('v6mode').value==='assemble'?'Assemble mode: bearings become open cradles and the lid carries the keepers, so every gear drops in from above. Press “Make / update enclosure”.':'Print-in-place mode: the gears are printed inside the box with a running gap all round. Press “Make / update enclosure”.'};
+ Q('v6clr').onchange=()=>LSS('mc6_clr',Q('v6clr').value);
+ ['v6fast','v6sz','v6ty'].forEach(i=>Q(i).onchange=sync);sync()}());
+const encOpts=()=>({asm:Q('v6mode').value==='assemble',clr:Math.max(.2,Math.min(1,+Q('v6clr').value||.4)),fast:Q('v6fast').value,sz:+Q('v6sz').value||3,ty:Q('v6ty').value,sink:Q('v6sink').checked});
+
+/* live check: is there room for inside screws? (disables the option when there is none) */
+function feasSoon(){clearTimeout(feasT);feasT=setTimeout(feas,250)}
+function feas(){try{const o=encOpts(),opt=Q('v6fast').querySelector('option[value=inside]'),note=Q('v6note'),base=newestBase(),G=base?gearsOf(base):objs.filter(isG);
+ if(!G.length||!J){opt.disabled=false;opt.textContent='Screws inside the box (box stays the same size)';note.textContent='';return}
+ ENVC=new Map();TRC=new Map();const info=base?encInfo(base):predInfo(G),lid=base&&[...objs].reverse().find(q=>/^Gearbox lid/.test(nameOf(q)));
+ const fits=[2,2.5,3,4,5].filter(d=>{const cs=colSpec(scr(d),o.ty);return!!freeSpots(info,footprints(G,o.ty==='nut'),cs.Rb,o.clr+.5,null,cs.headR)}),ok=fits.includes(o.sz);
+ opt.disabled=!ok;opt.textContent=ok?'Screws inside the box (box stays the same size)':'Screws inside – NO FREE SPACE for M'+o.sz;
+ if(o.fast==='inside'&&!ok){Q('v6fast').value=fits.length?'inside':'snap';if(fits.length){Q('v6sz').value=String(fits[fits.length-1]);opt.disabled=false;opt.textContent='Screws inside the box (box stays the same size)'}
+  note.textContent='No free space left between the gears for M'+o.sz+' screws inside the box. '+(fits.length?'Switched to M'+fits[fits.length-1]+', which fits.':'Switched to the snap-fit lid (print and place) – or pick “tabs outside”.');document.querySelectorAll('#v6blk .v6scr').forEach(e=>e.style.display=Q('v6fast').value==='snap'?'none':'');return}
+ note.textContent=Q('v6fast').value==='snap'?'Snap-fit lid: locating lip plus small latches that click into the wall.':Q('v6fast').value==='outside'?'Tabs add about '+f1(2*colSpec(scr(o.sz),o.ty).Rb)+' mm at four corners.':'Inside screws fit: '+(fits.length?fits.map(d=>'M'+d).join(', '):'none')+'. Columns go only where no gear, shaft or wheel passes.'}catch(e){console.warn('v60 feas',e)}}
+setInterval(()=>{try{if(!Q('p-gears').classList.contains('on')||!Q('v6blk').closest('details').open)return;const s=objs.filter(isG).map(g=>g.id+':'+g.position.x.toFixed(1)+','+g.position.z.toFixed(1)+','+gp(g).N+','+gp(g).m).join('|')+objs.length;if(s!==feasSig){feasSig=s;feas()}}catch(e){}},1200);
+
+/* ------------------------------ the finishing pass ------------------------------ */
+let encRep='',depth=0;
+const dirWord=(g,k)=>{const up=Math.abs(V3(0,1,0).applyQuaternion(g.quaternion).y)>.9;return k==='ax'?(up?'lift or drop':'slide along its shaft'):(up?'shift sideways':'lift out or shift')};
+function finish(before){if(window.__v60skip)return;ENVC=new Map();TRC=new Map();AP=new Map();const o=encOpts(),isNew=q=>!before.has(q);
+ const base=objs.find(q=>isNew(q)&&q.userData.container&&/^Gearbox base/.test(nameOf(q)))||newestBase(),lid=objs.find(q=>isNew(q)&&/^Gearbox lid/.test(nameOf(q)))||[...objs].reverse().find(q=>/^Gearbox lid/.test(nameOf(q)));
+ if(!base)return;const info=encInfo(base);if(!info)return;
+ const caps=objs.filter(q=>isNew(q)&&/^Pin caps/.test(nameOf(q))),hosts=[base].concat(lid?[lid]:[],caps),gears=gearsOf(base),chk=gears.filter(g=>(gp(g)||{}).ty!=='ring'),t0=performance.now(),L=[],TM=[],tk=n=>TM.push(n+':'+(performance.now()-t0|0));
+ /* 1 lid fastening */
+ let F={mode:o.fast,msg:[]};try{F=fasten(base,lid,info,gears,o)}catch(e){console.error('v60 fasten',e);F.msg.push('Lid fastening could not be generated: '+e.message)}
+ tk('fasten');
+ /* 2 assemble mode: open the base for drop-in */
+ let nd=0;if(o.asm){try{nd=dropCut(base,chk,info,o.clr)}catch(e){console.error('v60 drop',e)}}
+ tk('drop');
+ /* 3 running gap first, so the audit sees the real box; then stops where a gear could still move */
+ let nsh=0;try{nsh=shave(hosts,gears,o.clr)}catch(e){console.error('v60 shave',e)}
+ tk('shave1');let ns=0;chk.forEach(g=>{try{const r=audit(g,hosts);if(!r.ok())ns+=addStops(g,r,base,lid,info,o.clr,o.asm)}catch(e){console.error('v60 stops',e)}});
+ /* 4 uniform running gap */
+ if(ns){try{nsh+=shave(hosts,gears,o.clr)}catch(e){console.error('v60 shave',e)}}
+ AP=new Map();
+ tk('stops+shave2');
+ /* 5 final audit */
+ const bad=[];chk.forEach(g=>{try{const r=audit(g,hosts),w=[];if(!r.up||!r.dn)w.push(dirWord(g,'ax'));if(r.rad.some(x=>!x.ok))w.push(dirWord(g,'rad'));
+   const gap=minGap(hosts,g,o.clr+.6);L.push([w.length?'warn':'ok',nameOf(g)+': '+(w.length?'⚠ could still '+w.join(' / ')+' if the motor is removed':'held in place – cannot lift, drop, shift or tilt')+' · smallest gap '+f1(gap,2)+' mm']);if(w.length)bad.push(nameOf(g))}catch(e){console.error('v60 audit',e)}});
+ tk('audit2');const old=hint.textContent,head=o.asm?'Enclosure ready to ASSEMBLE after printing: bearings are open cradles so each gear drops in from above; the lid carries the keepers that trap them.':'Enclosure ready to PRINT IN PLACE: gears and box print together.';
+ const s2=' Every gear and shaft has at least '+f1(o.clr,2)+' mm of running gap to every wall, pin and support ('+nsh+' piece'+(nsh===1?'':'s')+' trimmed'+(ns?', '+ns+' extra stop'+(ns===1?'':'s')+' added':'')+'), so nothing prints fused or rubs.';
+ const s3=bad.length?' ⚠ '+bad.length+' gear(s) are not fully trapped by the box alone: '+bad.join(', ')+' – see the list in the panel.':' All '+chk.length+' gear'+(chk.length===1?' is':'s are')+' trapped in position (checked by trying to push each one up, down and sideways).';
+ hint.textContent=head+s2+s3+' '+F.msg.join(' ');
+ encRep='<h4 style="margin-top:10px">Enclosure check</h4>'+L.map(l=>`<div class="ln ${l[0]}">${l[1]}</div>`).join('')+F.msg.map(m=>`<div class="ln ${/^⚠/.test(m)?'warn':'ok'}">${m}</div>`).join('')
+  +'<div class="ln ok">'+(o.asm?'Print the base, lid and gears as separate parts (Array ▾ → Arrange all on bed). Drop the gears in, then close the lid.':'Print base + gears as they are; print the lid separately. Use 0.2 mm layers or finer – the '+f1(o.clr,2)+' mm gap is then two clean layers.')+'</div>'
+  +'<details style="margin-top:4px"><summary style="font-weight:400">Build details</summary><div class="mut">'+old.replace(/[<&]/g,'')+'</div></details>';
+ const bx=Q('grep');if(bx){bx.querySelectorAll('.v6rep').forEach(e=>e.remove());const d=document.createElement('div');d.className='v6rep';d.innerHTML=encRep;bx.appendChild(d)}
+ window.V60.last={tm:TM.join(' '),ms:performance.now()-t0|0,nsh,ns,nd,bad,mode:F.mode};feasSoon()}
+{const genc=Q('genc'),prev=genc.onclick;
+ genc.onclick=function(){const before=new Set(objs);depth++;
+  try{Q('glidmode').value='print';const vm=Q('v50mode');if(vm&&vm.value!=='inplace'){vm.value='inplace';vm.onchange&&vm.onchange()}}catch(e){}
+  let r;try{r=prev.apply(this,arguments)}finally{depth--;if(!depth){try{finish(before)}catch(e){console.error('v60 finish',e);hint.textContent+=' (Finishing pass failed: '+e.message+')'}}}
+  return r};
+ const _rep=report;report=function(){const r=_rep.apply(this,arguments);try{const bx=Q('grep');if(bx&&encRep&&newestBase()&&!bx.querySelector('.v6rep')){const d=document.createElement('div');d.className='v6rep';d.innerHTML=encRep;bx.appendChild(d)}}catch(e){}return r}}
+window.V60={reset:()=>{ENVC=new Map();TRC=new Map();AP=new Map()},env,audit,shave,minGap,scr,encInfo,freeSpots,footprints,gearsOf,newestBase,meshList,cutObj};
+/* ====================== simpler Gears & Motors panel (step chips) ====================== */
+(function(){const P=Q('p-gears');if(!P||Q('v6chips'))return;const top=el=>{while(el&&el.parentElement!==P)el=el.parentElement;return el};
+ const GR=[['1','① Gears','Make the gears. Start with “Quick gearbox”, or add gears one by one.',[['v9d','Quick gearbox – build a complete one'],['sga_box','Add one gear (any type)'],['gadd','Gear size – teeth, module, thickness'],['gmesh','Add a gear that meshes with the selected one'],['v9stack','Stack a second gear on the same shaft'],['v9rack','Rack & pinion (straight-line motion)'],['gtyadd','Special gears – fine settings']]],
+  ['2','② Motor','Click a gear, then give it a motor, a shaft or a wheel.',[['sm_m','Quick: motor or wheel on the selected gear'],['gmadd','Motor, shaft & wheel – all options']]],
+  ['3','③ Box','Wrap the gears in a box. Choose how you print it and how the lid is held.',[['genc','Enclosure (box, lid, print style)']]],
+  ['4','④ Test','Check that the gears mesh and are strong enough, then spin them.',[['gchk','Check, strength & spin']]],
+  ['5','Parts','Loose motors, wheels, shafts and springs that are not on a gear.',[['mtt','Motors & servos'],['wadd','Wheels'],['xat','Shaft & spin disc'],['mrun','Run & physics'],['spA','Spring']]]];
+ const st=document.createElement('style');st.textContent='.v6off{display:none!important}#p-gears>h4{display:none!important}#v6chips{position:static!important;margin:6px 0 2px}#v6chips button{flex:1;padding:4px 1px!important;font-size:11.5px;white-space:nowrap}#v6gh{margin:4px 2px 8px}';document.head.appendChild(st);
+ const grep=Q('grep');GR.forEach(([g,,,items])=>items.forEach(([id,title])=>{const d=top(Q(id));if(!d||d.tagName!=='DETAILS')return;d.dataset.grp=g;const sm=d.querySelector('summary');if(sm){if(sm.firstChild&&sm.firstChild.nodeType===3)sm.firstChild.textContent=title+' ';else sm.insertBefore(document.createTextNode(title+' '),sm.firstChild)}P.insertBefore(d,grep)}));
+ grep.dataset.grp='4';const bar=Q('gfixall2')&&top(Q('gfixall2'));if(bar)bar.dataset.grp='4';
+ const chips=document.createElement('div');chips.id='v6chips';chips.className='seg adv';chips.innerHTML=GR.map(([g,t])=>`<button data-g="${g}">${t}</button>`).join('');
+ const gh=document.createElement('p');gh.id='v6gh';gh.className='mut adv';const seg=P.querySelector(':scope>.seg');seg.after(chips);chips.after(gh);
+ let cur='1';const apply=()=>{const adv=!P.classList.contains('gs');P.querySelectorAll(':scope>[data-grp]').forEach(e=>e.classList.toggle('v6off',adv&&e.dataset.grp!==cur));chips.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.g===cur));gh.textContent=(GR.find(x=>x[0]===cur)||[])[2]||''};
+ chips.querySelectorAll('button').forEach(b=>b.onclick=()=>{cur=b.dataset.g;apply()});
+ new MutationObserver(apply).observe(P,{attributes:true,attributeFilter:['class']});
+ P.addEventListener('toggle',e=>{const t=e.target,d=top(t);if(!t.open||!d||!d.dataset||!d.dataset.grp)return;if(!P.classList.contains('gs')&&d.dataset.grp!==cur){cur=d.dataset.grp;apply()}
+  if(t===d)P.querySelectorAll(':scope>details[data-grp="'+d.dataset.grp+'"]').forEach(x=>{if(x!==d)x.open=false})},true);
+ /* tuck the rarely needed blocks away */
+ [['gplace','Fine-tune positions (optional)'],['rgo','Rotate / tilt the gear (optional)']].forEach(([id,t])=>{const b=Q(id)&&Q(id).closest('.blk');if(!b)return;const d=document.createElement('details');d.innerHTML='<summary style="font-weight:400">'+t+'</summary><div></div>';b.before(d);d.querySelector('div').appendChild(b)});
+ apply()}());
+
+/* ====================== precise holes ====================== */
+const cylL=(r,yT,yB,n)=>[new THREE.CylinderGeometry(r,r,yT-yB,n||32),(yT+yB)/2];
+const cutAt=(parts,p,n)=>{const g=new THREE.Group();parts.forEach(([geo,y])=>{const m=new THREE.Mesh(geo);m.position.y=y;g.add(m)});g.position.copy(p);g.quaternion.setFromUnitVectors(V3(0,1,0),n.clone().normalize());return g};
+let pickCb=null;
+cv.addEventListener('pointerdown',e=>{if(!pickCb||e.button!==0)return;e.stopImmediatePropagation();e.preventDefault();setRay(e);const h=RC.intersectObjects(meshes(),false)[0];if(!h||!h.face){hint.textContent='Click directly on a part.';return}
+ const n=h.face.normal.clone().transformDirection(h.object.matrixWorld);if(n.dot(RC.ray.direction)>0)n.negate();const p=h.point.clone(),k=['x','y','z'].find(a=>Math.abs(n[a])>.985);
+ if(k){const s=Math.sign(n[k]);n.set(0,0,0);n[k]=s;['x','y','z'].forEach(a=>{if(a!==k)p[a]=sn(p[a])})}
+ const cb=pickCb;pickCb=null;cv.style.cursor='';cb(p,n,rootOf.get(h.object))},true);
+const startPick=(cb,msg)=>{pickCb=cb;cv.style.cursor='crosshair';hint.textContent=msg};
+addEventListener('keydown',e=>{if(e.key==='Escape'&&pickCb){pickCb=null;cv.style.cursor=''}});
+const cutTargets=(cj,only)=>{const cb=boxOfJ(cj),useSel=Q('ctg')&&Q('ctg').value==='sel'&&sel.length;return objs.filter(o=>{const u=o.userData;if(u.hole||!o.visible||u.motor||u.drv)return false;if(only)return only.includes(o);if(useSel&&!sel.includes(o))return false;if(isG(o)&&!sel.includes(o))return false;return bbx(o).intersectsBox(cb)})};
+(function holeTool(){const pe_=Q('p-era');if(!pe_||Q('h6go'))return;
+ pe_.insertAdjacentHTML('afterbegin','<div class="blk" style="--c:#1f6feb"><div class="bt"><i>⌀</i>Precise hole <small>screw holes, exact depth</small></div>'
+ +'<div class="fl"><label>Type</label><select id="h6ty" style="grid-column:2/5"><option value="plain">Plain round hole</option><option value="clear">Screw passes through (clearance)</option><option value="tap">Screw bites here (pilot)</option><option value="cbore">Counterbore – cap head sinks in</option><option value="csk">Countersink – flat head</option><option value="nut">Hex nut pocket + hole</option><option value="ins">Heat-set insert hole</option></select>'
+ +'<label>Screw</label><select id="h6sz">'+sizeOpts(3)+'</select><label>Ø mm</label><input id="h6d" type="number" step=".1" value="3">'
+ +'<label>Depth</label><input id="h6dep" type="number" step=".1" min=".1" value="5"><label class="chk" style="grid-column:3/5"><input type="checkbox" id="h6thru"> Through all</label>'
+ +'<label>X</label><input id="h6x" type="number" step=".1" value="0"><label>Z</label><input id="h6z" type="number" step=".1" value="0"><label>Y</label><input id="h6y" type="number" step=".1" value="0">'
+ +'<label>Into</label><select id="h6dir"><option value="face">Clicked face</option><option value="0,1,0">Top (down)</option><option value="0,-1,0">Bottom (up)</option><option value="1,0,0">+X side</option><option value="-1,0,0">−X side</option><option value="0,0,1">+Z side</option><option value="0,0,-1">−Z side</option></select></div>'
+ +'<div class="br"><button class="btn-o c-blue" id="h6pick">📍 Click the spot on the model</button><button class="btn-c c-blue" id="h6go">Cut hole</button></div>'
+ +'<p class="mut" style="margin:6px 0 0">Click the spot (snaps to the grid), or type X / Y / Z. The red ghost shows exactly what is removed. Y is the surface height.</p></div>');
+ let fn=V3(0,1,0),ghost=null,has=false;
+ const nrm=()=>{const v=Q('h6dir').value;return v==='face'?fn.clone():V3(...v.split(',').map(Number))},pos=()=>V3(+Q('h6x').value||0,+Q('h6y').value||0,+Q('h6z').value||0);
+ const fill=()=>{const s=scr(+Q('h6sz').value),t=Q('h6ty').value;Q('h6d').value=t==='plain'?s.d:t==='tap'?s.tap:t==='ins'?s.ins:s.clear;if(t==='ins')Q('h6dep').value=+(1.4*s.d+.6).toFixed(1)};
+ const parts=dep=>{const s=scr(+Q('h6sz').value),t=Q('h6ty').value,r=Math.max(.15,(+Q('h6d').value||s.d)/2),P=[cylL(r,.3,-dep)];
+  if(t==='cbore')P.push(cylL(s.capD/2+.3,.3,-(s.d+.2),40));
+  if(t==='csk'){const R=s.csk/2+.1,h=Math.max(.2,R-r);P.push(cylL(R,.3,0,40),[new THREE.CylinderGeometry(R,r,h,40),-h/2])}
+  if(t==='nut')P.push([new THREE.CylinderGeometry((s.af+.3)/2/Math.cos(Math.PI/6),(s.af+.3)/2/Math.cos(Math.PI/6),s.nutH+.6,6),-(s.nutH+.3)/2+.15]);return P};
+ const depth=(p,n)=>{if(!Q('h6thru').checked)return Math.max(.1,+Q('h6dep').value||5);const T=objs.filter(o=>!o.userData.hole&&o.visible&&!o.userData.motor),ms=[];T.forEach(o=>o.traverse(c=>{if(c.isMesh)ms.push(c)}));
+  RC.set(p.clone().addScaledVector(n,.5),n.clone().negate());const h=RC.intersectObjects(ms,false);return h.length?h[h.length-1].distance-.5+.6:5};
+ const unghost=()=>{if(ghost){S.remove(ghost);ghost.traverse(c=>c.geometry&&c.geometry.dispose());ghost=null}};
+ const prev=()=>{unghost();if(!has)return;const p=pos(),n=nrm();ghost=cutAt(parts(depth(p,n)),p,n);const m=new THREE.MeshBasicMaterial({color:0xe5484d,transparent:true,opacity:.55,depthTest:false});ghost.traverse(c=>{if(c.isMesh){c.material=m;c.renderOrder=996}});S.add(ghost)};
+ ['h6ty','h6sz'].forEach(i=>Q(i).addEventListener('change',()=>{fill();prev()}));['h6d','h6dep','h6thru','h6x','h6y','h6z','h6dir'].forEach(i=>Q(i).addEventListener('input',()=>{has=true;prev()}));
+ Q('h6thru').addEventListener('change',()=>{Q('h6dep').disabled=Q('h6thru').checked});
+ Q('h6pick').onclick=()=>startPick((p,n)=>{fn=n;Q('h6dir').value='face';Q('h6x').value=+p.x.toFixed(2);Q('h6y').value=+p.y.toFixed(2);Q('h6z').value=+p.z.toFixed(2);has=true;prev();hint.textContent='Spot set at X '+f1(p.x,2)+', Y '+f1(p.y,2)+', Z '+f1(p.z,2)+'. Adjust the numbers if needed, then press “Cut hole”.'},'Click the exact spot for the hole on a part (Esc cancels).');
+ Q('h6go').onclick=()=>{if(!J){hint.textContent='The cutting engine needs internet access.';return}const p=pos(),n=nrm(),d=depth(p,n),cj=toJ(cutAt(parts(d),p,n)),T=cutTargets(cj);
+  if(!T.length){hint.textContent='No part at that position – click the spot on the model first (gears are only cut when selected).';return}
+  commit();let c=0;T.forEach(o=>c+=cutObj(o,cj));unghost();has=false;select(sel.filter(o=>objs.includes(o)));info();
+  hint.textContent=c?Q('h6ty').selectedOptions[0].text+' cut: Ø'+Q('h6d').value+' mm, '+(Q('h6thru').checked?'through':f1(d,2)+' mm deep')+', in '+T.map(nameOf).join(', ')+'. Ctrl+Z undoes.':'Nothing was removed there.'};
+ window.V60.holeSize=d=>{Q('h6sz').value=String(d);fill()};fill()}());
+
+/* ====================== bolts, nuts, washers ====================== */
+const thrR=(u,P,rM,rm)=>{const a=Math.abs(u-P/2),c=P/16,r=3*P/8;return a<=c?rM:a>=r?rm:rM-(rM-rm)*(a-c)/(r-c)};
+const ringP=(rf,y,n)=>[...Array(n)].map((_,i)=>{const a=i/n*2*Math.PI,r=rf(a,y);return{x:r*Math.cos(a),z:r*Math.sin(a)}});
+/* stack of rings following contour(y); optional straight recess `hole` from y=0 to hd */
+function stackLoft(contour,ys,hole,hd){if(!hole||!(hd>0))return loft(ys.map(contour),ys);const A=ys.filter(y=>y<hd-1e-4).concat([hd]),B=[hd].concat(ys.filter(y=>y>hd+1e-4));return mergeG([loft(A.map(contour),A,[hole]),loft(B.map(contour),B)])}
+function shankGeo(s,L,Lt,cl,real,hole,hd){const P=s.P,rM=s.d/2-cl,rm=rM-.5413*P,n=real?48:40,t0=Math.max(0,L-Lt);
+ const rf=(a,y)=>{let r=rM;if(real&&y>t0-1e-6){const f=Math.min(1,(y-t0)/P+(t0<1e-6?1:0));r=rM-(rM-thrR(((y+P*a/(2*Math.PI))%P+P)%P,P,rM,rm))*f}return Math.max(.12,Math.min(r,rm-.1+(L-y)))};
+ const ys=[0];if(real){const st=Math.max(P/8,Lt/520);if(t0>.01)ys.push(t0);for(let y=t0+st;y<L-1e-6;y+=st)ys.push(y)}else ys.push(Math.max(.01,L-(rM-rm)-.1));ys.push(L);
+ return stackLoft(y=>ringP(rf,y,n),ys,hole,hd)}
+function driveHole(kind,D,s,small){if(kind==='hex')return hexPoly((small?s.bsock:s.sock)+.2);if(kind==='ph'){const w=.11*D,l=.33*D;return[[w,-l],[w,-w],[l,-w],[l,w],[w,w],[w,l],[-w,l],[-w,w],[-l,w],[-l,-w],[-w,-w],[-w,-l]].map(([x,z])=>({x,z}))}
+ if(kind==='slot'){const w=Math.max(.25,.09*D),l=.42*D;return rc(-l,-w,l,w)}return null}
+function headGeo(s,type,drive){const d=s.d;let k,R,poly=null;
+ if(type==='hex'){k=.7*d;poly=hexPoly(s.af);R=()=>s.af/2;drive='none'}
+ else if(type==='cap'){k=d;R=()=>s.capD/2}
+ else if(type==='button'){k=.55*d;R=y=>.95*d*(.62+.38*Math.sqrt(Math.max(0,1-(1-y/k)**2)))}
+ else if(type==='csk'){k=d/2;R=y=>d-(d/2)*(y/k)}
+ else if(type==='pan'){k=.6*d;R=()=>d}
+ else{k=Math.max(3,.8*d);const R0=Math.max(4,1.5*d),N=Math.max(12,Math.round(R0*2));poly=[...Array(2*N)].map((_,i)=>{const r=i%2?R0-.5:R0,a=i*Math.PI/N;return{x:r*Math.cos(a),z:r*Math.sin(a)}});R=()=>R0-.5}
+ const hd=Math.max(.35,Math.min(.6*k,k-.4)),Dm=2*Math.min(R(0),R(hd)),hole=driveHole(drive,Dm,s,type==='button'||type==='csk'),ys=poly?[0,k]:[...Array(9)].map((_,i)=>k*i/8);
+ return{k,geo:stackLoft(poly?()=>poly:y=>circ(0,0,R(y),48),ys,hole,hd)}}
+function boltGeo(o){const s=scr(o.d,o.P),real=o.real,cl=real?o.cl:0;
+ if(o.head==='grub'){const hd=Math.min(.6*s.d,o.L-.6);return{geo:shankGeo(s,o.L,o.L,cl,real,driveHole(o.drive==='slot'?'slot':'hex',2*(s.d/2-.5413*s.P)*1.15,s,true),hd),s}}
+ const h=headGeo(s,o.head,o.drive),sh=shankGeo(s,o.L,Math.min(o.L,o.Lt>0?o.Lt:o.L),cl,real);sh.translate(0,h.k-.02,0);return{geo:mergeG([h.geo,sh]),s}}
+function tubeGeo(outer,rf,h,n,ny){const pos=[],T=(a,b,c)=>pos.push(...a,...b,...c);if(polyA(outer)<0)outer=outer.slice().reverse();const R=[];
+ for(let j=0;j<=ny;j++){const y=h*j/ny;R.push([...Array(n)].map((_,i)=>{const a=i/n*2*Math.PI,r=rf(a,y);return[r*Math.cos(a),y,r*Math.sin(a)]}))}
+ for(let j=0;j<ny;j++)for(let i=0;i<n;i++){const k=(i+1)%n,A=R[j][i],B=R[j][k],C=R[j+1][i],D=R[j+1][k];T(A,B,C);T(B,D,C)}
+ const N=outer.length;for(let i=0;i<N;i++){const p=outer[i],q=outer[(i+1)%N],A=[p.x,0,p.z],B=[q.x,0,q.z],C=[p.x,h,p.z],D=[q.x,h,q.z];T(A,C,B);T(B,C,D)}
+ const V2=THREE.Vector2,cap=(y,rg,top)=>{const all=outer.map(p=>[p.x,p.z]).concat(rg.map(p=>[p[0],p[2]]));
+  THREE.ShapeUtils.triangulateShape(outer.map(p=>new V2(p.x,p.z)),[rg.map(p=>new V2(p[0],p[2]))]).forEach(f=>{let[a,b,c]=f.map(i=>all[i]);const sg=(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);if((sg>0)===top)[b,c]=[c,b];T([a[0],y,a[1]],[b[0],y,b[1]],[c[0],y,c[1]])})};
+ cap(0,R[0],false);cap(h,R[ny],true);const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.computeVertexNormals();return g}
+function nutGeo(o){const s=scr(o.d,o.P),P=s.P,cl=o.real?o.cl:.1,rM=s.d/2+cl,rm=rM-.5413*P,t=o.nut;let h=t==='thin'?Math.max(.6,.5*s.d):t==='thumb'?Math.max(3,.8*s.d):s.nutH,outer;
+ if(t==='square')outer=rc(-s.af/2,-s.af/2,s.af/2,s.af/2);else if(t==='thumb'){const R0=Math.max(5,1.4*s.af/2+2),N=Math.max(12,Math.round(R0*2));outer=[...Array(2*N)].map((_,i)=>{const r=i%2?R0-.5:R0,a=i*Math.PI/N;return{x:r*Math.cos(a),z:r*Math.sin(a)}})}else outer=hexPoly(s.af);
+ const rf=(a,y)=>Math.max(o.real?thrR(((y+P*a/(2*Math.PI))%P+P)%P,P,rM,rm):rM,rM+.1-Math.min(y,h-y));
+ return{geo:tubeGeo(outer,rf,h,48,o.real?Math.max(8,Math.ceil(h/(P/8))):2),s,h}}
+(function fastPane(){if(Q('p-fast'))return;const tabs=document.querySelector('#side .tabs'),tb=document.createElement('button');tb.dataset.p='fast';tb.textContent='Bolts & Fits';tabs.querySelectorAll('button').forEach(b=>{if(b.dataset.p==='gears')b.textContent='Gears';if(b.dataset.p==='era')b.textContent='Cut & Holes'});tb.onclick=()=>tab('fast');tabs.appendChild(tb);
+ const pane=document.createElement('div');pane.className='pane';pane.id='p-fast';Q('side').appendChild(pane);
+ pane.innerHTML='<details class="acc" open><summary>Bolt &amp; nut generator</summary><div>'
+ +'<div class="fl"><label>Size</label><select id="b6sz">'+sizeOpts(6)+'<option value="c">Custom…</option></select><label>Length</label><input id="b6L" type="number" value="20" min="1" step="1">'
+ +'<label class="b6c">Ø mm</label><input class="b6c" id="b6d" type="number" value="6" step=".1"><label class="b6c">Pitch</label><input class="b6c" id="b6p" type="number" value="1" step=".05">'
+ +'<label>Head</label><select id="b6h" style="grid-column:2/5"><option value="hex">Hex head (spanner)</option><option value="cap">Socket cap (Allen key)</option><option value="button">Button head</option><option value="csk">Countersunk (flat)</option><option value="pan">Pan head</option><option value="thumb">Thumb screw (knurled)</option><option value="grub">Grub / set screw (no head)</option></select>'
+ +'<label>Drive</label><select id="b6dr" style="grid-column:2/5"><option value="hex">Hex socket</option><option value="ph">Phillips cross</option><option value="slot">Slot</option><option value="none">None</option></select>'
+ +'<label>Thread len</label><input id="b6lt" type="number" value="0" min="0" title="0 = threaded all the way"><label>Fit</label><select id="b6f"><option value=".1">Tight</option><option value=".18" selected>Normal</option><option value=".28">Loose</option></select>'
+ +'<label>Nut</label><select id="b6n" style="grid-column:2/5"><option value="hex">Hex nut</option><option value="thin">Thin (jam) nut</option><option value="square">Square nut</option><option value="thumb">Thumb nut (knurled)</option></select>'
+ +'<label class="chk" style="grid-column:1/5"><input type="checkbox" id="b6r" checked> Real printable threads (untick for a smooth stand-in)</label></div>'
+ +'<p class="mut" id="b6i" style="margin:6px 0 0"></p><div class="br"><button class="btn-c c-blue" id="b6b">＋ Bolt</button><button class="btn-c c-blue" id="b6nb">＋ Nut</button><button class="btn-o c-blue" id="b6w">＋ Washer</button><button class="btn-c c-teal" id="b6set">＋ Bolt + nut + washer</button></div>'
+ +'<div class="br"><button class="btn-o c-blue" id="b6hole">Cut a hole for this size…</button></div></div></details>'
+ +'<details class="acc" open><summary>Screw two parts together</summary><div><p class="mut" style="margin:0 0 6px">Put the two parts where they belong (touching). Click the spot on the outer part: it gets a clearance hole and a seat for the head, the part behind gets the hole the screw holds in.</p>'
+ +'<div class="fl"><label>Screw</label><select id="j6sz">'+sizeOpts(3)+'</select><label>Head</label><select id="j6h"><option value="cbore">Sunk cap head</option><option value="csk">Countersunk</option><option value="none">On the surface</option></select>'
+ +'<label>Holds by</label><select id="j6ty" style="grid-column:2/5"><option value="tap">Self-tapping into the second part</option><option value="nut">Nut in a hex pocket on the far side</option><option value="ins">Heat-set insert</option></select></div>'
+ +'<div class="br"><button class="btn-c c-violet" id="j6go">📍 Click where the screw goes</button></div></div></details>'
+ +'<details class="acc" open><summary>Tight fit – plug &amp; socket</summary><div><p class="mut" style="margin:0 0 6px">Push the plug part into the body where it should sit. Select the plug first, then shift-click the body. The body gets a socket shaped exactly like the plug, with the gap you choose.</p>'
+ +'<div class="fl"><label>Fit</label><select id="f6fit" style="grid-column:2/5"><option value="0.05">Press fit – hammer in, stays for good (0.05)</option><option value="0.12" selected>Tight – push in by hand, does not fall out (0.12)</option><option value="0.2">Snug – slides in, no wobble (0.2)</option><option value="0.35">Loose – drops in freely (0.35)</option></select><label>Gap mm</label><input id="f6c" type="number" step=".01" value="0.12"></div>'
+ +'<div class="br"><button class="btn-c c-amber" id="f6go">Cut socket for the plug</button></div><p class="mut" style="margin:6px 0 0">Gap is per side. Printers differ: if it is too tight add 0.05, too loose take 0.05 off.</p></div></details>';
+ const rd=()=>{const c=Q('b6sz').value==='c',d=c?Math.max(.6,+Q('b6d').value||6):+Q('b6sz').value;return{d,P:c?+Q('b6p').value:0,L:Math.max(1,+Q('b6L').value||20),Lt:+Q('b6lt').value||0,head:Q('b6h').value,drive:Q('b6dr').value,cl:+Q('b6f').value,real:Q('b6r').checked,nut:Q('b6n').value}};
+ const ui=()=>{const c=Q('b6sz').value==='c';pane.querySelectorAll('.b6c').forEach(e=>e.style.display=c?'':'none');const o=rd(),s=scr(o.d,o.P);if(!c){Q('b6d').value=s.d;Q('b6p').value=s.P}
+  const h=o.head,dr=Q('b6dr');[...dr.options].forEach(op=>op.disabled=h==='hex'?op.value!=='none':h==='grub'?!(op.value==='hex'||op.value==='slot'):h==='thumb'?!(op.value==='none'||op.value==='slot'):false);if(dr.selectedOptions[0].disabled)dr.value=[...dr.options].find(op=>!op.disabled).value;
+  Q('b6i').textContent='M'+s.d+' × '+s.P+' mm pitch · spanner '+s.af+' mm · through-hole Ø'+s.clear+' · pilot Ø'+s.tap+(o.real&&s.d<4?' · threads this small rarely print well – M5 and up is reliable (0.1–0.2 mm layers), or use real metal screws.':'')};
+ ['b6sz','b6h','b6d','b6p','b6r'].forEach(i=>Q(i).addEventListener('change',ui));ui();
+ const nm=o=>'M'+o.d+'×'+o.L;const mk=(geo,name,dx)=>{const w=place(M(geo,0xb8c0cc),name,false);if(dx)w.position.x+=dx;return w};
+ const safe=f=>{try{commit();f()}catch(e){console.error(e);hint.textContent='Could not build that part: '+e.message}};
+ Q('b6b').onclick=()=>safe(()=>{const o=rd(),b=boltGeo(o);mk(b.geo,'Bolt '+nm(o));hint.textContent='Bolt '+nm(o)+' added, standing on its head so it prints without supports.'});
+ Q('b6nb').onclick=()=>safe(()=>{const o=rd(),n=nutGeo(o);mk(n.geo,'Nut M'+o.d);hint.textContent='Nut M'+o.d+' added ('+f1(n.h)+' mm tall) – its thread matches bolts made with the same Fit.'});
+ const washer=o=>{const s=scr(o.d);return ext(circ(0,0,Math.max(s.d*1.05+1.5,s.af*.62+.5),48),Math.max(.4,+(s.d*.17).toFixed(1)),[circ(0,0,s.clear/2,32)])};
+ Q('b6w').onclick=()=>safe(()=>{const o=rd();mk(washer(o),'Washer M'+o.d);hint.textContent='Washer M'+o.d+' added.'});
+ Q('b6set').onclick=()=>safe(()=>{const o=rd(),s=scr(o.d),b=mk(boltGeo(o).geo,'Bolt '+nm(o)),n=mk(nutGeo(o).geo,'Nut M'+o.d),w=mk(washer(o),'Washer M'+o.d);n.position.set(b.position.x+s.af*2+6,0,b.position.z);w.position.set(b.position.x+s.af*4+12,0,b.position.z);select([b,n,w]);hint.textContent='Bolt, nut and washer M'+o.d+' added side by side, ready to print.'});
+ Q('b6hole').onclick=()=>{const o=rd();if(!SCT[o.d]){hint.textContent='Pick a standard size for the hole tool (or type the Ø there).';tab('era');return}window.V60.holeSize(o.d);tab('era');hint.textContent='Hole tool set to M'+o.d+'. Choose the hole type, click the spot, then Cut hole.'};
+ /* --- screw joint --- */
+ Q('j6go').onclick=()=>{if(!J){hint.textContent='The cutting engine needs internet access.';return}startPick((p,n,A)=>{const s=scr(+Q('j6sz').value),ty=Q('j6ty').value,hk=Q('j6h').value,ms=[];objs.forEach(o=>{if(o.visible&&!o.userData.hole)o.traverse(c=>{if(c.isMesh)ms.push(c)})});
+   RC.set(p.clone().addScaledVector(n,.3),n.clone().negate());const H=RC.intersectObjects(ms,false).map(h=>({d:h.distance-.3,o:rootOf.get(h.object)})).filter(h=>h.o),fb=H.find(h=>h.o!==A&&h.d>.2);
+   if(!A||!fb){hint.textContent='There is no second part behind that spot – move the two parts together first, then click again.';return}
+   const B=fb.o,tA=Math.max(...H.filter(h=>h.o===A&&h.d<=fb.d+.05).map(h=>h.d),.2),sB=fb.d,eB=Math.max(...H.filter(h=>h.o===B).map(h=>h.d)),tB=eB-sB;
+   if(sB-tA>3){hint.textContent='The parts are '+f1(sB-tA)+' mm apart at that spot – bring them together first.';return}
+   const sd=hk==='cbore'?Math.min(s.d+.2,tA-1.2):0,PA=[cylL(s.clear/2,.3,-(sB+.02))];if(hk==='cbore'&&sd>=.5)PA.push(cylL(s.capD/2+.3,.3,-sd,40));
+   if(hk==='csk'){const R=s.csk/2+.1,h=Math.max(.2,R-s.clear/2);PA.push(cylL(R,.3,0,40),[new THREE.CylinderGeometry(R,s.clear/2,h,40),-h/2])}
+   let PB,need,how;const hexR=(s.af+.3)/2/Math.cos(Math.PI/6);
+   if(ty==='nut'){const pd=Math.max(.6,Math.min(s.nutH+.3,tB-1.2));PB=[cylL(s.clear/2,-(sB-.05),-(eB+.5)),[new THREE.CylinderGeometry(hexR,hexR,pd+.5,6),-(eB-pd)-(pd+.5)/2]];need=eB-(sd>=.5?sd:0)-pd+s.nutH;how='M'+s.d+' nut in the hex pocket on the far side';need=STDL.find(x=>x>=need-.5)||need}
+   else if(ty==='ins'){const id=Math.min(1.4*s.d+.6,tB-.8);PB=[cylL(s.ins/2,-(sB-.05),-(sB+id))];need=stdLen(tA-(sd>=.5?sd:0)+id);how='M'+s.d+' heat-set insert (Ø'+s.ins+' hole, '+f1(id)+' mm deep)'}
+   else{const thru=tB<2.5,eng=thru?tB+.5:Math.min(tB-1,Math.max(3*s.d,6));PB=[cylL(s.tap/2,-(sB-.05),-(sB+eng))];need=stdLen(tA-(sd>=.5?sd:0)+eng);how='self-tapping, Ø'+s.tap+' pilot '+f1(Math.min(eng,tB))+' mm deep'}
+   commit();cutObj(A,toJ(cutAt(PA,p,n)));cutObj(B,toJ(cutAt(PB,p,n)));select([]);info();
+   hint.textContent='Screw joint made: '+nameOf(A)+' ('+f1(tA)+' mm) gets an M'+s.d+' clearance hole'+(hk==='none'?'':hk==='csk'?' with countersink':' with sunk head seat')+'; '+nameOf(B)+' holds it by '+how+'. Use an M'+s.d+'×'+f1(need,0)+' screw. Click the button again for the next screw.'},'Click on the outer part exactly where the screw should go (Esc cancels).')};
+ /* --- tight fit --- */
+ Q('f6fit').onchange=()=>Q('f6c').value=Q('f6fit').value;
+ Q('f6go').onclick=()=>{if(!J){hint.textContent='The cutting engine needs internet access.';return}if(sel.length!==2){hint.textContent='Select the plug first, then shift-click the body it goes into (exactly two parts).';return}
+  const plug=sel[0],body=sel[1],c=Math.max(0,+Q('f6c').value||0),b=bbx(plug),z=b.getSize(V3(0,0,0)),ct=b.getCenter(V3(0,0,0));if(!b.intersectsBox(bbx(body))){hint.textContent='The plug does not reach into the body yet – push it in to the depth you want, then press again.';return}
+  const w=new THREE.Group();w.matrixAutoUpdate=false;w.matrix.makeTranslation(ct.x,ct.y,ct.z).multiply(new THREE.Matrix4().makeScale((z.x+2*c)/z.x,(z.y+2*c)/z.y,(z.z+2*c)/z.z)).multiply(new THREE.Matrix4().makeTranslation(-ct.x,-ct.y,-ct.z));w.add(plug.clone(true));
+  let cj;try{cj=toJ(w)}catch(e){cj=null}if(!cj){hint.textContent='Could not read the plug shape.';return}commit();const n=cutObj(body,cj);select([plug]);info();
+  hint.textContent=n?'Socket cut into '+nameOf(body)+' to match '+nameOf(plug)+' with '+f1(c,2)+' mm gap per side. Move the plug away to see it. Ctrl+Z undoes.':'Nothing was cut – the plug must overlap the body.'}}());
+Object.assign(window.V60,{boltGeo,nutGeo,scr});
+
+}catch(e){console.error('v60 module failed:',e)}})();
+</script>
 </body></html>
