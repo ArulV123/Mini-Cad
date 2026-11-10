@@ -255,7 +255,7 @@ const okL=(p,n)=>{const b=hexId(n);return p===b||new RegExp('^'+b+'-\\d{1,2}$').
 let lp=null;
 function lstart(g){if(!me||!window.Peer)return;const p=lp=new Peer(hexId(me.name)+(g>1?'-'+g:''),{config:{iceServers:ICE}});
  p.on('connection',c=>{if(lp!==p)return;(window.__LC=window.__LC||new Set()).add(c);c.on('close',()=>window.__LC.delete(c));c.on('data',m=>{if(!m)return;
-  if(m.t==='ping'){const n=lobbyFr().find(x=>okL(c.peer,x));if(n)try{c.send({t:'pong',w:'b'})}catch(e){}}
+  if(m.t==='ping'){const n=lobbyFr().find(x=>okL(c.peer,x));if(n)try{c.send({t:'pong',w:'b',pid:new URLSearchParams(location.search).get('p')||''})}catch(e){}}
   else if(m.t==='env'||m.t==='knock')try{c.close()}catch(e){}})});   /* messages/join requests can't be handled here: the sender keeps them and retries when you're back on the projects page */
  p.on('close',()=>{if(lp===p){lp=null;setTimeout(()=>{if(!lp)lstart(1)},3000)}});
  p.on('error',e=>{if(lp!==p)return;
