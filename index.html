@@ -2875,7 +2875,7 @@ function tog(id,get,set){if(BUSY.has(id))return;const nv=!get(),el=$(id);if(el){
   setTimeout(()=>{BUSY.delete(id);pend--;rm();let good=ok&&get()===nv;
    if(good&&!solo()&&N.status!=='online'){good=false;msg('Saved here, but not synced to others yet – you are '+(N.status==='offline'?'offline':'still connecting')+'. It will sync when reconnected.',1,7000)}
    else if(!good){const o=$(id);if(o)o.setAttribute('aria-checked',get()?'true':'false');msg('Change could not be applied. Please try again.',1,7000)}
-   if(good){okUntil=Date.now()+1300;setTimeout(draw,1350)}$('cbm')._h=null;draw()},250)},0)}
+   if(good){okUntil=Date.now()+1300;setTimeout(()=>{$('cbt')._h=null;draw()},1350)}$('cbm')._h=null;$('cbt')._h=null;draw()},250)},0)}
 const sw=(id,on,dis)=>`<button class="sw${BUSY.has(id)?' busy':''}" id="${id}" role="switch" aria-checked="${on?'true':'false'}"${dis?' disabled':''}></button>`;
 const pmr=(id,t,d,on)=>`<div class="pm"><div class="pt"><b>${t}</b><small>${d}</small></div>${sw(id,on,!isO)}</div>`;
 const setH=(el,h)=>{if(el._h===h)return false;el._h=h;el.innerHTML=h;return true};
@@ -2893,9 +2893,10 @@ function draw(){const bx=$('cb');if(solo()){bx.style.display='none';$('cbp').hid
   +(isO&&R.length>1?'<button class="dg" id="cka">Remove everyone</button>':'')
   +(!isO&&!N.online(OWN)?'<div class="ow">The host is offline – you can keep editing; changes sync when they return.</div>':''));
  if(setH($('cbl'),chat.slice(-40).map(c=>`<div class="bb${c.u===me.name?' me':''}">${c.u===me.name?'':`<b style="color:${col(c.u)}">${esc(c.u)}</b>`}${esc(c.x)}</div>`).join('')||'<div class="em">Chat with everyone in this project</div>'))$('cbl').scrollTop=1e9}
-$('cbt').onclick=()=>{if(BUSY.has('open'))return;const p=$('cbp'),i=$('cbt').querySelector('i');if(i){i.className='cbsp';i.textContent=''}
- BUSY.add('open');const rm=msg('Opening… just a moment',0,0);
- setTimeout(()=>{p.hidden=!p.hidden;unread=0;draw();setTimeout(()=>{BUSY.delete('open');rm();okUntil=Date.now()+1100;draw();setTimeout(draw,1150)},60)},0)};
+$('cbt').onclick=()=>{const p=$('cbp');if(!p.hidden){p.hidden=true;unread=0;return}if(BUSY.has('open'))return;const i=$('cbt').querySelector('i');if(i){i.className='cbsp';i.textContent=''}
+ BUSY.add('open');
+ setTimeout(()=>{p.hidden=!p.hidden;unread=0;$('cbt')._h=null;draw();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{BUSY.delete('open');okUntil=Date.now()+1100;$('cbt')._h=null;draw();setTimeout(()=>{$('cbt')._h=null;draw()},1150)}))},0)};
 document.addEventListener('pointerdown',e=>{const p=$('cbp');if(p.hidden||box.contains(e.target))return;p.hidden=true},true);
 $('cbm').onclick=e=>{const t=e.target.closest('button')||e.target,f=t.dataset&&t.dataset.f,k=t.dataset&&t.dataset.k;
  if(t.dataset&&t.dataset.i){const u=t.dataset.i;t.disabled=true;t.textContent='Sent…';N.lobbyCall(u,{t:'binv',pid:pr.id},4000).then(r=>{t.textContent=r?'Invited':'Failed';setTimeout(()=>{$('cbm')._h=null;draw()},1800)});return}
