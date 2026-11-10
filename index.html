@@ -2649,6 +2649,7 @@ let R=MC.members.map(m=>({user:m.user,role:m.user===OWN?'Owner':(m.role||'Co-own
 const rl=u=>(R.find(m=>m.user===u)||{}).role,mem=u=>!!rl(u),mems=()=>R.map(m=>m.user),rd=()=>rl(me.name)==='Viewer',EDIT=u=>{const r=rl(u);return !!r&&r!=='Viewer'};
 const COL=['#e5484d','#30a46c','#f5a623','#8e4ec6','#0ea5e9','#d6409f'],col=u=>COL[[...u].reduce((a,c)=>a+c.charCodeAt(0),0)%COL.length];
 const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+const solo=()=>R.length<2;let sk1=0,sk2=0;
 let askPlace=(()=>{try{return localStorage.getItem('mc_ap_'+pr.id)==='1'}catch(e){return false}})();const LOB=new Set();
 setInterval(()=>{if(dead||!N.lobbyCall||document.hidden)return;mems().filter(u=>u!==me.name&&!N.online(u)).forEach(u=>N.lobbyCall(u,{t:'ping'},3500).then(r=>{const w=!!(r&&r.t==='pong'&&r.w==='l');if(w!==LOB.has(u)){w?LOB.add(u):LOB.delete(u);draw()}}))},12000);
 let NMv=null,NMk='',NMt=0;const nodeOf=id=>{if(!NMv||NMk!==lastS){NMv=new Map();objs.forEach(o=>o.traverse(n=>NMv.set(n.uuid,n)));NMk=lastS;NMt=Date.now()}
@@ -2656,7 +2657,7 @@ let NMv=null,NMk='',NMt=0;const nodeOf=id=>{if(!NMv||NMk!==lastS){NMv=new Map();
 /* part properties (visibility, colour, drive/physics settings…) travel as small per-part updates */
 const PC=new Map(),mat1=n=>n.isMesh?(Array.isArray(n.material)?n.material[0]:n.material):null;
 const psig=n=>{const m=mat1(n);return JSON.stringify({v:n.visible?1:0,c:m&&m.color?m.color.getHex():null,o:m?m.opacity:null,t:m&&m.transparent?1:0,u:clean(n.userData)})};
-setInterval(()=>{if(dead||applying||rd()||!ready)return;const ch=[];
+setInterval(()=>{if(dead||applying||rd()||!ready)return;if(solo()&&(sk1++%3))return;const ch=[];
  objs.forEach(o=>o.traverse(n=>{const g=psig(n),old=PC.get(n.uuid);if(old===undefined){PC.set(n.uuid,g);return}if(old!==g){PC.set(n.uuid,g);ch.push([n.uuid,g])}}));
  if(ch.length){sceneTs=Date.now();auto();if(N.peers().length)out('pr',{o:ch})}},150);
 let lastPv='',lastPvT=0;const PV=new Map();
@@ -2745,7 +2746,7 @@ function dropRig(u){const r=RIG.get(u);if(!r)return;S.remove(r.g);r.el.remove();
 const eyeOf=c=>new THREE.Vector3(c[3]+c[2]*Math.sin(c[1])*Math.sin(c[0]),c[4]+c[2]*Math.cos(c[1]),c[5]+c[2]*Math.sin(c[1])*Math.cos(c[0]));
 const nmOf=o=>(o.userData&&o.userData.name)||'a model';
 /* fast channel (~14/s): model moves, camera, pointer, what I'm dragging */
-setInterval(()=>{if(dead||applying)return;
+setInterval(()=>{if(dead||applying)return;if(solo()&&(sk2++%8))return;
  if(!rd()){const ch=[];objs.forEach(o=>o.traverse(n=>{if(tw.has(n.uuid))return;const k=ks(n);if(last[n.uuid]!==k){last[n.uuid]=k;ch.push([n.uuid,...xk(n)])}}));if(ch.length){sceneTs=Date.now();auto();if(N.peers().length)out('xf',{o:ch})}}
  calcPtr();const c=[th,ph,dist,tgt.x,tgt.y,tgt.z].map(v=>+v.toFixed(3)),s=sel.map(o=>o.uuid),d=(mv&&mv.c&&!rd())?mv.s.map(q=>q.o.uuid):[],p=ptr?ptr.map(v=>+v.toFixed(1)):null,cs=c+'|'+s+'|'+d+'|'+p;
  if(cs!==lastC||Date.now()-lastSend>1500){lastC=cs;lastSend=Date.now();out('cv',{c,s,d,p})}
@@ -2865,24 +2866,25 @@ const act=p=>p&&p.s&&p.s.length?'selected '+((objs.find(o=>o.uuid===p.s[0])||{us
 const live=u=>u===me.name||N.online(u);
 const sw=(id,on,dis)=>`<button class="sw" id="${id}" role="switch" aria-checked="${on?'true':'false'}"${dis?' disabled':''}></button>`;
 const pmr=(id,t,d,on)=>`<div class="pm"><div class="pt"><b>${t}</b><small>${d}</small></div>${sw(id,on,!isO)}</div>`;
-function draw(){const on=mems().filter(u=>u!==me.name&&N.online(u)).length,s=N.status,st=s==='online'?'g':s==='offline'?'x':'c',lb=s==='online'?'LIVE':s==='offline'?'OFFLINE':'CONNECTING';
- $('cbt').innerHTML='<i class="lv'+(st==='g'?'':' '+st)+'"></i><span class="lt '+st+'">'+lb+'</span>'+(s==='online'?'<span class="lc" title="'+(on+1)+' in this session"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-3.6 3.2-5.5 6.5-5.5s6 1.9 6.5 5.5"/><path d="M16 4.7a3.5 3.5 0 0 1 0 6.6M18.5 14.8c1.7.7 2.8 2.4 3 5.2"/></svg>'+(on+1)+'</span>':'')+(unread?'<span class="ub">'+(unread>9?'9+':unread)+'</span>':'');
+const setH=(el,h)=>{if(el._h===h)return false;el._h=h;el.innerHTML=h;return true};
+function draw(){const bx=$('cb');if(solo()){bx.style.display='none';$('cbp').hidden=true;return}bx.style.display='';const on=mems().filter(u=>u!==me.name&&N.online(u)).length,s=N.status,st=s==='online'?'g':s==='offline'?'x':'c',lb=s==='online'?'LIVE':s==='offline'?'OFFLINE':'CONNECTING';
+ setH($('cbt'),'<i class="lv'+(st==='g'?'':' '+st)+'"></i><span class="lt '+st+'">'+lb+'</span>'+(s==='online'?'<span class="lc" title="'+(on+1)+' in this session"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-3.6 3.2-5.5 6.5-5.5s6 1.9 6.5 5.5"/><path d="M16 4.7a3.5 3.5 0 0 1 0 6.6M18.5 14.8c1.7.7 2.8 2.4 3 5.2"/></svg>'+(on+1)+'</span>':'')+(unread?'<span class="ub">'+(unread>9?'9+':unread)+'</span>':''));
  $('cbt').title=s==='online'?'Live – connected':s==='offline'?'Offline – retrying…':'Connecting…';
  if($('cbp').hidden)return;
- $('cbpl').className='pill'+(st==='g'?'':' '+st);$('cbpl').innerHTML='<i class="lv'+(st==='g'?'':' '+st)+'"></i>'+(s==='online'?(on+1)+' online':lb);
- $('cbm').innerHTML='<div class="cst">Members<em>'+R.length+'</em></div>'+R.map(({user:u,role:r})=>{const you=u===me.name,o=live(u),sub=o?(you?'Online now':act(P.get(u))):LOB.has(u)?'On start page':'Offline';
+ $('cbpl').className='pill'+(st==='g'?'':' '+st);setH($('cbpl'),'<i class="lv'+(st==='g'?'':' '+st)+'"></i>'+(s==='online'?(on+1)+' online':lb));
+ setH($('cbm'),'<div class="cst">Members<em>'+R.length+'</em></div>'+R.map(({user:u,role:r})=>{const you=u===me.name,o=live(u),sub=o?(you?'Online now':act(P.get(u))):LOB.has(u)?'On start page':'Offline';
   return `<div class="mr"><div class="av" style="background:${col(u)}">${esc(u.charAt(0).toUpperCase())}<i class="${o?'on':!you&&LOB.has(u)?'st':''}"></i></div><div class="mi"><div class="mn"><span style="color:${col(u)}">${esc(u)}</span>${you?'<span style="color:var(--m,#667);font-weight:500">(you)</span>':''}<span class="rb${u===OWN?' o':''}">${u===OWN?'👑 Host':esc(r)}</span></div><div class="ms">${esc(sub)}</div></div><div class="ma">${!you&&!o&&LOB.has(u)?`<button data-i="${esc(u)}">Invite</button>`:''}${!you&&o&&(isO||fwOn)?`<button data-f="${esc(u)}">${follow===u?'Stop':'Follow'}</button>`:''}${isO&&!you?`<button class="k" data-k="${esc(u)}">Kick</button>`:''}</div></div>`}).join('')
   +'<div class="cst" style="margin-top:12px">Host controls'+(isO?'':'<em>🔒 Host only</em>')+'</div>'
   +pmr('cap','Ask permission to place','Members’ new parts wait for your approval.',askPlace)
   +pmr('cfw','Allow Follow','Members can follow each other’s camera.',fwOn)
   +pmr('ckb','Stay above plate','Stops any model sinking below the base plate.',kabOn)
   +(isO&&R.length>1?'<button class="dg" id="cka">Remove everyone</button>':'')
-  +(!isO&&!N.online(OWN)?'<div class="ow">The host is offline – you can keep editing; changes sync when they return.</div>':'');
- $('cbl').innerHTML=chat.slice(-40).map(c=>`<div class="bb${c.u===me.name?' me':''}">${c.u===me.name?'':`<b style="color:${col(c.u)}">${esc(c.u)}</b>`}${esc(c.x)}</div>`).join('')||'<div class="em">Chat with everyone in this project</div>';$('cbl').scrollTop=1e9}
-$('cbt').onclick=()=>{const p=$('cbp');p.hidden=!p.hidden;unread=0;if(p.hidden){draw();return}requestAnimationFrame(draw)};
+  +(!isO&&!N.online(OWN)?'<div class="ow">The host is offline – you can keep editing; changes sync when they return.</div>':''));
+ if(setH($('cbl'),chat.slice(-40).map(c=>`<div class="bb${c.u===me.name?' me':''}">${c.u===me.name?'':`<b style="color:${col(c.u)}">${esc(c.u)}</b>`}${esc(c.x)}</div>`).join('')||'<div class="em">Chat with everyone in this project</div>'))$('cbl').scrollTop=1e9}
+$('cbt').onclick=()=>{const p=$('cbp');p.hidden=!p.hidden;unread=0;draw()};
 document.addEventListener('pointerdown',e=>{const p=$('cbp');if(p.hidden||box.contains(e.target))return;p.hidden=true},true);
 $('cbm').onclick=e=>{const t=e.target.closest('button')||e.target,f=t.dataset&&t.dataset.f,k=t.dataset&&t.dataset.k;
- if(t.dataset&&t.dataset.i){const u=t.dataset.i;t.disabled=true;t.textContent='Sent…';N.lobbyCall(u,{t:'binv',pid:pr.id},4000).then(r=>{t.textContent=r?'Invited':'Failed';setTimeout(draw,1800)});return}
+ if(t.dataset&&t.dataset.i){const u=t.dataset.i;t.disabled=true;t.textContent='Sent…';N.lobbyCall(u,{t:'binv',pid:pr.id},4000).then(r=>{t.textContent=r?'Invited':'Failed';setTimeout(()=>{$('cbm')._h=null;draw()},1800)});return}
  if(t.id==='cap'&&isO){askPlace=!askPlace;try{localStorage.setItem('mc_ap_'+pr.id,askPlace?'1':'0')}catch(x){}if(!askPlace)BAT.filter(b=>!b.done).forEach(b=>resolveB(b,true));pushR();draw();return}
  if(t.id==='cfw'&&isO){fwOn=!fwOn;try{localStorage.setItem('mc_fw_'+pr.id,fwOn?'1':'0')}catch(x){}pushR();draw();return}
  if(t.id==='ckb'&&isO){kabOn=!kabOn;try{localStorage.setItem('mc_kab_'+pr.id,kabOn?'1':'0')}catch(x){}kabApply();pushR();draw();return}
