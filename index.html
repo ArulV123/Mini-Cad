@@ -2864,11 +2864,23 @@ const box=document.createElement('div');box.id='cb';box.innerHTML='<div id="cbp"
 box.addEventListener('keydown',e=>e.stopPropagation());
 const act=p=>p&&p.s&&p.s.length?'selected '+((objs.find(o=>o.uuid===p.s[0])||{userData:{}}).userData.name||'object')+(p.s.length>1?' +'+(p.s.length-1):''):'viewing';
 const live=u=>u===me.name||N.online(u);
-const sw=(id,on,dis)=>`<button class="sw" id="${id}" role="switch" aria-checked="${on?'true':'false'}"${dis?' disabled':''}></button>`;
+let pend=0,okUntil=0;const BUSY=new Set();
+const ind=st=>pend?'<i class="cbsp"></i>':Date.now()<okUntil?'<i class="cbok">✓</i>':'<i class="lv'+(st==='g'?'':' '+st)+'"></i>';
+(()=>{const c=document.createElement('style');c.textContent='@keyframes cbspin{to{transform:rotate(360deg)}}#cb .cbsp{width:11px;height:11px;border-radius:50%;border:2px solid #3b7cff44;border-top-color:#3b7cff;animation:cbspin .6s linear infinite;flex:none;display:inline-block}#cb .cbok{width:14px;height:14px;line-height:14px;text-align:center;font:900 12px system-ui;color:#22c55e;flex:none;font-style:normal}#cb .sw.busy::before{content:"";position:absolute;right:46px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid #3b7cff44;border-top-color:#3b7cff;animation:cbspin .6s linear infinite}#cwarn{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:99997;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none;max-width:min(360px,60vw)}#cwarn div{padding:7px 12px;border-radius:9px;font:600 12.5px system-ui;box-shadow:0 4px 16px #0004;color:#fff;background:#2b6cb0}#cwarn .w{background:#dc2626}';document.head.appendChild(c)})();
+const cw=document.createElement('div');cw.id='cwarn';document.body.appendChild(cw);
+const msg=(t,w,ms)=>{const d=document.createElement('div');d.textContent=t;if(w)d.className='w';cw.appendChild(d);const rm=()=>d.remove();if(ms)setTimeout(rm,ms);return rm};
+function tog(id,get,set){if(BUSY.has(id))return;const nv=!get(),el=$(id);if(el){el.setAttribute('aria-checked',nv?'true':'false');el.classList.add('busy')}
+ BUSY.add(id);pend++;draw();const rm=msg('Applying change… it will take effect shortly',0,0);
+ setTimeout(()=>{let ok=true;try{set(nv);pushR()}catch(e){ok=false;console.error(e)}
+  setTimeout(()=>{BUSY.delete(id);pend--;rm();let good=ok&&get()===nv;
+   if(good&&!solo()&&N.status!=='online'){good=false;msg('Saved here, but not synced to others yet – you are '+(N.status==='offline'?'offline':'still connecting')+'. It will sync when reconnected.',1,7000)}
+   else if(!good){const o=$(id);if(o)o.setAttribute('aria-checked',get()?'true':'false');msg('Change could not be applied. Please try again.',1,7000)}
+   if(good){okUntil=Date.now()+1300;setTimeout(draw,1350)}$('cbm')._h=null;draw()},250)},0)}
+const sw=(id,on,dis)=>`<button class="sw${BUSY.has(id)?' busy':''}" id="${id}" role="switch" aria-checked="${on?'true':'false'}"${dis?' disabled':''}></button>`;
 const pmr=(id,t,d,on)=>`<div class="pm"><div class="pt"><b>${t}</b><small>${d}</small></div>${sw(id,on,!isO)}</div>`;
 const setH=(el,h)=>{if(el._h===h)return false;el._h=h;el.innerHTML=h;return true};
 function draw(){const bx=$('cb');if(solo()){bx.style.display='none';$('cbp').hidden=true;return}bx.style.display='';const on=mems().filter(u=>u!==me.name&&N.online(u)).length,s=N.status,st=s==='online'?'g':s==='offline'?'x':'c',lb=s==='online'?'LIVE':s==='offline'?'OFFLINE':'CONNECTING';
- setH($('cbt'),'<i class="lv'+(st==='g'?'':' '+st)+'"></i><span class="lt '+st+'">'+lb+'</span>'+(s==='online'?'<span class="lc" title="'+(on+1)+' in this session"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-3.6 3.2-5.5 6.5-5.5s6 1.9 6.5 5.5"/><path d="M16 4.7a3.5 3.5 0 0 1 0 6.6M18.5 14.8c1.7.7 2.8 2.4 3 5.2"/></svg>'+(on+1)+'</span>':'')+(unread?'<span class="ub">'+(unread>9?'9+':unread)+'</span>':''));
+ setH($('cbt'),ind(st)+'<span class="lt '+st+'">'+lb+'</span>'+(s==='online'?'<span class="lc" title="'+(on+1)+' in this session"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-3.6 3.2-5.5 6.5-5.5s6 1.9 6.5 5.5"/><path d="M16 4.7a3.5 3.5 0 0 1 0 6.6M18.5 14.8c1.7.7 2.8 2.4 3 5.2"/></svg>'+(on+1)+'</span>':'')+(unread?'<span class="ub">'+(unread>9?'9+':unread)+'</span>':''));
  $('cbt').title=s==='online'?'Live – connected':s==='offline'?'Offline – retrying…':'Connecting…';
  if($('cbp').hidden)return;
  $('cbpl').className='pill'+(st==='g'?'':' '+st);setH($('cbpl'),'<i class="lv'+(st==='g'?'':' '+st)+'"></i>'+(s==='online'?(on+1)+' online':lb));
@@ -2881,13 +2893,15 @@ function draw(){const bx=$('cb');if(solo()){bx.style.display='none';$('cbp').hid
   +(isO&&R.length>1?'<button class="dg" id="cka">Remove everyone</button>':'')
   +(!isO&&!N.online(OWN)?'<div class="ow">The host is offline – you can keep editing; changes sync when they return.</div>':''));
  if(setH($('cbl'),chat.slice(-40).map(c=>`<div class="bb${c.u===me.name?' me':''}">${c.u===me.name?'':`<b style="color:${col(c.u)}">${esc(c.u)}</b>`}${esc(c.x)}</div>`).join('')||'<div class="em">Chat with everyone in this project</div>'))$('cbl').scrollTop=1e9}
-$('cbt').onclick=()=>{const p=$('cbp');p.hidden=!p.hidden;unread=0;draw()};
+$('cbt').onclick=()=>{if(BUSY.has('open'))return;const p=$('cbp'),i=$('cbt').querySelector('i');if(i){i.className='cbsp';i.textContent=''}
+ BUSY.add('open');const rm=msg('Opening… just a moment',0,0);
+ setTimeout(()=>{p.hidden=!p.hidden;unread=0;draw();setTimeout(()=>{BUSY.delete('open');rm();okUntil=Date.now()+1100;draw();setTimeout(draw,1150)},60)},0)};
 document.addEventListener('pointerdown',e=>{const p=$('cbp');if(p.hidden||box.contains(e.target))return;p.hidden=true},true);
 $('cbm').onclick=e=>{const t=e.target.closest('button')||e.target,f=t.dataset&&t.dataset.f,k=t.dataset&&t.dataset.k;
  if(t.dataset&&t.dataset.i){const u=t.dataset.i;t.disabled=true;t.textContent='Sent…';N.lobbyCall(u,{t:'binv',pid:pr.id},4000).then(r=>{t.textContent=r?'Invited':'Failed';setTimeout(()=>{$('cbm')._h=null;draw()},1800)});return}
- if(t.id==='cap'&&isO){askPlace=!askPlace;try{localStorage.setItem('mc_ap_'+pr.id,askPlace?'1':'0')}catch(x){}if(!askPlace)BAT.filter(b=>!b.done).forEach(b=>resolveB(b,true));pushR();draw();return}
- if(t.id==='cfw'&&isO){fwOn=!fwOn;try{localStorage.setItem('mc_fw_'+pr.id,fwOn?'1':'0')}catch(x){}pushR();draw();return}
- if(t.id==='ckb'&&isO){kabOn=!kabOn;try{localStorage.setItem('mc_kab_'+pr.id,kabOn?'1':'0')}catch(x){}kabApply();pushR();draw();return}
+ if(t.id==='cap'&&isO){tog('cap',()=>askPlace,v=>{askPlace=v;try{localStorage.setItem('mc_ap_'+pr.id,askPlace?'1':'0')}catch(x){}if(!askPlace)BAT.filter(b=>!b.done).forEach(b=>resolveB(b,true))});return}
+ if(t.id==='cfw'&&isO){tog('cfw',()=>fwOn,v=>{fwOn=v;try{localStorage.setItem('mc_fw_'+pr.id,fwOn?'1':'0')}catch(x){}});return}
+ if(t.id==='ckb'&&isO){tog('ckb',()=>kabOn,v=>{kabOn=v;try{localStorage.setItem('mc_kab_'+pr.id,kabOn?'1':'0')}catch(x){}kabApply()});return}
  if(t.id==='cka'){if(confirm('Remove everyone except you from this project?'))kick(mems().filter(u=>u!==me.name));return}
  if(k){if(confirm('Remove '+k+' from this project?'))kick([k]);return}
  if(!f)return;if(!isO&&!fwOn)return;follow=follow===f?null:f;if(!follow)ft=null;const p=P.get(f);if(follow&&p&&p.c)goCam(p.c);draw()};
