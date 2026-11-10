@@ -2801,10 +2801,10 @@ function localAdds(){const ad=objs.filter(o=>!known.has(o.uuid));known=new Set(o
  E12.forEach((e,k)=>{a.setXYZ(k*2,...c[e[0]]);a.setXYZ(k*2+1,...c[e[1]])});a.needsUpdate=true;p.ls.computeLineDistances()})})();
 /* panel */
 const css=document.createElement('style');css.textContent=`
-#cb{position:fixed;left:14px;bottom:48px;z-index:60;font:13px/1.35 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--t,#1f2328)}
+#cb{position:fixed;left:14px;bottom:48px;z-index:60;will-change:transform;transform:translateZ(0);font:13px/1.35 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--t,#1f2328)}
 #cb *{box-sizing:border-box}
 #cb button{height:auto;font:inherit}
-#cb #cbt{display:inline-flex;align-items:center;gap:9px;padding:7px 12px 7px 11px;border-radius:999px;border:1px solid var(--b,#0002);background:var(--p,#fff);color:var(--t,#1f2328);box-shadow:0 4px 14px #0003;cursor:pointer;position:relative;font-weight:700;font-size:11.5px;letter-spacing:.09em}
+#cb #cbt{will-change:transform;display:inline-flex;align-items:center;gap:9px;padding:7px 12px 7px 11px;border-radius:999px;border:1px solid var(--b,#0002);background:var(--p,#fff);color:var(--t,#1f2328);box-shadow:0 4px 14px #0003;cursor:pointer;position:relative;font-weight:700;font-size:11.5px;letter-spacing:.09em}
 #cb #cbt:hover{background:var(--h,#f3f5f8)}
 #cb .lv{position:relative;width:9px;height:9px;border-radius:50%;background:#22c55e;flex:none}
 #cb .lv::after{content:"";position:absolute;inset:0;border-radius:50%;background:#22c55e;animation:cblp 1.8s ease-out infinite}
@@ -2815,7 +2815,7 @@ const css=document.createElement('style');css.textContent=`
 #cb .lc{display:inline-flex;align-items:center;gap:4px;padding:2px 8px 2px 6px;border-radius:999px;background:var(--h,#eef1f5);color:var(--t,#1f2328);letter-spacing:0;font-weight:600;font-size:11.5px}
 #cb .lc svg{width:12px;height:12px;opacity:.7}
 #cb .ub{position:absolute;top:-3px;right:-2px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#e5484d;color:#fff;font:700 10px/16px system-ui;text-align:center;letter-spacing:0;border:2px solid var(--p,#fff);box-sizing:content-box}
-#cbp{width:330px;max-width:calc(100vw - 28px);max-height:calc(100vh - 120px);overflow:auto;margin-bottom:10px;background:var(--p,#fff);color:var(--t,#1f2328);border:1px solid var(--b,#0002);border-radius:16px;box-shadow:0 18px 44px #0005}
+#cbp{width:330px;max-width:calc(100vw - 28px);max-height:calc(100vh - 120px);overflow:auto;margin-bottom:10px;background:var(--p,#fff);color:var(--t,#1f2328);border:1px solid var(--b,#0002);border-radius:16px;box-shadow:0 8px 24px #0004;contain:layout paint}
 #cb .ch{display:flex;align-items:center;gap:8px;padding:13px 14px 11px;border-bottom:1px solid var(--b,#0002)}
 #cb .ch b{font-size:14px;flex:1}
 #cb .ch .pill{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;letter-spacing:.08em;padding:3px 9px;border-radius:999px;background:#22c55e1f;color:#16a34a}
@@ -2879,7 +2879,8 @@ function draw(){const on=mems().filter(u=>u!==me.name&&N.online(u)).length,s=N.s
   +(isO&&R.length>1?'<button class="dg" id="cka">Remove everyone</button>':'')
   +(!isO&&!N.online(OWN)?'<div class="ow">The host is offline – you can keep editing; changes sync when they return.</div>':'');
  $('cbl').innerHTML=chat.slice(-40).map(c=>`<div class="bb${c.u===me.name?' me':''}">${c.u===me.name?'':`<b style="color:${col(c.u)}">${esc(c.u)}</b>`}${esc(c.x)}</div>`).join('')||'<div class="em">Chat with everyone in this project</div>';$('cbl').scrollTop=1e9}
-$('cbt').onclick=()=>{const p=$('cbp');p.hidden=!p.hidden;unread=0;draw()};
+$('cbt').onclick=()=>{const p=$('cbp');p.hidden=!p.hidden;unread=0;if(p.hidden){draw();return}requestAnimationFrame(draw)};
+document.addEventListener('pointerdown',e=>{const p=$('cbp');if(p.hidden||box.contains(e.target))return;p.hidden=true},true);
 $('cbm').onclick=e=>{const t=e.target.closest('button')||e.target,f=t.dataset&&t.dataset.f,k=t.dataset&&t.dataset.k;
  if(t.dataset&&t.dataset.i){const u=t.dataset.i;t.disabled=true;t.textContent='Sent…';N.lobbyCall(u,{t:'binv',pid:pr.id},4000).then(r=>{t.textContent=r?'Invited':'Failed';setTimeout(draw,1800)});return}
  if(t.id==='cap'&&isO){askPlace=!askPlace;try{localStorage.setItem('mc_ap_'+pr.id,askPlace?'1':'0')}catch(x){}if(!askPlace)BAT.filter(b=>!b.done).forEach(b=>resolveB(b,true));pushR();draw();return}
