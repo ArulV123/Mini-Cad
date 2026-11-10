@@ -453,7 +453,7 @@ function move(e){if(pe&&tool!=='select')return;
 if(tool==='select'){setRay(e);if(mq){const[x,y,w,h]=mqBox(e);Object.assign(mqd.style,{display:'block',left:x+'px',top:y+'px',width:w+'px',height:h+'px'});return}
 if(hd){dragHd(e);return}if(rt){dragRot(e);return}
 if(mv){const g=ground();if(!g)return;const fs=v=>e.altKey?Math.round(v*100)/100:sn(v),dx=fs(g.x-mv.g0.x),dz=fs(g.z-mv.g0.z);if(!mv.c&&(dx||dz)){mv.c=true;const cur=objs.map(T);cur.forEach(n=>{const s=mv.s.find(q=>q.o===n.o);if(s)n.p=s.p.clone()});hist.push(cur);redo=[]}
-mv.s.forEach(s=>{const o=s.o,a=o.userData.gearAttach,g=a&&a.gear,gearDragged=g&&mv.s.some(k=>k.o===g);if(a&&g&&objs.includes(g)&&!gearDragged){const basis=(a.role==='motor'?(g.userData.mountQ||g.quaternion):g.quaternion).clone(),local=V(dx,0,dz).applyQuaternion(basis.invert()),off=s.off||{x:0,y:0,z:0};a.offset={x:(off.x||0)+local.x,y:(off.y||0)+local.y,z:(off.z||0)+local.z};__syncGearAttachment(o)}else o.position.set(s.p.x+dx,s.p.y,s.p.z+dz)});infoT()}return}
+mv.s.forEach(s=>{const o=s.o,a=o.userData.gearAttach,g=a&&a.gear,gearDragged=g&&mv.s.some(k=>k.o===g);if(a&&g&&objs.includes(g)&&!gearDragged){const basis=(a.role==='motor'?(g.userData.mountQ||g.quaternion):g.quaternion).clone();if(a.role==='wheel'){const bs=a.base||{x:0,y:0,z:0},t=V(s.p.x+dx,s.p.y,s.p.z+dz).sub(g.position).applyQuaternion(basis.clone().invert());a.offset={x:t.x-(+bs.x||0),y:t.y-(+bs.y||0)-(+a.caseShift||0),z:t.z-(+bs.z||0)};{const sh=objs.find(q=>q!==o&&q.userData.link===g&&q.userData.gearAttach&&q.userData.gearAttach.role==='shaft'),sa=sh&&sh.userData.gearAttach,sb=(sa&&sa.base)||{x:0,y:0,z:0},so=(sa&&sa.offset)||{x:0,y:0,z:0};a.detached=Math.hypot(t.x-((+sb.x||0)+(+so.x||0)),t.z-((+sb.z||0)+(+so.z||0)))>1}__syncGearAttachment(o);if(a.detached)o.position.set(s.p.x+dx,s.p.y,s.p.z+dz)}else{const local=V(dx,0,dz).applyQuaternion(basis.invert()),off=s.off||{x:0,y:0,z:0};a.offset={x:(off.x||0)+local.x,y:(off.y||0)+local.y,z:(off.z||0)+local.z};__syncGearAttachment(o)}}else o.position.set(s.p.x+dx,s.p.y,s.p.z+dz)});infoT()}return}
 if(tool==='orbit'||tool==='pan')return;
 if(!start&&!pts.length&&!fh&&tool!=='measure'){if(DRAWT.includes(tool))faceM(e);const um=dmd()!=='ground',ny=um?(hovM?hovOff:0):surfY(e);if(um&&lastM!==dmd()&&DRAWV.includes(tool))hint.textContent='Upright drawing plane (shown in blue): left-right = width, up = height. You set thickness after drawing. Use "Draw on" in the header for flat drawing.';lastM=dmd();if(ny!==workY){workY=ny;pl.constant=-ny;hint.textContent=ny?`Surface detected – drawing at height ${ny} mm`:(HT[tool]||'')}}
 if(isFree()){if(fh){setRay(e);const g=ground();if(g&&g.distanceTo(fh[fh.length-1])>Math.max(.6,dist*.006)){fh.push(g.clone());{const q=wOK()&&sp(e);if(q)wp.push(q)}setPrev(fh.map(q=>V(q.x,.2,q.z)),false)}}return}
@@ -781,7 +781,7 @@ else{hd.dv=V(0,0,0).setComponent(ci,1);hd.t0=rayT(hd.dv,hp)||0}}
 function dragHd0(e){const{d,o,b,s0,p0}=hd;setRay(e);
 if(d.cn){const r=cv.getBoundingClientRect();let f=Math.max(.02,Math.hypot(e.clientX-r.left-hd.ap[0],e.clientY-r.top-hd.ap[1])/(hd.L0||1));if(snap)f=Math.max(.05,Math.round(f*20)/20);o.scale.copy(s0).multiplyScalar(f);o.position.copy(p0);o.updateMatrixWorld(true);const c=bbx(o),an=hd.an;o.position.add(V(d.sx>0?an.x-c.min.x:an.x-c.max.x,d.sy>0?an.y-c.min.y:an.y-c.max.y,d.sz>0?an.z-c.min.z:an.z-c.max.z));info();return}
 const t=rayT(hd.dv,hd.hp);if(t===null)return;const ax=d.ax;
-if(d.lift){o.position.y=p0.y+(snap?Math.round((t-hd.t0)/snap)*snap:t-hd.t0);info();return}
+if(d.lift){const ny=p0.y+(snap?Math.round((t-hd.t0)/snap)*snap:t-hd.t0),at=o.userData&&o.userData.gearAttach,ag=at&&at.gear;if(at&&ag&&objs.includes(ag)&&isG(ag)){const bs=at.base||{x:0,y:0,z:0},bq=(at.role==='motor'?(ag.userData.mountQ||ag.quaternion):ag.quaternion).clone().invert(),t2=V(o.position.x,ny,o.position.z).sub(ag.position).applyQuaternion(bq);at.offset={x:t2.x-(+bs.x||0),y:t2.y-(+bs.y||0)-(+at.caseShift||0),z:t2.z-(+bs.z||0)};__syncGearAttachment(o)}else o.position.y=ny;info();return}
 const f0=d.sg>0?b.max[ax]:b.min[ax],a0=d.sg>0?b.min[ax]:b.max[ax];let f=f0+t-hd.t0;if(snap)f=Math.round(f/snap)*snap;const v=Math.max(.5,d.sg>0?f-a0:a0-f);
 o.scale.copy(s0);o.position.copy(p0);fitAxis(o,ax,v);const c=bbx(o);o.position[ax]+=a0-(d.sg>0?c.min[ax]:c.max[ax]);info()}
 function cleanPoly(p){const o=[];p.forEach(q=>{const l=o[o.length-1];if(!l||Math.hypot(q.x-l.x,q.z-l.z)>.05)o.push(q)});while(o.length>1&&Math.hypot(o[0].x-o[o.length-1].x,o[0].z-o[o.length-1].z)<=.05)o.pop();const A=o.reduce((s,q,i)=>{const n=o[(i+1)%o.length];return s+q.x*n.z-n.x*q.z},0)/2;return o.length<3||Math.abs(A)<1?[]:o}
@@ -1231,7 +1231,7 @@ const w0=dr?dr.rpm*Math.PI/30:1,It=c.Ieq+(dr?dr.Im:0),tc=c.tauC+(dr&&!run?.25*dr
 for(let k=0;k<4;k++){let tm=0;if(run)tm=srv?Math.max(-dr.tau,Math.min(dr.tau,dr.tau/(.05*w0)*(sv.dir*w0-wr))):dr.tau*(1-wr/w0);
 let net=tm-c.cv*wr;if(Math.abs(wr)<1e-5&&Math.abs(net)<=tc)continue;net-=Math.sign(wr||net)*tc;const w1=wr+net/It*h;wr=(!run&&w1*wr<0)?0:w1;ang+=wr*h;
 if(srv&&run){sv.th+=wr*h;if(sv.th>=swc&&sv.dir>0)sv.dir=-1;else if(sv.th<=0&&sv.dir<0)sv.dir=1}}
-simSvs.set(c.root,sv);c.gs.forEach(g=>{const w=c.W.get(g);simW.set(g,w*wr);g.rotation.y+=w*ang});
+simSvs.set(c.root,sv);c.gs.forEach(g=>{const w=c.W.get(g);simW.set(g,w*wr);const _q0=g.quaternion.clone();g.rotation.y+=w*ang;__holdWheelOffsets(g,_q0)});
 txt.push(dr?dr.nm+': '+f1(Math.abs(wr)*30/Math.PI,0)+' rpm ('+(run?(srv&&swc<6.2?'sweeping ±'+f1(swc*57.2958,0)+'°':'driving'):'motor off, braking')+') · '+c.gs.length+' gear(s)':c.gs.length+' gear(s) with NO motor – coasting: '+f1(Math.abs(wr)*30/Math.PI,1)+' rpm')});
 if(T-statT>150){statT=T;$('gst2').textContent=txt.join('  |  ')}
 if(simRun&&!simCache.some(c=>c.dr&&c.gs.every(g=>objs.includes(g)))){simRun=false;$('gspin').textContent='Spin'}}
@@ -1892,9 +1892,12 @@ rec.set(p,{g:rigid(g),p:rigid(p)})})}
 setInterval(()=>{try{follow(false)}catch(e){}},60);
 })();
 function __wheelGap(){const e=document.getElementById('pcol');return e&&e.checked?1.6:0}
+/* keep a gear's wheel(s) where they are while the gear turns: re-express the wheel offset in the gear's new frame so the wheel only spins about its own centre instead of orbiting the gear axis */
+function __holdWheelOffsets(g,q0){try{const rel=g.quaternion.clone().invert().multiply(q0);objs.forEach(o=>{const a=o.userData&&o.userData.gearAttach;if(!a||a.gear!==g||a.role!=='wheel')return;const b=a.base||{x:0,y:0,z:0},off=a.offset||{x:0,y:0,z:0},cs=+a.caseShift||0,t=V((+b.x||0)+(+off.x||0),(+b.y||0)+(+off.y||0)+cs,(+b.z||0)+(+off.z||0)).applyQuaternion(rel);a.offset={x:t.x-(+b.x||0),y:t.y-(+b.y||0)-cs,z:t.z-(+b.z||0)}})}catch(e){}}
 function __syncGearAttachment(o){
 const a=o&&o.userData&&o.userData.gearAttach,g=a&&a.gear;
 if(!a||!g||!objs.includes(g)||!isG(g))return;
+if(a.role==='wheel'&&a.detached)return;
 if(!g.userData.mountQ)g.userData.mountQ=g.quaternion.clone();
 const base=a.base||{x:0,y:0,z:0},off=a.offset||{x:0,y:0,z:0};
 const b=V((+base.x||0)+(+off.x||0),(+base.y||0)+(+off.y||0)+(+a.caseShift||0),(+base.z||0)+(+off.z||0));
