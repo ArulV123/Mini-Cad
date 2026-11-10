@@ -230,7 +230,7 @@ function wire(c){
  const gone=()=>{if(c._u&&C[c._u]===c){delete C[c._u];fire('presence');emit('down',null,c._u)}};
  c.on('close',gone);c.on('error',gone);
  if(c._out)setTimeout(()=>{if(!c._ok)try{c.close()}catch(e){}},10000)}
-function dial(u){if(!peer||!peer.open||up(u))return;const d=D[u]=D[u]||{s:1,t:0};if(Date.now()-d.t<3500)return;d.t=Date.now();
+function dial(u){if(!peer||!peer.open||up(u))return;const d=D[u]=D[u]||{s:1,t:0};if(Date.now()-d.t<2000)return;d.t=Date.now();
  try{const c=peer.connect(ID(u,d.s),{reliable:true});c._out=1;wire(c)}catch(e){}}
 const probe=()=>{if(me&&peer&&peer.open)room.forEach(dial)};
 function keep(p,n){if(peer!==p||p.destroyed||!p.disconnected)return;
@@ -283,7 +283,10 @@ API.fetchScene=(u,pid,ms)=>new Promise(res=>{let done=0,cs=[],t0=Date.now(),iv=0
    c.on('open',()=>{try{c.send({t:'scq',pid})}catch(e){}});
    c.on('data',m=>{if(m&&m.t==='scr'&&m.pid===pid&&m.d&&m.d.length)fin({ts:+m.ts||0,d:m.d})});c.on('error',()=>{})}catch(e){}};
  iv=setInterval(go,200);go()});
-setInterval(()=>{probe();if(lp&&lp.disconnected&&!lp.destroyed)try{lp.reconnect()}catch(e){}},4000);
+/* tell friends (who sit on the projects page) that I'm online in this project's builder, so they turn green without refreshing */
+const bpAt={};function bping(){if(!me||!lp||!lp.open)return;const pj=new URLSearchParams(location.search).get('p')||'';
+ lobbyFr().forEach(f=>{if(Date.now()-(bpAt[f]||0)<4500)return;bpAt[f]=Date.now();try{const c=lp.connect(hexId(f),{reliable:true});c.on('open',()=>{try{c.send({t:'ping',w:'b',pid:pj})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},3000)});c.on('error',()=>{})}catch(e){}})}
+setInterval(()=>{probe();bping();if(lp&&lp.disconnected&&!lp.destroyed)try{lp.reconnect()}catch(e){}},2500);setTimeout(bping,800);
 setInterval(()=>Object.keys(C).forEach(u=>{const c=C[u];if(Date.now()-seenAt[u]>12000){try{c.close()}catch(e){}if(C[u]===c){delete C[u];fire('presence');emit('down',null,u)}return}try{c.send({t:'p'})}catch(e){}}),4000);
 const wake=()=>{if(peer&&peer.disconnected&&!peer.destroyed)try{peer.reconnect()}catch(e){}setTimeout(probe,400)};
 addEventListener('online',wake);addEventListener('offline',()=>setSt('offline'));
