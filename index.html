@@ -4112,18 +4112,25 @@ function shankGeo(s,L,Lt,cl,real,hole,hd){const P=s.P,rM=s.d/2-cl,rm=rM-.5413*P,
  return stackLoft(y=>ringP(rf,y,n),ys,hole,hd)}
 function driveHole(kind,D,s,small,ov){ov=+ov>0?+ov:0;if(kind==='hex')return hexPoly((ov||(small?s.bsock:s.sock))+.2);if(kind==='ph'){const l=ov?ov/2:.33*D,w=ov?l*.32:.11*D;return[[w,-l],[w,-w],[l,-w],[l,w],[w,w],[w,l],[-w,l],[-w,w],[-l,w],[-l,-w],[-w,-w],[-w,-l]].map(([x,z])=>({x,z}))}
  if(kind==='slot'){const w=ov?ov/2:Math.max(.25,.09*D),l=.42*D;return rc(-l,-w,l,w)}return null}
-function headGeo(s,type,drive,ov){const d=s.d;let k,R,poly=null;
- if(type==='hex'){const af=+ov>0?+ov:s.af;k=.7*d;poly=hexPoly(af);R=()=>af/2;drive='none'}
- else if(type==='cap'){k=d;R=()=>s.capD/2}
- else if(type==='button'){k=.55*d;R=y=>.95*d*(.62+.38*Math.sqrt(Math.max(0,1-(1-y/k)**2)))}
- else if(type==='csk'){k=d/2;R=y=>d-(d/2)*(y/k)}
- else if(type==='pan'){k=.6*d;R=()=>d}
- else{k=Math.max(3,.8*d);const R0=Math.max(4,1.5*d),N=Math.max(12,Math.round(R0*2));poly=[...Array(2*N)].map((_,i)=>{const r=i%2?R0-.5:R0,a=i*Math.PI/N;return{x:r*Math.cos(a),z:r*Math.sin(a)}});R=()=>R0-.5}
- const hd=Math.max(.35,Math.min(.6*k,k-.4)),Dm=2*Math.min(R(0),R(hd)),hole=driveHole(drive,Dm,s,type==='button'||type==='csk',ov),ys=poly?[0,k]:[...Array(9)].map((_,i)=>k*i/8);
- return{k,Dm,geo:stackLoft(poly?()=>poly:y=>circ(0,0,R(y),48),ys,hole,hd)}}
+function headGeo(s,type,drive,ov,hdD){const d=s.d,W=1.2,small=type==='button'||type==='csk',hD=+hdD>0?+hdD:0,
+ std=drive==='hex'?(small?s.bsock:s.sock):drive==='ph'?(d<=2?2.6:d<=3?3.8:d<=5?5.2:7.2):drive==='slot'?Math.max(.5,SLOTN[d]||+(d*.27).toFixed(1)):0,
+ key=+ov>0?+ov:std,need=(+ov>0&&+ov>std+1e-6)?(drive==='hex'?(key+.2)*1.1547+2*W:key+2*W):0;
+ /* build the head with extra radius e (or scale f for the dome); Dm = width available for the drive, Do = outer width */
+ const build=(e,f)=>{let k,R,poly=null,dr=drive;
+  if(type==='hex'){const af=+ov>0?+ov:s.af;k=.7*d;poly=hexPoly(af);R=()=>af/2;dr='none'}
+  else if(type==='cap'){k=d;R=()=>s.capD/2+e}
+  else if(type==='button'){k=.55*d;R=y=>f*.95*d*(.62+.38*Math.sqrt(Math.max(0,1-(1-y/k)**2)))}
+  else if(type==='csk'){k=d/2+e;R=y=>d+e-y}
+  else if(type==='pan'){k=.6*d;R=()=>d+e}
+  else{k=Math.max(3,.8*d);const R0=Math.max(4,1.5*d)+e,N=Math.max(12,Math.round(R0*2));poly=[...Array(2*N)].map((_,i)=>{const r=i%2?R0-.5:R0,a=i*Math.PI/N;return{x:r*Math.cos(a),z:r*Math.sin(a)}});R=()=>R0-.5}
+  const hd=Math.max(.35,Math.min(.6*k,k-.4));return{k,R,poly,dr,hd,Dm:2*Math.min(R(0),R(hd)),Do:2*Math.max(R(0),R(k))}};
+ let e=0,f=1,r=build(0,1);
+ for(let n=0;n<30&&type!=='hex'&&(r.Dm<need-.001||(hD&&r.Do<hD-.001));n++){if(type==='button')f*=Math.max(need/r.Dm,hD?hD/r.Do:1,1);else e+=Math.max(need-r.Dm,hD?hD-r.Do:0,0)/2;r=build(e,f)}
+ const hole=driveHole(r.dr,r.Dm,s,small,ov),ys=r.poly?[0,r.k]:[...Array(9)].map((_,i)=>r.k*i/8);
+ return{k:r.k,Dm:r.Dm,Do:r.Do,grown:e>.001||f>1.001,geo:stackLoft(r.poly?()=>r.poly:y=>circ(0,0,r.R(y),48),ys,hole,r.hd)}}
 function boltGeo(o){const s=scr(o.d,o.P),real=o.real,cl=real?o.cl:0;
  if(o.head==='grub'){const hd=Math.min(.6*s.d,o.L-.6),gk=o.ds>0?o.ds:GRUBK(s.d),g=shankGeo(s,o.L,o.L,cl,real,driveHole(o.drive==='slot'?'slot':'hex',2*(s.d/2-.5413*s.P)*1.15,s,true,o.drive==='slot'?o.ds:gk),hd);g.rotateX(Math.PI);return{geo:g,s}}
- const h=headGeo(s,o.head,o.drive,o.ds),sh=shankGeo(s,o.L,Math.min(o.L,o.Lt>0?o.Lt:o.L),cl,real);sh.translate(0,h.k-.02,0);const bg=mergeG([h.geo,sh]);bg.rotateX(Math.PI);return{geo:bg,s}}
+ const h=headGeo(s,o.head,o.drive,o.ds,o.hs),sh=shankGeo(s,o.L,Math.min(o.L,o.Lt>0?o.Lt:o.L),cl,real);sh.translate(0,h.k-.02,0);const bg=mergeG([h.geo,sh]);bg.rotateX(Math.PI);return{geo:bg,s,Do:h.Do,grown:h.grown}}
 function tubeGeo(outer,rf,h,n,ny){const pos=[],T=(a,b,c)=>pos.push(...a,...b,...c);if(polyA(outer)<0)outer=outer.slice().reverse();const R=[];
  for(let j=0;j<=ny;j++){const y=h*j/ny;R.push([...Array(n)].map((_,i)=>{const a=i/n*2*Math.PI,r=rf(a,y);return[r*Math.cos(a),y,r*Math.sin(a)]}))}
  for(let j=0;j<ny;j++)for(let i=0;i<n;i++){const k=(i+1)%n,A=R[j][i],B=R[j][k],C=R[j+1][i],D=R[j+1][k];T(A,B,C);T(B,D,C)}
@@ -4143,10 +4150,12 @@ function nutGeo(o){const s=scr(o.d,o.P),P=s.P,cl=o.real?o.cl:.1,rM=s.d/2+cl,rm=r
  +'<label>Head</label><select id="b6h" style="grid-column:2/5"><option value="hex">Hex head (spanner)</option><option value="cap">Socket cap (Allen key)</option><option value="button">Button head</option><option value="csk">Countersunk (flat)</option><option value="pan">Pan head</option><option value="thumb">Thumb screw (knurled)</option><option value="grub">Grub / set screw (no head)</option></select>'
  +'<label>Drive</label><select id="b6dr" style="grid-column:2/5"><option value="hex">Hex socket</option><option value="ph">Phillips cross</option><option value="slot">Slot</option><option value="none">None</option></select>'
  +'<label id="b6dsl">Key size</label><select id="b6ds" style="grid-column:2/5"></select><input id="b6dc" type="number" step=".1" min=".3" value="4" style="display:none;grid-column:3/5">'
+ +'<label id="b6hsl">Head Ø</label><select id="b6hs" style="grid-column:2/5"><option value="0">Auto (grows to fit the drive)</option><option value="c">Custom Ø…</option></select><input id="b6hc" type="number" step=".5" min="1" value="12" style="display:none;grid-column:3/5">'
  +'<label>Thread len</label><input id="b6lt" type="number" value="0" min="0" title="0 = threaded all the way"><label>Fit</label><select id="b6f"><option value=".1">Tight</option><option value=".18" selected>Normal</option><option value=".28">Loose</option></select>'
  +'<label>Nut</label><select id="b6n" style="grid-column:2/5"><option value="hex">Hex nut</option><option value="thin">Thin (jam) nut</option><option value="square">Square nut</option><option value="thumb">Thumb nut (knurled)</option></select>'
  +'<label class="chk" style="grid-column:1/5"><input type="checkbox" id="b6r" checked> Real printable threads (untick for a smooth stand-in)</label></div>'
  +'<p class="mut" id="b6i" style="margin:6px 0 0"></p><div class="br"><button class="btn-c c-blue" id="b6b">＋ Bolt</button><button class="btn-c c-blue" id="b6nb">＋ Nut</button><button class="btn-o c-blue" id="b6w">＋ Washer</button><button class="btn-c c-teal" id="b6set">＋ Bolt + nut + washer</button></div>'
+ +'<div class="fl" style="margin-top:8px"><label>Hole</label><select id="b6ht" style="grid-column:2/5"><option value="clear">Without thread (smooth)</option><option value="thr">With thread (bolt screws in)</option></select></div>'
  +'<div class="br"><button class="btn-o c-blue" id="b6hole">Cut a hole for this size…</button></div></div></details>'
  +'<details class="acc" open><summary>Screw two parts together</summary><div><p class="mut" style="margin:0 0 6px">Put the two parts where they belong (touching). Click the spot on the outer part: it gets a clearance hole and a seat for the head, the part behind gets the hole the screw holds in.</p>'
  +'<div class="fl"><label>Screw</label><select id="j6sz">'+sizeOpts(3)+'</select><label>Head</label><select id="j6h"><option value="cbore">Sunk cap head</option><option value="csk">Countersunk</option><option value="none">On the surface</option></select>'
@@ -4155,15 +4164,16 @@ function nutGeo(o){const s=scr(o.d,o.P),P=s.P,cl=o.real?o.cl:.1,rM=s.d/2+cl,rm=r
  +'<details class="acc" open><summary>Tight fit – plug &amp; socket</summary><div><p class="mut" style="margin:0 0 6px">Push the plug part into the body where it should sit. Select the plug first, then shift-click the body. The body gets a socket shaped exactly like the plug, with the gap you choose.</p>'
  +'<div class="fl"><label>Fit</label><select id="f6fit" style="grid-column:2/5"><option value="0.05">Press fit – hammer in, stays for good (0.05)</option><option value="0.12" selected>Tight – push in by hand, does not fall out (0.12)</option><option value="0.2">Snug – slides in, no wobble (0.2)</option><option value="0.35">Loose – drops in freely (0.35)</option></select><label>Gap mm</label><input id="f6c" type="number" step=".01" value="0.12"></div>'
  +'<div class="br"><button class="btn-c c-amber" id="f6go">Cut socket for the plug</button></div><p class="mut" style="margin:6px 0 0">Gap is per side. Printers differ: if it is too tight add 0.05, too loose take 0.05 off.</p></div></details>';
- const rd=()=>{const c=Q('b6sz').value==='c',d=c?Math.max(.6,+Q('b6d').value||6):+Q('b6sz').value;return{d,P:c?+Q('b6p').value:0,L:Math.max(1,+Q('b6L').value||20),Lt:+Q('b6lt').value||0,head:Q('b6h').value,drive:Q('b6dr').value,ds:(Q('b6ds').parentNode&&Q('b6ds').style.display!=='none')?(Q('b6ds').value==='c'?Math.max(.3,+Q('b6dc').value||0):+Q('b6ds').value||0):0,cl:+Q('b6f').value,real:Q('b6r').checked,nut:Q('b6n').value}};
+ const rd=()=>{const c=Q('b6sz').value==='c',d=c?Math.max(.6,+Q('b6d').value||6):+Q('b6sz').value;return{d,P:c?+Q('b6p').value:0,L:Math.max(1,+Q('b6L').value||20),Lt:+Q('b6lt').value||0,head:Q('b6h').value,drive:Q('b6dr').value,hs:(Q('b6hs').style.display!=='none'&&Q('b6hs').value==='c')?Math.max(1,+Q('b6hc').value||0):0,ds:(Q('b6ds').parentNode&&Q('b6ds').style.display!=='none')?(Q('b6ds').value==='c'?Math.max(.3,+Q('b6dc').value||0):+Q('b6ds').value||0):0,cl:+Q('b6f').value,real:Q('b6r').checked,nut:Q('b6n').value}};
+ const hsVis=o=>{const sh=!(o.head==='hex'||o.head==='grub'),se=Q('b6hs'),c=sh&&se.value==='c';Q('b6hsl').style.display=se.style.display=sh?'':'none';se.style.gridColumn=c?'2/3':'2/5';Q('b6hc').style.display=c?'':'none'};
  let dsSig='';
  const dsFill=(o,s)=>{const sel=Q('b6ds'),lab=Q('b6dsl'),cu=Q('b6dc'),h=o.head,dr=Q('b6dr').value;let kind=h==='hex'?'span':dr==='hex'?'key':dr==='ph'?'ph':dr==='slot'?'slot':'';
   const show=!!kind;lab.style.display=sel.style.display=show?'':'none';if(!show){cu.style.display='none';dsSig='';return}
   const hg=h==='hex'||h==='grub'?null:headGeo(s,h,'none'),Dm=hg?hg.Dm:2*(s.d/2-.5413*s.P)*1.15,fl=[];let std,lbl='Key size',unit=' mm';
   if(kind==='span'){lbl='Spanner';std=s.af;SPAN.forEach(v=>{if(v>=.8*std&&v<=1.4*std&&v>=s.d+1)fl.push([v,v+unit])})}
-  else if(kind==='key'){lbl='Key size';std=h==='grub'?GRUBK(s.d):h==='cap'?s.sock:s.bsock;const lim=h==='grub'?2*(s.d/2-.5413*s.P)-.8:Dm-2.4;KEYS.forEach(v=>{if((v+.2)*1.1547<=lim&&v>=.25*Dm*(h==='grub'?.5:1))fl.push([v,v+unit+' hex key'])})}
-  else if(kind==='ph'){lbl='Cross size';std=s.d<=2?2.6:s.d<=3?3.8:s.d<=5?5.2:7.2;PHS.forEach(([n,v])=>{if(v<=Dm-2||v===std)fl.push([v,n+' ('+v+' mm)'])})}
-  else{lbl='Slot width';std=Math.max(.5,SLOTN[s.d]||+(.09*Dm*2).toFixed(1));SLOTW.forEach(v=>{if(v>=.04*Dm&&v<=.26*Dm)fl.push([v,v+unit+' wide'])})}
+  else if(kind==='key'){lbl='Key size';std=h==='grub'?GRUBK(s.d):h==='cap'?s.sock:s.bsock;KEYS.forEach(v=>{const ok=h==='grub'?((v+.2)*1.1547<=2*(s.d/2-.5413*s.P)-.8&&v>=.125*Dm):(v<=1.7*s.d&&v>=.25*Dm);if(ok)fl.push([v,v+unit+' hex key'])})}
+  else if(kind==='ph'){lbl='Cross size';std=s.d<=2?2.6:s.d<=3?3.8:s.d<=5?5.2:7.2;PHS.forEach(([n,v])=>fl.push([v,n+' ('+v+' mm)']))}
+  else{lbl='Slot width';std=Math.max(.5,SLOTN[s.d]||+(s.d*.27).toFixed(1));SLOTW.forEach(v=>{if(v>=.04*Dm&&(h!=='grub'||v<=.26*Dm))fl.push([v,v+unit+' wide'])})}
   if(!fl.some(x=>x[0]===std))fl.push([std,kind==='ph'?(PHS.find(x=>x[1]===std)||['',''])[0]+' ('+std+' mm)':std+unit+(kind==='key'?' hex key':kind==='slot'?' wide':'')]);fl.sort((a,b)=>a[0]-b[0]);
   const sig=[o.d,s.P,h,dr].join('|'),keep=sig===dsSig?sel.value:null;lab.textContent=lbl;
   sel.innerHTML=fl.map(x=>'<option value="'+x[0]+'">'+x[1]+(x[0]===std?' – standard':'')+'</option>').join('')+'<option value="c">Custom…</option>';
@@ -4171,16 +4181,16 @@ function nutGeo(o){const s=scr(o.d,o.P),P=s.P,cl=o.real?o.cl:.1,rM=s.d/2+cl,rm=r
   const cs=sel.value==='c';sel.style.gridColumn=cs?'2/3':'2/5';cu.style.display=cs?'':'none'};
  const ui=()=>{const c=Q('b6sz').value==='c';pane.querySelectorAll('.b6c').forEach(e=>e.style.display=c?'':'none');const o=rd(),s=scr(o.d,o.P);if(!c){Q('b6d').value=s.d;Q('b6p').value=s.P}
   const h=o.head,dr=Q('b6dr');[...dr.options].forEach(op=>op.disabled=h==='hex'?op.value!=='none':h==='grub'?!(op.value==='hex'||op.value==='slot'):h==='thumb'?!(op.value==='none'||op.value==='slot'):false);if(dr.selectedOptions[0].disabled)dr.value=[...dr.options].find(op=>!op.disabled).value;
-  dsFill(o,s);Q('b6i').textContent='M'+s.d+' × '+s.P+' mm pitch · spanner '+(o.head==='hex'&&Q('b6ds').value!=='c'&&+Q('b6ds').value>0?+Q('b6ds').value:s.af)+' mm · through-hole Ø'+s.clear+' · pilot Ø'+s.tap+(o.real&&s.d<4?' · threads this small rarely print well – M5 and up is reliable (0.1–0.2 mm layers), or use real metal screws.':'')};
- ['b6sz','b6d','b6p','b6r','b6dr','b6ds'].forEach(i=>Q(i).addEventListener('change',ui));Q('b6h').addEventListener('change',()=>{Q('b6dr').value={hex:'none',thumb:'none',pan:'ph'}[Q('b6h').value]||'hex';ui()});ui();
+  dsFill(o,s);hsVis(o);Q('b6i').textContent='M'+s.d+' × '+s.P+' mm pitch · spanner '+(o.head==='hex'&&Q('b6ds').value!=='c'&&+Q('b6ds').value>0?+Q('b6ds').value:s.af)+' mm · through-hole Ø'+s.clear+' · pilot Ø'+s.tap+(o.real&&s.d<4?' · threads this small rarely print well – M5 and up is reliable (0.1–0.2 mm layers), or use real metal screws.':'')};
+ ['b6sz','b6d','b6p','b6r','b6dr','b6ds','b6hs'].forEach(i=>Q(i).addEventListener('change',ui));Q('b6h').addEventListener('change',()=>{Q('b6dr').value={hex:'none',thumb:'none',pan:'ph'}[Q('b6h').value]||'hex';ui()});ui();
  const nm=o=>'M'+o.d+'×'+o.L;const mk=(geo,name,dx)=>{const w=place(M(geo,0xb8c0cc),name,false);if(dx)w.position.x+=dx;return w};
  const safe=f=>{try{commit();f()}catch(e){console.error(e);hint.textContent='Could not build that part: '+e.message}};
- Q('b6b').onclick=()=>safe(()=>{const o=rd(),b=boltGeo(o);mk(b.geo,'Bolt '+nm(o));hint.textContent='Bolt '+nm(o)+' added with the head on top so the drive is visible. Flip it upside-down before slicing if you want to print it head-down.'});
+ Q('b6b').onclick=()=>safe(()=>{const o=rd(),b=boltGeo(o);mk(b.geo,'Bolt '+nm(o));hint.textContent='Bolt '+nm(o)+' added with the head on top so the drive is visible.'+(b.grown?' Head made bigger (Ø'+f1(b.Do)+' mm) so the drive keeps a solid wall.':'')+' Flip it upside-down before slicing if you want to print it head-down.'});
  Q('b6nb').onclick=()=>safe(()=>{const o=rd(),n=nutGeo(o);mk(n.geo,'Nut M'+o.d);hint.textContent='Nut M'+o.d+' added ('+f1(n.h)+' mm tall) – its thread matches bolts made with the same Fit.'});
  const washer=o=>{const s=scr(o.d);return ext(circ(0,0,Math.max(s.d*1.05+1.5,s.af*.62+.5),48),Math.max(.4,+(s.d*.17).toFixed(1)),[circ(0,0,s.clear/2,32)])};
  Q('b6w').onclick=()=>safe(()=>{const o=rd();mk(washer(o),'Washer M'+o.d);hint.textContent='Washer M'+o.d+' added.'});
  Q('b6set').onclick=()=>safe(()=>{const o=rd(),s=scr(o.d),b=mk(boltGeo(o).geo,'Bolt '+nm(o)),n=mk(nutGeo(o).geo,'Nut M'+o.d),w=mk(washer(o),'Washer M'+o.d);n.position.set(b.position.x+s.af*2+6,0,b.position.z);w.position.set(b.position.x+s.af*4+12,0,b.position.z);select([b,n,w]);hint.textContent='Bolt, nut and washer M'+o.d+' added side by side, ready to print.'});
- Q('b6hole').onclick=()=>{const o=rd();if(!SCT[o.d]){hint.textContent='Pick a standard size for the hole tool (or type the Ø there).';tab('era');return}if(!J){hint.textContent='The cutting engine needs internet access.';return}window.V60.holeSize(o.d);startPick((p,n)=>window.V60.holeCut(p,n),'Click on the part where the M'+o.d+' hole should go – it is cut as soon as you click (Esc cancels).')};
+ Q('b6hole').onclick=()=>{const o=rd();if(!SCT[o.d]){hint.textContent='Pick a standard size for the hole tool (or type the Ø there).';tab('era');return}if(!J){hint.textContent='The cutting engine needs internet access.';return}const ht=Q('b6ht').value;Q('h6ty').value=ht;window.V60.holeSize(o.d);startPick((p,n)=>window.V60.holeCut(p,n),'Click on the part where the M'+o.d+(ht==='thr'?' threaded':' smooth')+' hole should go – it is cut as soon as you click (Esc cancels).')};
  /* --- screw joint --- */
  Q('j6go').onclick=()=>{if(!J){hint.textContent='The cutting engine needs internet access.';return}startPick((p,n,A)=>{const s=scr(+Q('j6sz').value),ty=Q('j6ty').value,hk=Q('j6h').value,ms=[];objs.forEach(o=>{if(o.visible&&!o.userData.hole)o.traverse(c=>{if(c.isMesh)ms.push(c)})});
    RC.set(p.clone().addScaledVector(n,.3),n.clone().negate());const H=RC.intersectObjects(ms,false).map(h=>({d:h.distance-.3,o:rootOf.get(h.object)})).filter(h=>h.o),fb=H.find(h=>h.o!==A&&h.d>.2);
