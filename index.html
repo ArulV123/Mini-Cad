@@ -13,6 +13,10 @@ header{grid-area:h;display:flex;gap:8px;align-items:center;padding:6px 12px;back
 header label{color:var(--m);display:flex;gap:6px;align-items:center}
 button,input,select{font:inherit;color:var(--t);background:var(--bg);border:1px solid var(--b);border-radius:5px;padding:4px 9px;height:28px;box-sizing:border-box}
 button{cursor:pointer}button:hover:not(:disabled){background:var(--h)}button:disabled{opacity:.4;cursor:default}
+@keyframes cutPulse{0%{box-shadow:0 0 0 0 #f5a524cc}70%{box-shadow:0 0 0 9px #f5a52400}100%{box-shadow:0 0 0 0 #f5a52400}}
+button.hl{border-color:#f5a524!important;font-weight:600;animation:cutPulse 1.5s ease-out infinite}button.hl:not(.pri){background:#f5a52426}button.pri.hl{background:var(--a)}
+@media (prefers-reduced-motion:reduce){button.hl{animation:none;box-shadow:0 0 0 3px #f5a52499}}
+#cstep{padding:6px 8px;margin:0 0 6px;border-left:3px solid #f5a524;background:#f5a52418;border-radius:4px}
 button.pri{background:var(--a);border-color:var(--a);color:#fff}button.pri:hover:not(:disabled){background:var(--a);filter:brightness(1.1)}
 input[type=number]{width:70px}input[type=color]{padding:1px;width:34px}
 .seg{display:flex}.seg button{border-radius:0;margin-left:-1px}.seg button:first-child{border-radius:5px 0 0 5px;margin:0}.seg button:last-child{border-radius:0 5px 5px 0}
@@ -135,20 +139,23 @@ header{gap:6px;padding:5px 12px}header button,header select{padding:4px 8px;whit
 <div class="fl"><label>Length</label><input id="spL" type="number" value="60" min="3"><label>Outer Ø</label><input id="spD" type="number" value="20"><label>Wire Ø</label><input id="spd" type="number" value="2" step=".1"><label>Turns</label><input id="spN" type="number" value="8" step=".5"><label>Material</label><select id="spM" style="grid-column:2/5"></select><label>Load N</label><input id="spF" type="number" value="10"></div>
 <div class="br"><button class="btn-c c-blue" id="spA">＋ Add spring</button></div>
 <p class="mut" id="spI" style="margin:6px 0"></p><p class="mut" style="margin:0">Select a spring and change any number to resize it live.</p></div></details></div>
-<div class="pane" id="p-cut"><h4>Plane cut (like Bambu Studio)</h4><p class="mut">Select the part(s), then position and tilt the orange plane with the sliders (or type exact values), pick what to keep, and press Cut.</p>
+<div class="pane" id="p-cut"><h4>Plane cut (like Bambu Studio)</h4><p class="mut">Select the part(s), then drag the orange plane or use the sliders / exact values to position and tilt it, pick what to keep, and press Cut.</p>
+<div id="cstep" class="mut"></div>
+<div class="row"><button id="cal" style="flex:1">① Show plane &amp; align it</button><button id="cpick" title="Go back to selecting / moving parts (needed to pick the part and drag the plane)">↖ Select</button></div>
 <div class="row"><span style="width:62px">Plane</span><select id="cori" style="flex:1"><option value="y">Horizontal (top / bottom)</option><option value="x">Vertical – left / right</option><option value="z">Vertical – front / back</option></select></div>
-<div class="row"><span style="width:62px">Position</span><input id="cof" type="range" step=".1" style="flex:1"><input id="cofn" type="number" step=".1" style="width:66px"></div>
-<div class="row"><span style="width:62px">Tilt A °</span><input id="cta" type="range" min="-90" max="90" step="1" value="0" style="flex:1"><span id="ctav" style="width:30px">0</span></div>
-<div class="row"><span style="width:62px">Tilt B °</span><input id="ctb" type="range" min="-90" max="90" step="1" value="0" style="flex:1"><span id="ctbv" style="width:30px">0</span></div>
+<div class="row"><span style="width:62px">Position</span><input id="cof" type="range" step=".1" style="flex:1;min-width:0"><input id="cofn" type="number" step=".1" style="width:62px"></div>
+<div class="row"><span style="width:62px">Tilt A °</span><input id="cta" type="range" min="-90" max="90" step="1" value="0" style="flex:1;min-width:0"><input id="ctav" type="number" min="-90" max="90" step="1" value="0" style="width:62px"></div>
+<div class="row"><span style="width:62px">Tilt B °</span><input id="ctb" type="range" min="-90" max="90" step="1" value="0" style="flex:1;min-width:0"><input id="ctbv" type="number" min="-90" max="90" step="1" value="0" style="width:62px"></div>
 <div class="row"><span style="width:62px">Keep</span><select id="ckeep" style="flex:1"><option value="both">Both parts</option><option value="upper">Upper part only</option><option value="lower">Lower part only</option></select></div>
-<div class="row"><button class="pri" id="cgo" style="flex:1">Cut along plane</button></div></div>
+<div class="row"><label style="width:auto;display:flex;gap:6px;align-items:center"><input type="checkbox" id="cgap" checked style="height:auto"> Move the two parts apart after cutting</label></div>
+<div class="row"><button id="crs" style="flex:1" title="Put the plane back in the middle of the part, level">Reset plane</button><button class="pri" id="cgo" style="flex:2">② Cut along plane</button></div><p class="mut" style="margin:4px 0 0">Tip: drag the orange plane in the 3D view to slide it through the part (it moves along the chosen axis, so it stays exactly where you put it). Tilt it with the sliders or type exact numbers.</p></div>
 <div class="pane" id="p-era">
 <div class="blk" style="--c:#d92d4b"><div class="bt"><i>1</i>Eraser <small>what gets removed</small></div>
 <div class="fl"><label>Shape</label><select id="esh" style="grid-column:2/5"><option value="click">Click (round brush)</option><option value="rect">Rectangle</option><option value="circle">Circle</option><option value="shape">Any shape from list…</option><option value="poly">Polygon</option><option value="free">Freehand</option></select>
 <label class="eks">Which</label><select id="esk" class="eks" style="grid-column:2/5"></select>
 <label>Mode</label><select id="emd" style="grid-column:2/5"><option value="carve">Carve away (precise)</option><option value="obj">Whole objects</option></select>
 <label>Brush r</label><input id="ebr" type="number" value="3" step=".5" min=".25" title="Radius in mm for the Click brush"><label>Affects</label><select id="ctg"><option value="all">All</option><option value="sel">Selected</option></select></div>
-<div class="br"><button class="btn-c c-red" id="ers_go">✎ Start erasing</button><button class="btn-o c-red" id="ers_sel" title="Deletes the selected objects">Erase selected</button></div></div>
+<div class="br"><button class="btn-c c-red" id="ers_go">✎ Start erasing</button><button class="btn-o c-red" id="ers_sel" title="Deletes the selected objects">Erase selected</button><button class="btn-o c-blue" id="ers_pick" title="Stop erasing and go back to selecting / moving parts (also needed to use the cut plane)">↖ Select</button></div></div>
 <div class="blk" style="--c:#7a4de0"><div class="bt"><i>2</i>Depth <small>how deep it cuts</small></div>
 <div class="fl"><label>Depth mm</label><input id="cd" type="number" value="0" min="0" step=".1"><label class="chk" style="grid-column:3/5"><input type="checkbox" id="cdt" checked> Through all</label>
 <label>Slider</label><input id="cds" type="range" min="0" max="50" step=".1" value="0" style="grid-column:2/5">
@@ -309,6 +316,50 @@ let pe=null;let th=.7,ph=1,dist=330,tgt=V(0,0,0);
 const upd=()=>{cam.position.set(tgt.x+dist*Math.sin(ph)*Math.sin(th),tgt.y+dist*Math.cos(ph),tgt.z+dist*Math.sin(ph)*Math.cos(th));cam.lookAt(tgt);cam.updateMatrix()};
 function rs(){const w=vp.clientWidth,h=vp.clientHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}new ResizeObserver(rs).observe(vp);
 let tool='select',objs=[],sel=[],bx=[],snap=1,meas=[],pts=[],prev=null,start=null,A=null,drag=null,mv=null,hd=null,cnt=0,hist=[],redo=[];
+/* v-fix: boolean/cut results are triangle soups with T-junctions; THREE.EdgesGeometry draws their coplanar joins as stray lines across the cut face.
+   This builder keeps an edge only if the surface really bends (or ends) there. */
+function featEdges(geo,thDeg){
+  const P=geo.attributes.position,nT=Math.floor(P.count/3),cosT=Math.cos((thDeg==null?25:thDeg)*Math.PI/180),Q=1e3;
+  const ids=new Map(),X=[],Y=[],Z=[];
+  const vid=i=>{const x=P.getX(i),y=P.getY(i),z=P.getZ(i),k=Math.round(x*Q)+'_'+Math.round(y*Q)+'_'+Math.round(z*Q);let v=ids.get(k);if(v===undefined){v=X.length;ids.set(k,v);X.push(x);Y.push(y);Z.push(z)}return v};
+  const tv=new Int32Array(nT*3),N=new Float32Array(nT*3),ok=new Uint8Array(nT);
+  for(let t=0;t<nT;t++){const a=vid(t*3),b=vid(t*3+1),c=vid(t*3+2);tv[t*3]=a;tv[t*3+1]=b;tv[t*3+2]=c;
+    const ux=X[b]-X[a],uy=Y[b]-Y[a],uz=Z[b]-Z[a],wx=X[c]-X[a],wy=Y[c]-Y[a],wz=Z[c]-Z[a],nx=uy*wz-uz*wy,ny=uz*wx-ux*wz,nz=ux*wy-uy*wx,l=Math.hypot(nx,ny,nz);
+    if(l>1e-9&&a!==b&&b!==c&&a!==c){ok[t]=1;N[t*3]=nx/l;N[t*3+1]=ny/l;N[t*3+2]=nz/l}}
+  const key=(a,b)=>a<b?a*4294967296+b:b*4294967296+a,em=new Map();
+  for(let t=0;t<nT;t++){if(!ok[t])continue;for(let k=0;k<3;k++){const a=tv[t*3+k],b=tv[t*3+(k+1)%3],kk=key(a,b);let l=em.get(kk);if(!l)em.set(kk,l=[]);l.push(t,k)}}
+  // spatial grid over triangles (only built if needed)
+  let grid=null,mn=null,C=1;
+  const build=()=>{let a=1e9,b=1e9,c=1e9,d=-1e9,e=-1e9,f=-1e9;for(let i=0;i<X.length;i++){a=Math.min(a,X[i]);d=Math.max(d,X[i]);b=Math.min(b,Y[i]);e=Math.max(e,Y[i]);c=Math.min(c,Z[i]);f=Math.max(f,Z[i])}
+    mn=[a,b,c];C=Math.max(Math.hypot(d-a,e-b,f-c)/40,.5);grid=new Map();
+    for(let t=0;t<nT;t++){if(!ok[t])continue;let x0=1e9,y0=1e9,z0=1e9,x1=-1e9,y1=-1e9,z1=-1e9;for(let k=0;k<3;k++){const v=tv[t*3+k];x0=Math.min(x0,X[v]);x1=Math.max(x1,X[v]);y0=Math.min(y0,Y[v]);y1=Math.max(y1,Y[v]);z0=Math.min(z0,Z[v]);z1=Math.max(z1,Z[v])}
+      const i0=Math.floor((x0-a)/C),i1=Math.floor((x1-a)/C),j0=Math.floor((y0-b)/C),j1=Math.floor((y1-b)/C),k0=Math.floor((z0-c)/C),k1=Math.floor((z1-c)/C);
+      for(let i=i0;i<=i1;i++)for(let j=j0;j<=j1;j++)for(let k=k0;k<=k1;k++){const g=i+','+j+','+k;let l=grid.get(g);if(!l)grid.set(g,l=[]);l.push(t)}}};
+  // is the surface continuing (almost flat) at point p, in some triangle other than the owners?
+  const covered=(px,py,pz,nx,ny,nz,own)=>{if(!grid)build();const l=grid.get(Math.floor((px-mn[0])/C)+','+Math.floor((py-mn[1])/C)+','+Math.floor((pz-mn[2])/C));if(!l)return false;
+    for(const t of l){if(own.includes(t))continue;const tx=N[t*3],ty=N[t*3+1],tz=N[t*3+2];if(nx*tx+ny*ty+nz*tz<cosT)continue;
+      const a=tv[t*3],b=tv[t*3+1],c=tv[t*3+2],d=(px-X[a])*tx+(py-Y[a])*ty+(pz-Z[a])*tz;if(Math.abs(d)>.012)continue;
+      const qx=px-d*tx,qy=py-d*ty,qz=pz-d*tz;let inside=true;const V=[a,b,c];
+      for(let k=0;k<3;k++){const p=V[k],q=V[(k+1)%3],ex=X[q]-X[p],ey=Y[q]-Y[p],ez=Z[q]-Z[p],rx=qx-X[p],ry=qy-Y[p],rz=qz-Z[p];
+        const cx=ey*rz-ez*ry,cy=ez*rx-ex*rz,cz=ex*ry-ey*rx,s=cx*tx+cy*ty+cz*tz;if(s<-1e-4*Math.hypot(ex,ey,ez)){inside=false;break}}
+      if(inside)return true}return false};
+  const out=[];
+  em.forEach(l=>{const n=l.length/2,t0=l[0],k0=l[1],a=tv[t0*3+k0],b=tv[t0*3+(k0+1)%3];let keep;
+    if(n===2){const t1=l[2];keep=N[t0*3]*N[t1*3]+N[t0*3+1]*N[t1*3+1]+N[t0*3+2]*N[t1*3+2]<cosT;
+      if(!keep){} }
+    else{ // unmatched (T-junction / open / non-manifold): keep only if the surface does NOT continue flat across it
+      keep=true;const own=[];for(let i=0;i<l.length;i+=2)own.push(l[i]);
+      const ex=X[b]-X[a],ey=Y[b]-Y[a],ez=Z[b]-Z[a],el=Math.hypot(ex,ey,ez);
+      for(let i=0;i<l.length&&keep;i+=2){const t=l[i],k=l[i+1],c=tv[t*3+(k+2)%3],tx=N[t*3],ty=N[t*3+1],tz=N[t*3+2];
+        let ox=ty*ez-tz*ey,oy=tz*ex-tx*ez,oz=tx*ey-ty*ex;const ol=Math.hypot(ox,oy,oz)||1;ox/=ol;oy/=ol;oz/=ol;
+        const mx=(X[a]+X[b])/2,my=(Y[a]+Y[b])/2,mz=(Z[a]+Z[b])/2;if((X[c]-mx)*ox+(Y[c]-my)*oy+(Z[c]-mz)*oz>0){ox=-ox;oy=-oy;oz=-oz}
+        // probe three points along the edge, just outside the triangle
+        const s=.02;let cov=0;for(const f of[.5,.2,.8]){if(covered(X[a]+ex*f+ox*s,Y[a]+ey*f+oy*s,Z[a]+ez*f+oz*s,tx,ty,tz,own))cov++}
+        if(cov>=2)keep=false}}
+    if(keep)out.push(X[a],Y[a],Z[a],X[b],Y[b],Z[b])});
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(out,3));return g}
+
+try{const _EG=THREE.EdgesGeometry;THREE.EdgesGeometry=function(g,t){if(g&&g.userData&&g.userData.jg&&g.attributes&&g.attributes.position&&!g.index){try{return featEdges(g,t)}catch(e){}}return new _EG(g,t)};THREE.EdgesGeometry.prototype=_EG.prototype}catch(e){}
 const rootOf=new WeakMap(),RC=new THREE.Raycaster(),pl=new THREE.Plane(V(0,1,0),0),ndc=new THREE.Vector2();
 const mk=new THREE.Mesh(new THREE.SphereGeometry(1,12,12),new THREE.MeshBasicMaterial({color:0xd92d4b,depthTest:false}));mk.visible=false;mk.renderOrder=1000;S.add(mk);const dpm=new THREE.Mesh(new THREE.PlaneGeometry(400,300),new THREE.MeshBasicMaterial({color:0x1f6feb,transparent:true,opacity:.08,side:THREE.DoubleSide,depthWrite:false}));dpm.visible=false;dpm.renderOrder=5;S.add(dpm);
 const HD=[];[['x',1],['x',-1],['y',1],['y',-1],['z',1],['z',-1]].forEach(([a,g])=>HD.push({ax:a,sg:g}));
@@ -373,7 +424,7 @@ let so,ho=[];if(op==='sub'&&sel.some(o=>o.userData.hole)){so=sel.filter(o=>!o.us
 if(!so.length||(op==='sub'&&!ho.length))return;const old=sel.slice();hint.textContent='Computing…';
 setTimeout(()=>{try{let r=op==='sub'?J.booleans.subtract(U(so),U(ho)):op==='int'?J.booleans.intersect(...so.map(toJ)):U(so);
 const pts=J.geometries.geom3.toPoints(r),pos=[];pts.forEach(p=>{for(let i=1;i<p.length-1;i++)pos.push(...p[0],...p[i],...p[i+1])});if(!pos.length)throw new Error('result is empty');
-const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.computeVertexNormals();
+const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.computeVertexNormals();g.userData.jg=1;
 let c=0x4f8cff;so[0].traverse(n=>{if(n.isMesh)c=n.userData.col??n.material.color.getHex()});
 commit();old.forEach(o=>{S.remove(o);objs.splice(objs.indexOf(o),1)});place(M(g,c),op==='sub'?'Cut':op==='int'?'Common':'Union',true);hint.textContent='Done.'}catch(e){hint.textContent='Boolean failed: '+e.message}},30)}
 const ACT={ontop:()=>{commit();const base=sel[sel.length-1],bb=bbx(base),c=bb.getCenter(V(0,0,0));sel.slice(0,-1).forEach(o=>{const b=bbx(o),k=b.getCenter(V(0,0,0));o.position.x+=c.x-k.x;o.position.z+=c.z-k.z;o.position.y+=bb.max.y-b.min.y});info()},grp:()=>bool('grp'),uni:()=>bool('uni'),sub:()=>bool('sub'),int:()=>bool('int'),
@@ -438,7 +489,7 @@ if(RC.ray.intersectPlane(new THREE.Plane(V(0,1,0),0),g)&&Math.abs(g.x)<=200&&Mat
 if(ph>=.5&&RC.ray.intersectPlane(new THREE.Plane(nrmOf(m),0),u)&&Math.abs(m==='front'?u.x:u.z)<=200&&u.y>=0&&u.y<=270)tu=o.distanceTo(u);
 if(tu<tg){hovM=m;hovOff=0}else if(tg<1e9)hovM='ground'}
 function down(e){if(pe&&tool!=='select')return;if(DRAWT.includes(tool)&&!start&&!pts.length&&!fh)faceM(e);
-if(tool==='select'){setRay(e);const multi=e.shiftKey||e.ctrlKey||e.metaKey;
+if(tool==='select'){if(cutDragStart(e))return;setRay(e);const multi=e.shiftKey||e.ctrlKey||e.metaKey;
 if(sel.length===1){const rg=gm==='rot'?RC.intersectObjects(rings,false)[0]:null;if(rg){startRot(rg.object.userData.i,e);return}const h=gm==='size'?RC.intersectObjects(handles,false)[0]:null;if(h){startHd(h.object.userData.d);return}}
 const r=pick(e,true);if(r&&r.obj){if(multi)pickObj(r.obj,true);else if(!sel.includes(r.obj))select([r.obj]);
 setRay(e);const g=ground();if(g&&sel.includes(r.obj))mv={g0:g.clone(),c:false,s:sel.map(o=>({o,p:o.position.clone(),off:o.userData.gearAttach?{...o.userData.gearAttach.offset}:null,base:o.userData.gearAttach&&o.userData.gearAttach.gear?o.userData.gearAttach.gear:null}))}}else{if(!multi)select([]);mq={x:e.clientX,y:e.clientY,m:multi}}return}
@@ -450,6 +501,7 @@ const r=pick(e,false);if(!r)return;
 if(tool==='poly'||(tool==='erase'&&$('esh').value==='poly')){const p=r.p;if(pts.length&&p.distanceTo(pts[pts.length-1])<.01)return;if(pts.length>2&&p.distanceTo(pts[0])<Math.max(4,dist*.03)){closePoly();return}if(!pts.length)wp=[];pts.push(p.clone());{const q=wOK()&&sp(e);if(q){q.p.set(sn(q.p.x),sn(q.p.y),sn(q.p.z));wp.push(q)}}return}
 start=r.p.clone()}
 function move(e){if(pe&&tool!=='select')return;
+if(tool==='select'&&cpd){cutDrag(e);return}
 if(tool==='select'){setRay(e);if(mq){const[x,y,w,h]=mqBox(e);Object.assign(mqd.style,{display:'block',left:x+'px',top:y+'px',width:w+'px',height:h+'px'});return}
 if(hd){dragHd(e);return}if(rt){dragRot(e);return}
 if(mv){const g=ground();if(!g)return;const fs=v=>e.altKey?Math.round(v*100)/100:sn(v),dx=fs(g.x-mv.g0.x),dz=fs(g.z-mv.g0.z);if(!mv.c&&(dx||dz)){mv.c=true;const cur=objs.map(T);cur.forEach(n=>{const s=mv.s.find(q=>q.o===n.o);if(s)n.p=s.p.clone()});hist.push(cur);redo=[]}
@@ -464,7 +516,7 @@ else if(tool==='shape'&&start){const q=shapePoly(start,p);setPrev(q.map(a=>V(a.x
 else if(K()==='cuts'&&start){const q=eshPoly(start,p);setPrev(q.map(a=>V(a.x,.2,a.z)),true);hint.textContent=$('esk').selectedOptions[0].text+' eraser: '+Math.abs(p.x-start.x).toFixed(1)+' × '+Math.abs(p.z-start.z).toFixed(1)+' mm'}
 else if((K()==='rect'||K()==='cutr')&&start){const a=start;setPrev([V(a.x,.2,a.z),V(p.x,.2,a.z),V(p.x,.2,p.z),V(a.x,.2,p.z)],true);hint.textContent=(dmd()==='ground'?`Length ${Math.abs(p.x-a.x).toFixed(1)} × Width ${Math.abs(p.z-a.z).toFixed(1)} mm (flat on the ground)`:`Width ${Math.abs(p.x-a.x).toFixed(1)} × Height ${Math.abs(p.z-a.z).toFixed(1)} mm (upright)`)+' – then set the extrusion in the panel'}
 else if((K()==='circle'||K()==='cutc')&&start){const rad=start.distanceTo(p);setPrev(circ(start.x,start.z,rad).map(q=>V(q.x,.2,q.z)),true);hint.textContent=`Radius ${rad.toFixed(1)} mm · Ø ${(rad*2).toFixed(1)} mm – then set the extrusion in the panel`}}
-function up(e){if(mq){endMq(e);return}if(hd){hd=null;return}if(rt){rt=null;return}if(fh){endFree();return}if(mv){const was=mv.c,l=mv.s.map(q=>q.o);mv=null;if(was)settle(l);info();return}if(!start)return;const r=pick(e,false),s=start,md0=dm0;start=null;setPrev([]);if(!r)return;const b=r.p;
+function up(e){if(cpd){cpd=null;return}if(mq){endMq(e);return}if(hd){hd=null;return}if(rt){rt=null;return}if(fh){endFree();return}if(mv){const was=mv.c,l=mv.s.map(q=>q.o);mv=null;if(was)settle(l);info();return}if(!start)return;const r=pick(e,false),s=start,md0=dm0;start=null;setPrev([]);if(!r)return;const b=r.p;
 if(K()==='cuts'){if(Math.abs(b.x-s.x)<.5||Math.abs(b.z-s.z)<.5)return;region(eshPoly(s,b))}else if(K()==='cutr'){if(Math.abs(b.x-s.x)<.5||Math.abs(b.z-s.z)<.5)return;region(rc(s.x,s.z,b.x,b.z))}else if(K()==='cutc'){const rad=s.distanceTo(b);if(rad<.5)return;region(circ(s.x,s.z,rad))}
 else if(tool==='shape'){if(Math.abs(b.x-s.x)<1||Math.abs(b.z-s.z)<1)return;addExt(shapePoly(s,b),$('shp').selectedOptions[0].text,undefined,md0)}
 else if(tool==='rect'){if(Math.abs(b.x-s.x)<1||Math.abs(b.z-s.z)<1)return;addExt(rc(s.x,s.z,b.x,b.z),'Rectangle',undefined,md0)}
@@ -539,7 +591,7 @@ let dls=null;if(window.claude)claude.use('downloads').then(d=>dls=d).catch(()=>{
 $('exp').onclick=async()=>{if(!objs.length){hint.textContent='Nothing to export yet.';return}const z=zip([{name:'design.stl',data:stl()},{name:'design.obj',data:obj()}]);
 try{if(dls)await dls.save({filename:'minicad-design.zip',data:z});else{const a=document.createElement('a');a.href=URL.createObjectURL(z);a.download='minicad-design.zip';a.click()}hint.textContent='Exported zip with design.stl and design.obj (mm, Z-up). Holes are excluded.'}
 catch(e){hint.textContent=e&&e.code==='declined'?'Export cancelled.':'Export is not available in this view.'}};
-function tab(n){n=({parts:'shapes',text:'shapes',cut:'era',wheels:'gears'})[n]||n;document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===n));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='p-'+n))}
+function tab(n){n=({parts:'shapes',text:'shapes',cut:'era',wheels:'gears'})[n]||n;document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===n));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='p-'+n));try{if(n!=='era'&&['erase','cutr','cutc'].includes(tool))setTool('select')}catch(e){}}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>tab(b.dataset.p));
 $('snap').onchange=e=>snap=+e.target.value;
 function fit(){const b=new THREE.Box3();objs.forEach(o=>b.expandByObject(o));if(b.isEmpty()){tgt.set(0,0,0);dist=330}else{tgt.copy(b.getCenter(V(0,0,0)));dist=Math.max(60,b.getSize(V(0,0,0)).length()*1.6)}upd()}
@@ -563,8 +615,24 @@ if(!inBox)o.position.y+=top-b.min.y})}
 function setRot(ax,deg){const o=sel[0];if(!o)return;const c0=bbx(o).getCenter(V(0,0,0));o.rotation[ax]=deg*Math.PI/180;o.updateMatrixWorld(true);
 if(!(isG(o)&&ax==='y')){o.position.add(c0.sub(bbx(o).getCenter(V(0,0,0))));if(ax!=='y')settle([o])}if(isG(o))o.userData.mountQ=o.quaternion.clone();info()}
 [['rx','x'],['ry','y'],['rz','z']].forEach(([i,a])=>$(i).onchange=e=>{commit();setRot(a,+e.target.value||0)});
-function jGeo(r){const pts=J.geometries.geom3.toPoints(r),pos=[];pts.forEach(p=>{for(let i=1;i<p.length-1;i++)pos.push(...p[0],...p[i],...p[i+1])});if(!pos.length)return null;
-const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.computeVertexNormals();return g}
+/* weld vertices + split triangles along T-junctions so cut results are watertight (no stray seam lines / cracks) */
+function healSoup(pos){const W=.005,cell=new Map(),vx=[],ck=(a,b,c)=>a+','+b+','+c;
+const idx=(x,y,z)=>{const ix=Math.floor(x/W),iy=Math.floor(y/W),iz=Math.floor(z/W);for(let a=ix-1;a<=ix+1;a++)for(let b=iy-1;b<=iy+1;b++)for(let c=iz-1;c<=iz+1;c++){const l=cell.get(ck(a,b,c));if(l)for(const i of l){const p=vx[i],dx=p[0]-x,dy=p[1]-y,dz=p[2]-z;if(dx*dx+dy*dy+dz*dz<=W*W)return i}}
+const i=vx.length;vx.push([x,y,z]);const k=ck(ix,iy,iz);(cell.get(k)||cell.set(k,[]).get(k)).push(i);return i};
+let T=[];for(let i=0;i<pos.length;i+=9){const a=idx(pos[i],pos[i+1],pos[i+2]),b=idx(pos[i+3],pos[i+4],pos[i+5]),c=idx(pos[i+6],pos[i+7],pos[i+8]);if(a!==b&&b!==c&&a!==c)T.push([a,b,c])}
+for(let pass=0;pass<12;pass++){const dm=new Set();T.forEach(t=>{for(let k=0;k<3;k++)dm.add(t[k]+'_'+t[(k+1)%3])});
+const open=(u,v)=>!dm.has(v+'_'+u),B=new Set();let nOpen=0;T.forEach(t=>{for(let k=0;k<3;k++){const u=t[k],v=t[(k+1)%3];if(open(u,v)){B.add(u);B.add(v);nOpen++}}});
+if(!nOpen)break;const BA=[...B];if(BA.length*nOpen>6e7)break;const out=[];let split=0;
+T.forEach(t=>{for(let k=0;k<3;k++){const u=t[k],v=t[(k+1)%3];if(!open(u,v))continue;const A=vx[u],C=vx[v],dx=C[0]-A[0],dy=C[1]-A[1],dz=C[2]-A[2],L2=dx*dx+dy*dy+dz*dz;if(L2<1e-12)continue;const hit=[];
+for(const w of BA){if(w===u||w===v)continue;const P=vx[w],s=((P[0]-A[0])*dx+(P[1]-A[1])*dy+(P[2]-A[2])*dz)/L2;if(s<=1e-4||s>=1-1e-4)continue;const ex=A[0]+s*dx-P[0],ey=A[1]+s*dy-P[1],ez=A[2]+s*dz-P[2];if(ex*ex+ey*ey+ez*ez<W*W*1.5)hit.push([s,w])}
+if(hit.length){hit.sort((p,q)=>p[0]-q[0]);const o=t[(k+2)%3],ch=[u,...hit.map(h=>h[1]),v];for(let i=0;i<ch.length-1;i++)out.push([ch[i],ch[i+1],o]);split++;return}}out.push(t)});
+T=out;if(!split)break}
+const res=[];T.forEach(t=>t.forEach(i=>res.push(vx[i][0],vx[i][1],vx[i][2])));return res}
+function jGeo(r){const pts=J.geometries.geom3.toPoints(r),pos=[],E=2e-3,D=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]);
+pts.forEach(p0=>{const p=[];p0.forEach(q=>{if(!p.length||D(q,p[p.length-1])>E)p.push(q)});while(p.length>1&&D(p[0],p[p.length-1])<=E)p.pop();if(p.length<3)return;
+for(let i=1;i<p.length-1;i++){const a=p[0],b=p[i],c=p[i+1],ux=b[0]-a[0],uy=b[1]-a[1],uz=b[2]-a[2],wx=c[0]-a[0],wy=c[1]-a[1],wz=c[2]-a[2],cr=Math.hypot(uy*wz-uz*wy,uz*wx-ux*wz,ux*wy-uy*wx),L=Math.max(D(a,b),D(a,c),D(b,c));
+if(!(L>0)||cr/L<5e-4)continue;pos.push(...a,...b,...c)}});if(!pos.length)return null;let fp=pos;try{const h=healSoup(pos);if(h.length)fp=h}catch(e){}
+const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(fp,3));g.computeVertexNormals();g.userData.jg=1;return g}
 function cutRegion(poly){poly=cleanPoly(poly);if(poly.length<3){hint.textContent='Cut area too small.';return}pendStart('cut',{p:poly})}
 function cutterGeo(p,y0,y1,flip){return flip?ext(rc(-4000,-4000,4000,4000),y1-y0,[p]):ext(p,y1-y0)}
 function cutExec(poly,y0,y1,flip){if(!J){hint.textContent='Boolean engine could not load (needs internet access).';return}
@@ -803,18 +871,36 @@ const aV=i=>V(0,0,0).setComponent(i,1);
 function rAng(i,c,e){setRay(e);const p=V(0,0,0);if(!RC.ray.intersectPlane(new THREE.Plane().setFromNormalAndCoplanarPoint(aV(i),c),p))return null;p.sub(c);return Math.atan2(p.getComponent((i+2)%3),p.getComponent((i+1)%3))}
 function startRot(i,e){const o=sel[0];if(isG(o)&&i!==1){hint.textContent='Gears must stay upright – rotate them around Y (green ring) only.';return}commit();const c=bbx(o).getCenter(V(0,0,0));rt={i,o,c,q0:o.quaternion.clone(),p0:o.position.clone(),a0:rAng(i,c,e)}}
 function dragRot(e){const{i,o,c,q0,p0,a0}=rt,a=rAng(i,c,e);if(a===null||a0===null)return;let d=a-a0;d=Math.atan2(Math.sin(d),Math.cos(d));if(snap)d=Math.round(d/(Math.PI/12))*Math.PI/12;const dq=new THREE.Quaternion().setFromAxisAngle(aV(i),d);o.quaternion.copy(q0).premultiply(dq);o.position.copy(p0).sub(c).applyQuaternion(dq).add(c);if(isG(o))o.userData.mountQ=o.quaternion.clone();info();hint.textContent=`Rotating around ${'XYZ'[i]} (${['red','green','blue'][i]}): ${(d*57.2958).toFixed(0)}°  (15° steps while Snap is on)`}
-const cutPl=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({color:0xf5a524,transparent:true,opacity:.35,side:THREE.DoubleSide,depthTest:false}));cutPl.renderOrder=997;cutPl.visible=false;S.add(cutPl);
-function cutPlane(){const ori=$('cori').value,a=(+$('cta').value||0)*Math.PI/180,b=(+$('ctb').value||0)*Math.PI/180,base=V(ori==='x'?1:0,ori==='y'?1:0,ori==='z'?1:0),e=ori==='y'?new THREE.Euler(a,0,b):ori==='x'?new THREE.Euler(0,a,b):new THREE.Euler(a,b,0),n=base.clone().applyEuler(e).normalize(),bb=new THREE.Box3();sel.forEach(o=>bb.expandByObject(o));const P=bb.getCenter(V(0,0,0));P[ori]=+$('cofn').value;return{n,P,bb}}
-function cutUi(){const on=$('p-cut').classList.contains('on')&&sel.length>0;cutPl.visible=on;if(!on)return;const o=$('cori').value,key=sel.map(q=>q.id).join()+o;
-if(key!==cutKey){cutKey=key;const bb=new THREE.Box3();sel.forEach(q=>bb.expandByObject(q));['cof','cofn'].forEach(i=>{$(i).min=bb.min[o]-1;$(i).max=bb.max[o]+1;$(i).value=((bb.min[o]+bb.max[o])/2).toFixed(2)})}
-const{n,P,bb}=cutPlane();cutPl.position.copy(P);cutPl.quaternion.setFromUnitVectors(V(0,0,1),n);cutPl.scale.setScalar(bb.getSize(V(0,0,0)).length()*1.2+10)}
-$('cof').oninput=()=>$('cofn').value=$('cof').value;$('cofn').oninput=()=>$('cof').value=$('cofn').value;
-['cta','ctb'].forEach(i=>$(i).oninput=()=>$(i+'v').textContent=$(i).value);
-$('cgo').onclick=()=>{if(!J){hint.textContent='Boolean engine could not load (needs internet access).';return}const T=sel.filter(o=>!o.userData.hole&&!isG(o)&&!o.userData.link);if(!T.length){hint.textContent='Select the part(s) to cut first.';return}
-const{n,P}=cutPlane(),keep=$('ckeep').value;hint.textContent='Cutting…';
-setTimeout(()=>{try{const res=[],S0=3000;T.forEach(o=>{let c=0x4f8cff;o.traverse(m=>{if(m.isMesh)c=m.userData.col??m.material.color.getHex()});const jo=toJ(o);
-[['upper',-1],['lower',1]].forEach(([k,sg])=>{if(keep!=='both'&&keep!==k)return;const bm=M(new THREE.BoxGeometry(S0,S0,S0),0xffffff);bm.quaternion.setFromUnitVectors(V(0,1,0),n);bm.position.copy(P).addScaledVector(n,sg*S0/2);const g=jGeo(J.booleans.subtract(jo,toJ(bm)));if(g)res.push([o,g,c,k])})});
-if(!res.length)throw new Error('the plane does not pass through the part');commit();T.forEach(o=>{S.remove(o);objs.splice(objs.indexOf(o),1)});const outs=res.map(([o,g,c,k])=>place(M(g,c),nameOf(o).replace(/ \d+$/,'')+' '+k,true));select(outs);hint.textContent=`Cut done – ${outs.length} part(s). Undo with Ctrl+Z.`}
+const cutPl=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({color:0xf5a524,transparent:true,opacity:.18,side:THREE.DoubleSide,depthTest:false,depthWrite:false}));cutPl.renderOrder=997;cutPl.visible=false;S.add(cutPl);
+{const ol=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(1,1)),new THREE.LineBasicMaterial({color:0xf5a524,depthTest:false}));ol.renderOrder=998;cutPl.add(ol)}
+let cpd=null,cpOn=false;
+function cutPlane(){const ori=$('cori').value,a=(+$('cta').value||0)*Math.PI/180,b=(+$('ctb').value||0)*Math.PI/180,base=V(ori==='x'?1:0,ori==='y'?1:0,ori==='z'?1:0),e=ori==='y'?new THREE.Euler(a,0,b):ori==='x'?new THREE.Euler(0,a,b):new THREE.Euler(a,b,0),n=base.clone().applyEuler(e).normalize(),bb=new THREE.Box3();sel.forEach(o=>bb.expandByObject(o));const P=bb.getCenter(V(0,0,0)),v=parseFloat($('cofn').value);P[ori]=isFinite(v)?v:P[ori];return{n,P,bb,ori}}
+let _hl='';
+function cutHL(pane){const st=!pane?'none':cpOn?'cut':'show';if(st===_hl)return;_hl=st;$('cal').classList.toggle('hl',st==='show');$('cgo').classList.toggle('hl',st==='cut');
+const e=$('cstep');if(e)e.innerHTML=st==='none'?'<b>Start:</b> select the part you want to cut.':st==='show'?'<b>Step 1:</b> press <b>Show plane</b> \u2013 or just move any control below and the plane appears on its own.':'<b>Step 2:</b> slide / tilt the orange plane, then press <b>Cut along plane</b>.'}
+function cutAuto(){if(cpOn)return;if(!sel.length){hint.textContent='Select the part you want to cut first \u2013 the orange plane then appears as soon as you move these controls.';return}cpOn=true;cutBtn();cutUi();hint.textContent='Orange plane shown. Drag it in the 3D view or keep using the controls, then press \u2461 Cut along plane.'}
+function cutUi(){const pane=$('cgo').offsetParent!==null&&sel.length>0;cutHL(pane);const on=cpOn&&pane;cutPl.visible=on;if(!pane)return;
+const o=$('cori').value,key=sel.map(q=>q.id||q.uuid).join()+o,bb0=new THREE.Box3();sel.forEach(q=>bb0.expandByObject(q));if(bb0.isEmpty()){cutPl.visible=false;return}
+['cof','cofn'].forEach(i=>{$(i).min=(bb0.min[o]-1).toFixed(2);$(i).max=(bb0.max[o]+1).toFixed(2)});
+if(key!==cutKey){cutKey=key;['cof','cofn'].forEach(i=>{$(i).value=((bb0.min[o]+bb0.max[o])/2).toFixed(2)})}
+if(!on)return;
+const{n,P,bb}=cutPlane();cutPl.position.copy(P);cutPl.quaternion.setFromUnitVectors(V(0,0,1),n);cutPl.scale.setScalar(bb.getSize(V(0,0,0)).length()*1.1+4)}
+function cutSet(v){const o=$('cori').value,bb=new THREE.Box3();sel.forEach(q=>bb.expandByObject(q));v=Math.min(bb.max[o]+1,Math.max(bb.min[o]-1,v));$('cof').value=v.toFixed(2);$('cofn').value=v.toFixed(2);cutUi()}
+function cutDragStart(e){if(!cutPl.visible||!sel.length)return false;cutPl.updateMatrixWorld(true);setRay(e);if(!RC.intersectObject(cutPl,false).length)return false;const{ori,P}=cutPlane(),ax=V(ori==='x'?1:0,ori==='y'?1:0,ori==='z'?1:0),t0=rayT(ax,P);if(t0===null)return false;cpd={ax,P0:P.clone(),t0,v0:P[ori]};hint.textContent='Dragging the cut plane along '+ori.toUpperCase()+' – release to place it. Press Cut to cut.';return true}
+function cutDrag(e){setRay(e);const t=rayT(cpd.ax,cpd.P0);if(t===null)return;let v=cpd.v0+t-cpd.t0;if(snap)v=Math.round(v/snap)*snap;cutSet(v);hint.textContent='Cut plane position: '+$('cofn').value+' mm'}
+function cutBtn(){const b=$('cal');b.textContent=cpOn?'① Hide plane':'① Show plane & align it';b.classList.toggle('pri',cpOn)}
+$('cal').onclick=()=>{if(!cpOn&&!sel.length){hint.textContent='Select the part you want to cut first, then press this button.';return}cpOn=!cpOn;cutKey='';cutBtn();cutUi();if(cpOn)hint.textContent='Orange plane shown. Drag it in the 3D view to slide it through the part, set the angle with Tilt A / Tilt B, then press ② Cut along plane.'};
+$('crs').onclick=()=>{['cta','ctb','ctav','ctbv'].forEach(i=>$(i).value=0);cutKey='';cutAuto();cutUi()};
+(function cutLoop(){requestAnimationFrame(cutLoop);try{cutUi()}catch(e){}})();
+$('cof').oninput=()=>{$('cofn').value=$('cof').value;cutAuto();cutUi()};$('cofn').oninput=()=>{$('cof').value=$('cofn').value;cutAuto();cutUi()};
+['cta','ctb'].forEach(i=>{$(i).oninput=()=>{$(i+'v').value=$(i).value;cutAuto();cutUi()};$(i+'v').oninput=()=>{let v=Math.max(-90,Math.min(90,parseFloat($(i+'v').value)||0));$(i).value=v;cutAuto();cutUi()}});
+['ckeep','cgap'].forEach(i=>$(i).addEventListener('change',cutAuto));
+$('cori').onchange=()=>{cutKey='';cutAuto();cutUi()};
+$('cgo').onclick=()=>{if(!J){hint.textContent='Boolean engine could not load (needs internet access).';return}const noCut=o=>o.userData.motor||o.userData.isWheel||/motor|wheel/i.test(nameOf(o)),T=sel.filter(o=>!o.userData.hole&&!noCut(o));if(!T.length){hint.textContent=sel.some(noCut)?'Motors and wheels cannot be cut. Select a gear or another part.':'Select the part(s) to cut first.';return}
+const{n,P,bb:cbb}=cutPlane(),keep=$('ckeep').value;{let lo=1e9,hi=-1e9;for(let i=0;i<8;i++){const q=V(i&1?cbb.max.x:cbb.min.x,i&2?cbb.max.y:cbb.min.y,i&4?cbb.max.z:cbb.min.z),d=q.sub(P).dot(n);lo=Math.min(lo,d);hi=Math.max(hi,d)}if(lo>=-1e-4||hi<=1e-4){hint.textContent='The orange plane does not pass through the part – move it inside the part first.';return}}hint.textContent='Cutting…';
+setTimeout(()=>{try{const res=[],S0=cbb.getSize(V(0,0,0)).length()*2+20;T.forEach(o=>{let c=0x4f8cff;o.traverse(m=>{if(m.isMesh)c=m.userData.col??m.material.color.getHex()});const jo=toJ(o);
+[['upper',-1],['lower',1]].forEach(([k,sg])=>{if(keep!=='both'&&keep!==k)return;const bm=M(new THREE.BoxGeometry(S0,S0,S0),0xffffff);bm.quaternion.setFromUnitVectors(V(0,1,0),n);bm.position.copy(P).addScaledVector(n,sg*S0/2);bm.updateMatrixWorld(true);const g=jGeo(J.booleans.subtract(jo,toJ(bm)));if(g)res.push([o,g,c,k])})});
+if(!res.length)throw new Error('the plane does not pass through the part');commit();T.forEach(o=>{objs.forEach(q=>{if(q!==o&&q.userData.link===o){delete q.userData.link;delete q.userData.gearAttach}});S.remove(o);objs.splice(objs.indexOf(o),1)});const gapOn=$('cgap').checked&&keep==='both';const outs=res.map(([o,g,c,k])=>{const w=place(M(g,c),nameOf(o).replace(/ \d+$/,'')+' '+k,true);if(gapOn&&k==='upper')w.position.addScaledVector(n,8);return w});cpOn=false;cutBtn();select([]);hint.textContent=`Cut done – ${outs.length} separate part(s). Click either one to move it on its own. Undo with Ctrl+Z.`}
 catch(e){hint.textContent='Cut failed: '+e.message}},30)};
 function askStack(o){if(!o||o.userData.hole||isG(o)||o.userData.link||!objs.includes(o))return;const b=bbx(o),ov=(a,c)=>Math.min(a.max.x,c.max.x)-Math.max(a.min.x,c.min.x)>1&&Math.min(a.max.z,c.max.z)-Math.max(a.min.z,c.min.z)>1;let top=-1e9,tg=null;
 objs.forEach(q=>{if(q===o||q.userData.hole||q.userData.container||q.userData.link)return;const c=bbx(q);if(ov(b,c)&&b.min.y<c.max.y-.01&&b.max.y>c.min.y+.01&&c.max.y>top){top=c.max.y;tg=q}});
@@ -852,7 +938,7 @@ function pendSize(){if(!pe||pe.k!=='add')return;const lx=Math.max(.1,+$('pe_lx')
 function pendNo(){pendClear();hint.textContent='Cancelled.'}
 function pendOk(){if(!pe)return;const o=pe,y=+$('pe_y').value||0,d=Math.max(.01,+$('pe_d').value||1);
 if(o.k==='add'){pendClear();$('dh').value=d;addExtNow(o.p,o.name,o.rad,d,y,o.mode);return}
-const[y0,y1]=cutRange(),fl=$('pe_flip').checked;pendClear();cutExec(o.p,y0,y1,fl)}
+const[y0,y1]=cutRange(),fl=$('pe_flip').checked;pendClear();cutExec(o.p,y0,y1,fl);if(['erase','cutr','cutc'].includes(tool))setTool('select')}
 $('pe_ok').onclick=pendOk;$('pe_no').onclick=pendNo;
 $('pend').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();pendOk()}else if(e.key==='Escape')pendNo()});
 const pv=V(0,0,0);
@@ -1275,7 +1361,7 @@ const _st=setTool;setTool=function(t){_st(t);if(['erase','cutr','cutc'].includes
 $('esk').innerHTML=$('shp').innerHTML;
 window.eshPoly=(s0,p)=>{const x0=Math.min(s0.x,p.x),x1=Math.max(s0.x,p.x),z0=Math.min(s0.z,p.z),z1=Math.max(s0.z,p.z),k=$('esk').value;if(k==='rect')return rc(x0,z0,x1,z1);if(k==='rrect')return rrPoly(x0,z0,x1,z1,.2);if(k==='slot')return rrPoly(x0,z0,x1,z1,.5);const cx=(x0+x1)/2,cz=(z0+z1)/2,w=(x1-x0)/2,d=(z1-z0)/2;return SHP[k]().map(q=>({x:cx+q[0]*w,z:cz+q[1]*d}))};
 const eksUp=()=>document.querySelectorAll('#p-era .eks').forEach(e=>e.style.display=$('esh').value==='shape'?'':'none');$('esh').addEventListener('change',()=>{eksUp();if(['click','rect','circle','shape','poly','free'].includes($('esh').value)&&tool!=='erase')setTool('erase')});eksUp();
-$('ers_go').onclick=()=>setTool('erase');$('ers_sel').onclick=()=>{if(!sel.length){hint.textContent='Select something first (or press Start erasing and click / drag on the model).';return}ACT.del()};
+$('ers_go').onclick=()=>setTool('erase');$('cpick').onclick=()=>{setTool('select');hint.textContent='Select mode: click the part you want to cut, then drag the orange plane to position it.'};$('ers_pick').onclick=()=>{setTool('select');hint.textContent='Select mode: click a part to select it (then you can use the cut plane or move it). Press Start erasing to erase again.'};$('ers_sel').onclick=()=>{if(!sel.length){hint.textContent='Select something first (or press Start erasing and click / drag on the model).';return}ACT.del()};
 const cd=$('cd'),cds=$('cds'),cdt=$('cdt'),cdi=$('cdi');let lastD=2;
 const dSync=()=>{const v=Math.max(0,+cd.value||0);cdt.checked=v===0;cds.disabled=v===0&&false;if(v>0)lastD=v;if(+cds.max<v)cds.max=Math.ceil(v);cds.value=v;
 cdi.textContent=v===0?'Through all: cuts every part under the eraser completely.':'Blind cut: removes '+v+' mm '+($('cdf').value==='bottom'?'upwards from the underside.':'downwards from the surface you click.')};
@@ -3639,6 +3725,8 @@ const SIZES=Object.keys(SCT).map(Number).sort((a,b)=>a-b);
 function scr(d,P){d=Math.max(.6,+d||3);const t=SCT[d]||[+(Math.max(.2,d*.15+.05)).toFixed(2),+(d*1.7).toFixed(1),+(d*.8).toFixed(1),+(d*1.5).toFixed(1),+(d*.8).toFixed(1),+(d*.6).toFixed(1)];
  return{d,P:+P>0?+P:t[0],af:t[1],nutH:t[2],capD:t[3],sock:t[4],bsock:t[5],clear:+(d*1.1+.1).toFixed(2),tap:+(d*.85+.05).toFixed(2),ins:+(d*1.27+.4).toFixed(2),csk:2*d}}
 const STDL=[3,4,5,6,8,10,12,14,16,18,20,25,30,35,40,45,50,60,70,80];
+const GRUBKT={2:.9,2.5:1.3,3:1.5,4:2,5:2.5,6:3,8:4,10:5,12:6,16:8,20:10},GRUBK=d=>GRUBKT[d]||Math.max(.7,+(.5*d).toFixed(1));
+const KEYS=[1.3,1.5,2,2.5,3,4,5,6,8,10,12,14,17,19,22],SPAN=[4,5,5.5,6,7,8,9,10,11,12,13,14,16,17,18,19,21,22,24,27,30,36],SLOTW=[.5,.6,.8,1,1.2,1.6,2,2.5,3,4],SLOTN={1:.5,1.2:.5,1.4:.5,1.6:.5,2:.5,2.5:.6,3:.8,4:1.2,5:1.2,6:1.6,8:2,10:2.5,12:3,16:4,20:5},PHS=[['PH0',2.6],['PH1',3.8],['PH2',5.2],['PH3',7.2]];
 const stdLen=L=>{let b=STDL[0];STDL.forEach(x=>{if(x<=L+.01)b=x});return b};
 const sizeOpts=(sel,list)=>(list||SIZES).map(d=>`<option value="${d}"${d===sel?' selected':''}>M${d}</option>`).join('');
 const hexPoly=(af,rot)=>{const R=af/2/Math.cos(Math.PI/6);return[...Array(6)].map((_,i)=>({x:R*Math.cos(i*Math.PI/3+(rot||0)),z:R*Math.sin(i*Math.PI/3+(rot||0))}))};
@@ -3969,11 +4057,17 @@ cv.addEventListener('pointerdown',e=>{if(!pickCb||e.button!==0)return;e.stopImme
  if(k){const s=Math.sign(n[k]);n.set(0,0,0);n[k]=s;['x','y','z'].forEach(a=>{if(a!==k)p[a]=sn(p[a])})}
  const cb=pickCb;pickCb=null;cv.style.cursor='';cb(p,n,rootOf.get(h.object))},true);
 const startPick=(cb,msg)=>{pickCb=cb;cv.style.cursor='crosshair';hint.textContent=msg};
+/* a half-finished "click the spot" pick must never swallow later clicks: drop it when the tool or tab changes */
+const disarmPick=()=>{if(pickCb){pickCb=null;cv.style.cursor=''}};
+{const _tabP=tab;tab=function(){disarmPick();return _tabP.apply(this,arguments)};const _stP=setTool;setTool=function(){disarmPick();return _stP.apply(this,arguments)}}
+/* choosing anything outside the Cut & Erase panel (Gears, Add, Bolts...) hands the mouse back to Select */
+document.getElementById('side').addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button,summary');if(!b)return;disarmPick();
+ if(['erase','cutr','cutc'].includes(tool)&&!b.closest('#p-era')&&!(b.dataset&&b.dataset.p==='era'))setTool('select')},true);
 addEventListener('keydown',e=>{if(e.key==='Escape'&&pickCb){pickCb=null;cv.style.cursor=''}});
 const cutTargets=(cj,only)=>{const cb=boxOfJ(cj),useSel=Q('ctg')&&Q('ctg').value==='sel'&&sel.length;return objs.filter(o=>{const u=o.userData;if(u.hole||!o.visible||u.motor||u.drv)return false;if(only)return only.includes(o);if(useSel&&!sel.includes(o))return false;if(isG(o)&&!sel.includes(o))return false;return bbx(o).intersectsBox(cb)})};
 (function holeTool(){const pe_=Q('p-era');if(!pe_||Q('h6go'))return;
  pe_.insertAdjacentHTML('afterbegin','<div class="blk" style="--c:#1f6feb"><div class="bt"><i>⌀</i>Precise hole <small>screw holes, exact depth</small></div>'
- +'<div class="fl"><label>Type</label><select id="h6ty" style="grid-column:2/5"><option value="plain">Plain round hole</option><option value="clear">Screw passes through (clearance)</option><option value="tap">Screw bites here (pilot)</option><option value="cbore">Counterbore – cap head sinks in</option><option value="csk">Countersink – flat head</option><option value="nut">Hex nut pocket + hole</option><option value="ins">Heat-set insert hole</option></select>'
+ +'<div class="fl"><label>Type</label><select id="h6ty" style="grid-column:2/5"><option value="plain">Plain round hole</option><option value="clear">Screw passes through (clearance)</option><option value="tap">Screw bites here (pilot)</option><option value="cbore">Counterbore – cap head sinks in</option><option value="csk">Countersink – flat head</option><option value="nut">Hex nut pocket + hole</option><option value="ins">Heat-set insert hole</option><option value="thr">Threaded hole – spiral thread for a bolt</option></select>'
  +'<label>Screw</label><select id="h6sz">'+sizeOpts(3)+'</select><label>Ø mm</label><input id="h6d" type="number" step=".1" value="3">'
  +'<label>Depth</label><input id="h6dep" type="number" step=".1" min=".1" value="5"><label class="chk" style="grid-column:3/5"><input type="checkbox" id="h6thru"> Through all</label>'
  +'<label>X</label><input id="h6x" type="number" step=".1" value="0"><label>Z</label><input id="h6z" type="number" step=".1" value="0"><label>Y</label><input id="h6y" type="number" step=".1" value="0">'
@@ -3982,23 +4076,30 @@ const cutTargets=(cj,only)=>{const cb=boxOfJ(cj),useSel=Q('ctg')&&Q('ctg').value
  +'<p class="mut" style="margin:6px 0 0">Click the spot (snaps to the grid), or type X / Y / Z. The red ghost shows exactly what is removed. Y is the surface height.</p></div>');
  let fn=V3(0,1,0),ghost=null,has=false;
  const nrm=()=>{const v=Q('h6dir').value;return v==='face'?fn.clone():V3(...v.split(',').map(Number))},pos=()=>V3(+Q('h6x').value||0,+Q('h6y').value||0,+Q('h6z').value||0);
- const fill=()=>{const s=scr(+Q('h6sz').value),t=Q('h6ty').value;Q('h6d').value=t==='plain'?s.d:t==='tap'?s.tap:t==='ins'?s.ins:s.clear;if(t==='ins')Q('h6dep').value=+(1.4*s.d+.6).toFixed(1)};
- const parts=dep=>{const s=scr(+Q('h6sz').value),t=Q('h6ty').value,r=Math.max(.15,(+Q('h6d').value||s.d)/2),P=[cylL(r,.3,-dep)];
-  if(t==='cbore')P.push(cylL(s.capD/2+.3,.3,-(s.d+.2),40));
+ const fill=()=>{const s=scr(+Q('h6sz').value),t=Q('h6ty').value;Q('h6d').value=t==='plain'||t==='thr'?s.d:t==='tap'?s.tap:t==='ins'?s.ins:s.clear;if(t==='ins')Q('h6dep').value=+(1.4*s.d+.6).toFixed(1)};
+ let note='';
+ /* thickness of the part at the spot, measured along the hole direction */
+ const thick=(p,n)=>{const ms=[];objs.forEach(o=>{if(!o.userData.hole&&o.visible&&!o.userData.motor)o.traverse(c=>{if(c.isMesh)ms.push(c)})});RC.set(p.clone().addScaledVector(n,.5),n.clone().negate());const h=RC.intersectObjects(ms,false).map(x=>x.distance).filter((d,i,a)=>!i||d-a[i-1]>.001);return h.length>1?h[1]-h[0]:1e9};
+ const parts=(dep,T)=>{note='';const s=scr(+Q('h6sz').value),t=Q('h6ty').value,r=Math.max(.15,(+Q('h6d').value||s.d)/2),P=[cylL(r,.3,-dep)],room=Math.min((T==null?1e9:T)-1.2,dep-.5);
+  /* a head seat / nut pocket must never eat the whole part, or every type collapses into one plain hole: keep 1.2 mm of material under it */
+  const seat=want=>{const v=Math.min(want,room);if(v<.5){note=' The part is too thin for a seat, so only the screw hole was cut.';return 0}if(v<want-.01)note=' Seat shortened to '+f1(v,1)+' mm so material is left under it.';return v};
+  if(t==='thr'){const L=dep+.3,g=shankGeo(s,L,L,s.d/2-r,true);g.rotateX(Math.PI);g.translate(0,.3,0);note=' Spiral thread, M'+s.d+' pitch '+s.P+' mm (right-hand). A bolt from Bolts & Fits screws in.';return[[g,0]]}
+  if(t==='cbore'){const sd=seat(s.d+.2);if(sd)P.push(cylL(s.capD/2+.3,.3,-sd,40))}
   if(t==='csk'){const R=s.csk/2+.1,h=Math.max(.2,R-r);P.push(cylL(R,.3,0,40),[new THREE.CylinderGeometry(R,r,h,40),-h/2])}
-  if(t==='nut')P.push([new THREE.CylinderGeometry((s.af+.3)/2/Math.cos(Math.PI/6),(s.af+.3)/2/Math.cos(Math.PI/6),s.nutH+.6,6),-(s.nutH+.3)/2+.15]);return P};
+  if(t==='nut'){const pd=seat(s.nutH+.3);if(pd)P.push([new THREE.CylinderGeometry((s.af+.3)/2/Math.cos(Math.PI/6),(s.af+.3)/2/Math.cos(Math.PI/6),pd+.3,6),-pd/2+.15])}return P};
  const depth=(p,n)=>{if(!Q('h6thru').checked)return Math.max(.1,+Q('h6dep').value||5);const T=objs.filter(o=>!o.userData.hole&&o.visible&&!o.userData.motor),ms=[];T.forEach(o=>o.traverse(c=>{if(c.isMesh)ms.push(c)}));
   RC.set(p.clone().addScaledVector(n,.5),n.clone().negate());const h=RC.intersectObjects(ms,false);return h.length?h[h.length-1].distance-.5+.6:5};
  const unghost=()=>{if(ghost){S.remove(ghost);ghost.traverse(c=>c.geometry&&c.geometry.dispose());ghost=null}};
- const prev=()=>{unghost();if(!has)return;const p=pos(),n=nrm();ghost=cutAt(parts(depth(p,n)),p,n);const m=new THREE.MeshBasicMaterial({color:0xe5484d,transparent:true,opacity:.55,depthTest:false});ghost.traverse(c=>{if(c.isMesh){c.material=m;c.renderOrder=996}});S.add(ghost)};
+ const prev=()=>{unghost();if(!has)return;const p=pos(),n=nrm();ghost=cutAt(parts(depth(p,n),thick(p,n)),p,n);const m=new THREE.MeshBasicMaterial({color:0xe5484d,transparent:true,opacity:.55,depthTest:false});ghost.traverse(c=>{if(c.isMesh){c.material=m;c.renderOrder=996}});S.add(ghost)};
  ['h6ty','h6sz'].forEach(i=>Q(i).addEventListener('change',()=>{fill();prev()}));['h6d','h6dep','h6thru','h6x','h6y','h6z','h6dir'].forEach(i=>Q(i).addEventListener('input',()=>{has=true;prev()}));
  Q('h6thru').addEventListener('change',()=>{Q('h6dep').disabled=Q('h6thru').checked});
  Q('h6pick').onclick=()=>startPick((p,n)=>{fn=n;Q('h6dir').value='face';Q('h6x').value=+p.x.toFixed(2);Q('h6y').value=+p.y.toFixed(2);Q('h6z').value=+p.z.toFixed(2);has=true;prev();hint.textContent='Spot set at X '+f1(p.x,2)+', Y '+f1(p.y,2)+', Z '+f1(p.z,2)+'. Adjust the numbers if needed, then press “Cut hole”.'},'Click the exact spot for the hole on a part (Esc cancels).');
- Q('h6go').onclick=()=>{if(!J){hint.textContent='The cutting engine needs internet access.';return}const p=pos(),n=nrm(),d=depth(p,n),cj=toJ(cutAt(parts(d),p,n)),T=cutTargets(cj);
+ Q('h6go').onclick=()=>{if(!J){hint.textContent='The cutting engine needs internet access.';return}const p=pos(),n=nrm(),d=depth(p,n),cj=toJ(cutAt(parts(d,thick(p,n)),p,n)),T=cutTargets(cj);
   if(!T.length){hint.textContent='No part at that position – click the spot on the model first (gears are only cut when selected).';return}
   commit();let c=0;T.forEach(o=>c+=cutObj(o,cj));unghost();has=false;select(sel.filter(o=>objs.includes(o)));info();
-  hint.textContent=c?Q('h6ty').selectedOptions[0].text+' cut: Ø'+Q('h6d').value+' mm, '+(Q('h6thru').checked?'through':f1(d,2)+' mm deep')+', in '+T.map(nameOf).join(', ')+'. Ctrl+Z undoes.':'Nothing was removed there.'};
- window.V60.holeSize=d=>{Q('h6sz').value=String(d);fill()};fill()}());
+  hint.textContent=c?Q('h6ty').selectedOptions[0].text+' cut: Ø'+Q('h6d').value+' mm, '+(Q('h6thru').checked?'through':f1(d,2)+' mm deep')+', in '+T.map(nameOf).join(', ')+'.'+note+' Ctrl+Z undoes.':'Nothing was removed there.'};
+ window.V60.holeSize=d=>{Q('h6sz').value=String(d);fill()};
+ window.V60.holeCut=(p,n)=>{fn=n;Q('h6dir').value='face';Q('h6x').value=+p.x.toFixed(2);Q('h6y').value=+p.y.toFixed(2);Q('h6z').value=+p.z.toFixed(2);has=true;Q('h6go').onclick()};fill()}());
 
 /* ====================== bolts, nuts, washers ====================== */
 const thrR=(u,P,rM,rm)=>{const a=Math.abs(u-P/2),c=P/16,r=3*P/8;return a<=c?rM:a>=r?rm:rM-(rM-rm)*(a-c)/(r-c)};
@@ -4009,20 +4110,20 @@ function shankGeo(s,L,Lt,cl,real,hole,hd){const P=s.P,rM=s.d/2-cl,rm=rM-.5413*P,
  const rf=(a,y)=>{let r=rM;if(real&&y>t0-1e-6){const f=Math.min(1,(y-t0)/P+(t0<1e-6?1:0));r=rM-(rM-thrR(((y+P*a/(2*Math.PI))%P+P)%P,P,rM,rm))*f}return Math.max(.12,Math.min(r,rm-.1+(L-y)))};
  const ys=[0];if(real){const st=Math.max(P/8,Lt/520);if(t0>.01)ys.push(t0);for(let y=t0+st;y<L-1e-6;y+=st)ys.push(y)}else ys.push(Math.max(.01,L-(rM-rm)-.1));ys.push(L);
  return stackLoft(y=>ringP(rf,y,n),ys,hole,hd)}
-function driveHole(kind,D,s,small){if(kind==='hex')return hexPoly((small?s.bsock:s.sock)+.2);if(kind==='ph'){const w=.11*D,l=.33*D;return[[w,-l],[w,-w],[l,-w],[l,w],[w,w],[w,l],[-w,l],[-w,w],[-l,w],[-l,-w],[-w,-w],[-w,-l]].map(([x,z])=>({x,z}))}
- if(kind==='slot'){const w=Math.max(.25,.09*D),l=.42*D;return rc(-l,-w,l,w)}return null}
-function headGeo(s,type,drive){const d=s.d;let k,R,poly=null;
- if(type==='hex'){k=.7*d;poly=hexPoly(s.af);R=()=>s.af/2;drive='none'}
+function driveHole(kind,D,s,small,ov){ov=+ov>0?+ov:0;if(kind==='hex')return hexPoly((ov||(small?s.bsock:s.sock))+.2);if(kind==='ph'){const l=ov?ov/2:.33*D,w=ov?l*.32:.11*D;return[[w,-l],[w,-w],[l,-w],[l,w],[w,w],[w,l],[-w,l],[-w,w],[-l,w],[-l,-w],[-w,-w],[-w,-l]].map(([x,z])=>({x,z}))}
+ if(kind==='slot'){const w=ov?ov/2:Math.max(.25,.09*D),l=.42*D;return rc(-l,-w,l,w)}return null}
+function headGeo(s,type,drive,ov){const d=s.d;let k,R,poly=null;
+ if(type==='hex'){const af=+ov>0?+ov:s.af;k=.7*d;poly=hexPoly(af);R=()=>af/2;drive='none'}
  else if(type==='cap'){k=d;R=()=>s.capD/2}
  else if(type==='button'){k=.55*d;R=y=>.95*d*(.62+.38*Math.sqrt(Math.max(0,1-(1-y/k)**2)))}
  else if(type==='csk'){k=d/2;R=y=>d-(d/2)*(y/k)}
  else if(type==='pan'){k=.6*d;R=()=>d}
  else{k=Math.max(3,.8*d);const R0=Math.max(4,1.5*d),N=Math.max(12,Math.round(R0*2));poly=[...Array(2*N)].map((_,i)=>{const r=i%2?R0-.5:R0,a=i*Math.PI/N;return{x:r*Math.cos(a),z:r*Math.sin(a)}});R=()=>R0-.5}
- const hd=Math.max(.35,Math.min(.6*k,k-.4)),Dm=2*Math.min(R(0),R(hd)),hole=driveHole(drive,Dm,s,type==='button'||type==='csk'),ys=poly?[0,k]:[...Array(9)].map((_,i)=>k*i/8);
- return{k,geo:stackLoft(poly?()=>poly:y=>circ(0,0,R(y),48),ys,hole,hd)}}
+ const hd=Math.max(.35,Math.min(.6*k,k-.4)),Dm=2*Math.min(R(0),R(hd)),hole=driveHole(drive,Dm,s,type==='button'||type==='csk',ov),ys=poly?[0,k]:[...Array(9)].map((_,i)=>k*i/8);
+ return{k,Dm,geo:stackLoft(poly?()=>poly:y=>circ(0,0,R(y),48),ys,hole,hd)}}
 function boltGeo(o){const s=scr(o.d,o.P),real=o.real,cl=real?o.cl:0;
- if(o.head==='grub'){const hd=Math.min(.6*s.d,o.L-.6);return{geo:shankGeo(s,o.L,o.L,cl,real,driveHole(o.drive==='slot'?'slot':'hex',2*(s.d/2-.5413*s.P)*1.15,s,true),hd),s}}
- const h=headGeo(s,o.head,o.drive),sh=shankGeo(s,o.L,Math.min(o.L,o.Lt>0?o.Lt:o.L),cl,real);sh.translate(0,h.k-.02,0);return{geo:mergeG([h.geo,sh]),s}}
+ if(o.head==='grub'){const hd=Math.min(.6*s.d,o.L-.6),gk=o.ds>0?o.ds:GRUBK(s.d),g=shankGeo(s,o.L,o.L,cl,real,driveHole(o.drive==='slot'?'slot':'hex',2*(s.d/2-.5413*s.P)*1.15,s,true,o.drive==='slot'?o.ds:gk),hd);g.rotateX(Math.PI);return{geo:g,s}}
+ const h=headGeo(s,o.head,o.drive,o.ds),sh=shankGeo(s,o.L,Math.min(o.L,o.Lt>0?o.Lt:o.L),cl,real);sh.translate(0,h.k-.02,0);const bg=mergeG([h.geo,sh]);bg.rotateX(Math.PI);return{geo:bg,s}}
 function tubeGeo(outer,rf,h,n,ny){const pos=[],T=(a,b,c)=>pos.push(...a,...b,...c);if(polyA(outer)<0)outer=outer.slice().reverse();const R=[];
  for(let j=0;j<=ny;j++){const y=h*j/ny;R.push([...Array(n)].map((_,i)=>{const a=i/n*2*Math.PI,r=rf(a,y);return[r*Math.cos(a),y,r*Math.sin(a)]}))}
  for(let j=0;j<ny;j++)for(let i=0;i<n;i++){const k=(i+1)%n,A=R[j][i],B=R[j][k],C=R[j+1][i],D=R[j+1][k];T(A,B,C);T(B,D,C)}
@@ -4041,6 +4142,7 @@ function nutGeo(o){const s=scr(o.d,o.P),P=s.P,cl=o.real?o.cl:.1,rM=s.d/2+cl,rm=r
  +'<label class="b6c">Ø mm</label><input class="b6c" id="b6d" type="number" value="6" step=".1"><label class="b6c">Pitch</label><input class="b6c" id="b6p" type="number" value="1" step=".05">'
  +'<label>Head</label><select id="b6h" style="grid-column:2/5"><option value="hex">Hex head (spanner)</option><option value="cap">Socket cap (Allen key)</option><option value="button">Button head</option><option value="csk">Countersunk (flat)</option><option value="pan">Pan head</option><option value="thumb">Thumb screw (knurled)</option><option value="grub">Grub / set screw (no head)</option></select>'
  +'<label>Drive</label><select id="b6dr" style="grid-column:2/5"><option value="hex">Hex socket</option><option value="ph">Phillips cross</option><option value="slot">Slot</option><option value="none">None</option></select>'
+ +'<label id="b6dsl">Key size</label><select id="b6ds" style="grid-column:2/5"></select><input id="b6dc" type="number" step=".1" min=".3" value="4" style="display:none;grid-column:3/5">'
  +'<label>Thread len</label><input id="b6lt" type="number" value="0" min="0" title="0 = threaded all the way"><label>Fit</label><select id="b6f"><option value=".1">Tight</option><option value=".18" selected>Normal</option><option value=".28">Loose</option></select>'
  +'<label>Nut</label><select id="b6n" style="grid-column:2/5"><option value="hex">Hex nut</option><option value="thin">Thin (jam) nut</option><option value="square">Square nut</option><option value="thumb">Thumb nut (knurled)</option></select>'
  +'<label class="chk" style="grid-column:1/5"><input type="checkbox" id="b6r" checked> Real printable threads (untick for a smooth stand-in)</label></div>'
@@ -4053,19 +4155,32 @@ function nutGeo(o){const s=scr(o.d,o.P),P=s.P,cl=o.real?o.cl:.1,rM=s.d/2+cl,rm=r
  +'<details class="acc" open><summary>Tight fit – plug &amp; socket</summary><div><p class="mut" style="margin:0 0 6px">Push the plug part into the body where it should sit. Select the plug first, then shift-click the body. The body gets a socket shaped exactly like the plug, with the gap you choose.</p>'
  +'<div class="fl"><label>Fit</label><select id="f6fit" style="grid-column:2/5"><option value="0.05">Press fit – hammer in, stays for good (0.05)</option><option value="0.12" selected>Tight – push in by hand, does not fall out (0.12)</option><option value="0.2">Snug – slides in, no wobble (0.2)</option><option value="0.35">Loose – drops in freely (0.35)</option></select><label>Gap mm</label><input id="f6c" type="number" step=".01" value="0.12"></div>'
  +'<div class="br"><button class="btn-c c-amber" id="f6go">Cut socket for the plug</button></div><p class="mut" style="margin:6px 0 0">Gap is per side. Printers differ: if it is too tight add 0.05, too loose take 0.05 off.</p></div></details>';
- const rd=()=>{const c=Q('b6sz').value==='c',d=c?Math.max(.6,+Q('b6d').value||6):+Q('b6sz').value;return{d,P:c?+Q('b6p').value:0,L:Math.max(1,+Q('b6L').value||20),Lt:+Q('b6lt').value||0,head:Q('b6h').value,drive:Q('b6dr').value,cl:+Q('b6f').value,real:Q('b6r').checked,nut:Q('b6n').value}};
+ const rd=()=>{const c=Q('b6sz').value==='c',d=c?Math.max(.6,+Q('b6d').value||6):+Q('b6sz').value;return{d,P:c?+Q('b6p').value:0,L:Math.max(1,+Q('b6L').value||20),Lt:+Q('b6lt').value||0,head:Q('b6h').value,drive:Q('b6dr').value,ds:(Q('b6ds').parentNode&&Q('b6ds').style.display!=='none')?(Q('b6ds').value==='c'?Math.max(.3,+Q('b6dc').value||0):+Q('b6ds').value||0):0,cl:+Q('b6f').value,real:Q('b6r').checked,nut:Q('b6n').value}};
+ let dsSig='';
+ const dsFill=(o,s)=>{const sel=Q('b6ds'),lab=Q('b6dsl'),cu=Q('b6dc'),h=o.head,dr=Q('b6dr').value;let kind=h==='hex'?'span':dr==='hex'?'key':dr==='ph'?'ph':dr==='slot'?'slot':'';
+  const show=!!kind;lab.style.display=sel.style.display=show?'':'none';if(!show){cu.style.display='none';dsSig='';return}
+  const hg=h==='hex'||h==='grub'?null:headGeo(s,h,'none'),Dm=hg?hg.Dm:2*(s.d/2-.5413*s.P)*1.15,fl=[];let std,lbl='Key size',unit=' mm';
+  if(kind==='span'){lbl='Spanner';std=s.af;SPAN.forEach(v=>{if(v>=.8*std&&v<=1.4*std&&v>=s.d+1)fl.push([v,v+unit])})}
+  else if(kind==='key'){lbl='Key size';std=h==='grub'?GRUBK(s.d):h==='cap'?s.sock:s.bsock;const lim=h==='grub'?2*(s.d/2-.5413*s.P)-.8:Dm-2.4;KEYS.forEach(v=>{if((v+.2)*1.1547<=lim&&v>=.25*Dm*(h==='grub'?.5:1))fl.push([v,v+unit+' hex key'])})}
+  else if(kind==='ph'){lbl='Cross size';std=s.d<=2?2.6:s.d<=3?3.8:s.d<=5?5.2:7.2;PHS.forEach(([n,v])=>{if(v<=Dm-2||v===std)fl.push([v,n+' ('+v+' mm)'])})}
+  else{lbl='Slot width';std=Math.max(.5,SLOTN[s.d]||+(.09*Dm*2).toFixed(1));SLOTW.forEach(v=>{if(v>=.04*Dm&&v<=.26*Dm)fl.push([v,v+unit+' wide'])})}
+  if(!fl.some(x=>x[0]===std))fl.push([std,kind==='ph'?(PHS.find(x=>x[1]===std)||['',''])[0]+' ('+std+' mm)':std+unit+(kind==='key'?' hex key':kind==='slot'?' wide':'')]);fl.sort((a,b)=>a[0]-b[0]);
+  const sig=[o.d,s.P,h,dr].join('|'),keep=sig===dsSig?sel.value:null;lab.textContent=lbl;
+  sel.innerHTML=fl.map(x=>'<option value="'+x[0]+'">'+x[1]+(x[0]===std?' – standard':'')+'</option>').join('')+'<option value="c">Custom…</option>';
+  sel.value=keep!=null&&[...sel.options].some(op=>op.value===keep)?keep:String(std);dsSig=sig;
+  const cs=sel.value==='c';sel.style.gridColumn=cs?'2/3':'2/5';cu.style.display=cs?'':'none'};
  const ui=()=>{const c=Q('b6sz').value==='c';pane.querySelectorAll('.b6c').forEach(e=>e.style.display=c?'':'none');const o=rd(),s=scr(o.d,o.P);if(!c){Q('b6d').value=s.d;Q('b6p').value=s.P}
   const h=o.head,dr=Q('b6dr');[...dr.options].forEach(op=>op.disabled=h==='hex'?op.value!=='none':h==='grub'?!(op.value==='hex'||op.value==='slot'):h==='thumb'?!(op.value==='none'||op.value==='slot'):false);if(dr.selectedOptions[0].disabled)dr.value=[...dr.options].find(op=>!op.disabled).value;
-  Q('b6i').textContent='M'+s.d+' × '+s.P+' mm pitch · spanner '+s.af+' mm · through-hole Ø'+s.clear+' · pilot Ø'+s.tap+(o.real&&s.d<4?' · threads this small rarely print well – M5 and up is reliable (0.1–0.2 mm layers), or use real metal screws.':'')};
- ['b6sz','b6h','b6d','b6p','b6r'].forEach(i=>Q(i).addEventListener('change',ui));ui();
+  dsFill(o,s);Q('b6i').textContent='M'+s.d+' × '+s.P+' mm pitch · spanner '+(o.head==='hex'&&Q('b6ds').value!=='c'&&+Q('b6ds').value>0?+Q('b6ds').value:s.af)+' mm · through-hole Ø'+s.clear+' · pilot Ø'+s.tap+(o.real&&s.d<4?' · threads this small rarely print well – M5 and up is reliable (0.1–0.2 mm layers), or use real metal screws.':'')};
+ ['b6sz','b6d','b6p','b6r','b6dr','b6ds'].forEach(i=>Q(i).addEventListener('change',ui));Q('b6h').addEventListener('change',()=>{Q('b6dr').value={hex:'none',thumb:'none',pan:'ph'}[Q('b6h').value]||'hex';ui()});ui();
  const nm=o=>'M'+o.d+'×'+o.L;const mk=(geo,name,dx)=>{const w=place(M(geo,0xb8c0cc),name,false);if(dx)w.position.x+=dx;return w};
  const safe=f=>{try{commit();f()}catch(e){console.error(e);hint.textContent='Could not build that part: '+e.message}};
- Q('b6b').onclick=()=>safe(()=>{const o=rd(),b=boltGeo(o);mk(b.geo,'Bolt '+nm(o));hint.textContent='Bolt '+nm(o)+' added, standing on its head so it prints without supports.'});
+ Q('b6b').onclick=()=>safe(()=>{const o=rd(),b=boltGeo(o);mk(b.geo,'Bolt '+nm(o));hint.textContent='Bolt '+nm(o)+' added with the head on top so the drive is visible. Flip it upside-down before slicing if you want to print it head-down.'});
  Q('b6nb').onclick=()=>safe(()=>{const o=rd(),n=nutGeo(o);mk(n.geo,'Nut M'+o.d);hint.textContent='Nut M'+o.d+' added ('+f1(n.h)+' mm tall) – its thread matches bolts made with the same Fit.'});
  const washer=o=>{const s=scr(o.d);return ext(circ(0,0,Math.max(s.d*1.05+1.5,s.af*.62+.5),48),Math.max(.4,+(s.d*.17).toFixed(1)),[circ(0,0,s.clear/2,32)])};
  Q('b6w').onclick=()=>safe(()=>{const o=rd();mk(washer(o),'Washer M'+o.d);hint.textContent='Washer M'+o.d+' added.'});
  Q('b6set').onclick=()=>safe(()=>{const o=rd(),s=scr(o.d),b=mk(boltGeo(o).geo,'Bolt '+nm(o)),n=mk(nutGeo(o).geo,'Nut M'+o.d),w=mk(washer(o),'Washer M'+o.d);n.position.set(b.position.x+s.af*2+6,0,b.position.z);w.position.set(b.position.x+s.af*4+12,0,b.position.z);select([b,n,w]);hint.textContent='Bolt, nut and washer M'+o.d+' added side by side, ready to print.'});
- Q('b6hole').onclick=()=>{const o=rd();if(!SCT[o.d]){hint.textContent='Pick a standard size for the hole tool (or type the Ø there).';tab('era');return}window.V60.holeSize(o.d);tab('era');hint.textContent='Hole tool set to M'+o.d+'. Choose the hole type, click the spot, then Cut hole.'};
+ Q('b6hole').onclick=()=>{const o=rd();if(!SCT[o.d]){hint.textContent='Pick a standard size for the hole tool (or type the Ø there).';tab('era');return}if(!J){hint.textContent='The cutting engine needs internet access.';return}window.V60.holeSize(o.d);startPick((p,n)=>window.V60.holeCut(p,n),'Click on the part where the M'+o.d+' hole should go – it is cut as soon as you click (Esc cancels).')};
  /* --- screw joint --- */
  Q('j6go').onclick=()=>{if(!J){hint.textContent='The cutting engine needs internet access.';return}startPick((p,n,A)=>{const s=scr(+Q('j6sz').value),ty=Q('j6ty').value,hk=Q('j6h').value,ms=[];objs.forEach(o=>{if(o.visible&&!o.userData.hole)o.traverse(c=>{if(c.isMesh)ms.push(c)})});
    RC.set(p.clone().addScaledVector(n,.3),n.clone().negate());const H=RC.intersectObjects(ms,false).map(h=>({d:h.distance-.3,o:rootOf.get(h.object)})).filter(h=>h.o),fb=H.find(h=>h.o!==A&&h.d>.2);
