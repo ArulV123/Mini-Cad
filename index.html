@@ -205,11 +205,11 @@ header{gap:6px;padding:5px 12px}header button,header select{padding:4px 8px;whit
 <p id="im_msg" class="mut" style="margin:6px 0 0;font-size:11.5px"></p>
 <div id="im_ed" style="display:none;margin-top:8px"><div id="im_stb" style="margin:0 0 10px;padding:8px;border:1px solid var(--b);border-radius:8px"><div style="font-weight:700;font-size:12.5px">Picture size buttons</div><div class="mut" style="font-size:11px;margin-top:2px">Use the little arrows, or type an exact number in the boxes.</div><div style="display:flex;align-items:center;gap:8px;margin-top:6px"><b style="width:110px;font-size:12.5px">Height (raise)</b><input type="number" id="im_hv" step=".5" min=".2" style="width:90px"></div><div style="display:flex;align-items:center;gap:8px;margin-top:6px"><b style="width:110px;font-size:12.5px">Width</b><input type="number" id="im_wv" step="1" min="1" style="width:90px"><b style="font-size:12.5px;margin-left:6px">Length</b><input type="number" id="im_lv" step="1" min="1" style="width:90px"></div><div style="display:flex;align-items:center;gap:8px;margin-top:6px"><b style="width:110px;font-size:12.5px">Scale (same ratio)</b><input type="number" id="im_sv" step="5" min="5" style="width:90px"></div></div><div class="fl">
 <label>Across</label><input id="im_x" type="number" step=".5" title="Left / right position from the middle of the text (mm)"><label>Up</label><input id="im_z" type="number" step=".5" title="Up / down position (mm)">
-<label>Width</label><input id="im_w" type="number" min="1" step=".5"><label>Turn °</label><input id="im_r" type="number" step="5">
+<label>Width</label><input id="im_w" type="number" min="1" step=".5"><label title="Only the up/down size of the picture changes">Length</label><input id="im_l" type="number" min="1" step=".5" title="Picture size up/down (mm) – the width stays the same">
 <label>Height</label><input id="im_t" type="number" min=".2" step=".2" title="How far the picture stands up from the plate (mm)"><label>Style</label><select id="im_mode"><option value="orig">Real colours</option><option value="one">One colour</option><option value="mono">Monochrome (shades of one colour)</option></select>
 <label>Colours</label><input id="im_k" type="number" min="2" max="10" step="1" title="How many colours to keep from the picture (2-10)"><label>Step</label><input id="im_st" type="number" min="0" step=".1" title="Each extra colour stands this much taller, for a layered relief (0 = flat)">
 <label>Colour</label><input id="im_c" type="color" style="width:34px"><label>Bg tol.</label><input id="im_tol" type="number" min="5" max="120" step="5" title="How close to the corner colour counts as background"></div>
-<div class="fl" style="margin-top:6px"><label title="Only the up/down size of the picture changes">Length</label><input id="im_l" type="number" min="1" step=".5" title="Picture size up/down (mm) – the width stays the same"><label title="Width and length change together, same ratio">Scale %</label><input id="im_sc" type="number" min="5" step="5" title="Bigger / smaller, same proportions"></div>
+<div class="fl" style="margin-top:6px"><label>Turn °</label><input id="im_r" type="number" step="5"><label title="Width and length change together, same ratio">Scale %</label><input id="im_sc" type="number" min="5" step="5" title="Bigger / smaller, same proportions"></div>
 <label class="chk" style="margin-top:8px"><input type="checkbox" id="im_same" checked> One colour: use the plate colour</label>
 <label class="chk" style="margin-top:4px"><input type="checkbox" id="im_cw"> Auto background remover (untick if the picture is already transparent)</label>
 <label class="chk" style="margin-top:4px"><input type="checkbox" id="im_fill"> Solid fill (not hollow)</label>
@@ -682,6 +682,16 @@ function txFontMod(f,b,i){if(i&&!/italic/.test(f))f='italic '+f;if(b)f=f.replace
 function txRaster(txt,font,hmm,bold,ital,sx){sx=sx>0?sx:1;const fs=Math.round(bold?Math.min(320,Math.max(120,hmm*9)):Math.min(220,Math.max(48,hmm*4.8))),c=document.createElement('canvas'),x=c.getContext('2d'),fnt=txFontMod(font.replace('{s}',fs),bold,ital);x.font=fnt;
 const w=Math.ceil(x.measureText(txt).width)+Math.ceil(fs*.3)+4,h=Math.ceil(fs*1.5);c.width=Math.ceil(w*sx);c.height=h;x.scale(sx,1);x.font=fnt;x.fillStyle='#000';x.fillText(txt,Math.ceil(fs*.15)+2,Math.round(fs*1.05));if(bold){x.lineWidth=fs*.03;x.lineJoin='round';x.strokeStyle='#000';x.strokeText(txt,Math.ceil(fs*.15)+2,Math.round(fs*1.05))}
 const W2=c.width;return{w:W2,h,d:x.getImageData(0,0,W2,h).data,k:hmm/(fs*.72)}}
+/* smooth letter outlines: sub-pixel contour of the anti-aliased text (no pixel staircase) */
+function txTraceA(d,w,h){const W2=w+2,H2=h+2,V=new Float32Array(W2*H2);
+for(let y=0;y<h;y++){const r=(h-1-y)*w;for(let i=0;i<w;i++)V[(y+1)*W2+i+1]=d[(r+i)*4+3]/255}
+const nx=new Map(),pt=new Map(),hp=(i,y)=>{const k=((y+1)*W2+i+1)*2;if(!pt.has(k)){const a=V[(y+1)*W2+i+1],b=V[(y+1)*W2+i+2];pt.set(k,[i+.5+(.5-a)/(b-a),y+.5])}return k},vp=(i,y)=>{const k=((y+1)*W2+i+1)*2+1;if(!pt.has(k)){const a=V[(y+1)*W2+i+1],b=V[(y+2)*W2+i+1];pt.set(k,[i+.5,y+.5+(.5-a)/(b-a)])}return k};
+for(let y=-1;y<h;y++)for(let i=-1;i<w;i++){const a=V[(y+1)*W2+i+1],b=V[(y+1)*W2+i+2],c=V[(y+2)*W2+i+2],e=V[(y+2)*W2+i+1],q=(a>=.5?1:0)|(b>=.5?2:0)|(c>=.5?4:0)|(e>=.5?8:0);if(q===0||q===15)continue;
+const B=()=>hp(i,y),R=()=>vp(i+1,y),T=()=>hp(i,y+1),L=()=>vp(i,y),S=(f,t)=>nx.set(f(),t());
+switch(q){case 1:S(B,L);break;case 2:S(R,B);break;case 4:S(T,R);break;case 8:S(L,T);break;case 3:S(R,L);break;case 6:S(T,B);break;case 12:S(L,R);break;case 9:S(B,T);break;case 14:S(L,B);break;case 13:S(B,R);break;case 11:S(R,T);break;case 7:S(T,L);break;
+case 5:if((a+b+c+e)/4>=.5){S(B,R);S(T,L)}else{S(B,L);S(T,R)}break;
+case 10:if((a+b+c+e)/4>=.5){S(L,B);S(R,T)}else{S(R,B);S(L,T)}break}}
+const loops=[];for(const k0 of [...nx.keys()]){if(!nx.has(k0))continue;const p=[];let k=k0;while(nx.has(k)){p.push(pt.get(k));const n=nx.get(k);nx.delete(k);k=n}if(p.length>2)loops.push(p)}return loops}
 function txArea(p){return p.reduce((s,q,i)=>{const n=p[(i+1)%p.length];return s+q[0]*n[1]-n[0]*q[1]},0)/2}
 function txInside(pt,p){let r=false;for(let i=0,j=p.length-1;i<p.length;j=i++)if((p[i][1]>pt[1])!==(p[j][1]>pt[1])&&pt[0]<(p[j][0]-p[i][0])*(pt[1]-p[i][1])/(p[j][1]-p[i][1])+p[i][0])r=!r;return r}
 function txTrace(F,w,h){const E=new Map(),ad=(a,b,c2,e)=>{const q=a+','+b;if(!E.has(q))E.set(q,[]);E.get(q).push([c2,e])};
@@ -839,7 +849,7 @@ const d=g.getImageData(0,0,W,H).data;for(let i=0;i<N;i++)if(d[i*4+3]>127)m1[i]=1
 var TXFAST=false,TXTC=null;const txCk=p=>[p.txt,p.font,p.h,p.bold,p.ital,p.lw].join('\u0001');
 function txBuild(p,lo){const imgs=p.imgs||[],has=p.txt.trim().length>0;if(!has&&!imgs.length)return null;
 let R={k:p.h/(48*.72)},F=()=>false,outs=[];
-if(has&&TXTC&&TXTC.k===txCk(p)){R=TXTC.R;F=TXTC.F;outs=TXTC.outs}else if(has){R=txRaster(p.txt,p.font,p.h,p.bold,p.ital,(p.lw||100)/100);const{w,h,d}=R;F=(i,y)=>i>=0&&y>=0&&i<w&&y<h&&d[((h-1-y)*w+i)*4+3]>127;const L=txTrace(F,w,h);outs=L.filter(q=>txArea(q)>0).map(q=>({p:q,h:[]}));
+if(has&&TXTC&&TXTC.k===txCk(p)){R=TXTC.R;F=TXTC.F;outs=TXTC.outs}else if(has){R=txRaster(p.txt,p.font,p.h,p.bold,p.ital,(p.lw||100)/100);const{w,h,d}=R;F=(i,y)=>i>=0&&y>=0&&i<w&&y<h&&d[((h-1-y)*w+i)*4+3]>127;const L=txTraceA(d,w,h).map(q=>txDP(q,.08)).filter(q=>q.length>2);outs=L.filter(q=>txArea(q)>0).map(q=>({p:q,h:[]}));
  L.filter(q=>txArea(q)<0).forEach(q=>{const o=outs.find(o=>txInside([q[0][0]+.1,q[0][1]+.1],o.p))||outs.find(o=>txInside(q[0],o.p));if(o)o.h.push(q)});TXTC={k:txCk(p),R,F,outs}}
 if(has&&!outs.length&&!imgs.length)return null;
 const k=R.k;let x0=0,x1=0,z0=0,z1=0;if(outs.length){x0=1e9;x1=-1e9;z0=1e9;z1=-1e9;outs.forEach(o=>o.p.forEach(q=>{x0=Math.min(x0,q[0]*k);x1=Math.max(x1,q[0]*k);z0=Math.min(z0,-q[1]*k);z1=Math.max(z1,-q[1]*k)}))}
