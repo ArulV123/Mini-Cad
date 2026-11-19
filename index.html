@@ -1109,7 +1109,7 @@ let m='';cols.forEach(h=>{m+=`newmtl c_${hx6(h)}\nKa 0 0 0\nKd ${((h>>16)&255)/2
 async function mf3(){const{t,c}=trisC(),E=new TextEncoder(),idx=new Map(),vs=[],cm=new Map(),cols=[],tr=[];
 for(let i=0;i<t.length;i+=3){const ids=[0,1,2].map(k=>{const p=t[i+k],key=Math.round(p[0]*1e4)+','+Math.round(p[1]*1e4)+','+Math.round(p[2]*1e4);let j=idx.get(key);if(j===undefined){j=vs.length;idx.set(key,j);vs.push(p)}return j});if(ids[0]===ids[1]||ids[1]===ids[2]||ids[0]===ids[2])continue;
 const h=c[i/3];let ci=cm.get(h);if(ci===undefined){ci=cols.length;cm.set(h,ci);cols.push(h)}tr.push(`<triangle v1="${ids[0]}" v2="${ids[1]}" v3="${ids[2]}" pid="1" p1="${ci}"/>`)}
-const model='<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><resources><basematerials id="1">'+cols.map((h,i)=>`<base name="Colour ${i+1}" displaycolor="#${hx6(h).toUpperCase()}FF"/>`).join('')+'</basematerials><object id="2" type="model" pid="1" pindex="0"><mesh><vertices>'+vs.map(p=>`<vertex x="${p[0].toFixed(4)}" y="${p[1].toFixed(4)}" z="${p[2].toFixed(4)}"/>`).join('')+'</vertices><triangles>'+tr.join('')+'</triangles></mesh></object></resources><build><item objectid="2"/></build></model>';
+const model='<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><resources><basematerials id="1">'+cols.map((h,i)=>`<base name="Colour ${i+1} #${hx6(h).toUpperCase()}" displaycolor="#${hx6(h).toUpperCase()}FF"/>`).join('')+'</basematerials><object id="2" type="model" pid="1" pindex="0"><mesh><vertices>'+vs.map(p=>`<vertex x="${p[0].toFixed(4)}" y="${p[1].toFixed(4)}" z="${p[2].toFixed(4)}"/>`).join('')+'</vertices><triangles>'+tr.join('')+'</triangles></mesh></object></resources><build><item objectid="2"/></build></model>';
 const z=zip([{name:'[Content_Types].xml',data:E.encode('<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/></Types>')},{name:'_rels/.rels',data:E.encode('<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>')},{name:'3D/3dmodel.model',data:E.encode(model)}]);
 return new Uint8Array(await z.arrayBuffer())}
 
@@ -1135,8 +1135,8 @@ function partFiles(){const out=[];if(!window.V70||!V70.asmOf)return out;objs.for
   const bb=new THREE.Box3();T.forEach(v=>bb.expandByPoint(v));const cx=(bb.min.x+bb.max.x)/2,cz=(bb.min.z+bb.max.z)/2;
   out.push({name:base+' - '+(pn[r]||r)+'.stl',data:stlOf(T.map(v=>[v.x-cx,-(v.z-cz),v.y-bb.min.y]))})})});window._pfn=out.map(f=>f.name);return out}
 let dls=null;if(window.claude)claude.use('downloads').then(d=>dls=d).catch(()=>{});
-$('exp').onclick=async()=>{if(!objs.length){hint.textContent='Nothing to export yet.';return}const pf=partFiles(),m3=await mf3(),oc=objC(),z=zip([{name:'design.3mf',data:m3},{name:'design-bambu.3mf',data:await mf3b()},{name:'design.obj',data:oc.o},{name:'design.mtl',data:oc.m},{name:'design.stl',data:stl()}].concat(pf));
-try{if(dls)await dls.save({filename:'minicad-design.zip',data:z});else{const a=document.createElement('a');a.href=URL.createObjectURL(z);a.download='minicad-design.zip';a.click()}hint.textContent='Exported zip: design.3mf (coloured, any slicer) + design-bambu.3mf (one filament slot per colour, for Bambu Studio / Orca), design.obj + design.mtl (coloured) and design.stl (STL cannot store colour) (mm, Z-up)'+(pf.length?' plus each printed piece on its own: '+pf.map(f=>f.name).join(', '):'')+'. Holes are excluded.'}
+$('exp').onclick=async()=>{if(!objs.length){hint.textContent='Nothing to export yet.';return}const pf=partFiles(),m3=await mf3(),oc=objC(),z=zip([{name:'design.3mf',data:m3},{name:'design-bambu.3mf',data:await mf3c()},{name:'design-parts.3mf',data:await mf3b()},{name:'design-prusa.3mf',data:await mf3p()},{name:'design.ply',data:plyC()},{name:'colours.txt',data:colTxt()},{name:'design.obj',data:oc.o},{name:'design.mtl',data:oc.m},{name:'design.stl',data:stl()}].concat(pf));
+try{if(dls)await dls.save({filename:'minicad-design.zip',data:z});else{const a=document.createElement('a');a.href=URL.createObjectURL(z);a.download='minicad-design.zip';a.click()}hint.textContent='Exported zip with your exact colours. Bambu Studio: open design-bambu.3mf, press OK on the "not from Bambu Lab" note, and in the colour window choose Append (colours = the number in colours.txt) so your exact colours become new filaments. Also inside: design-parts.3mf (one part per colour), design-prusa.3mf (PrusaSlicer / SuperSlicer / Orca), design.3mf (Cura, 3D Builder, Windows), design.obj + design.mtl, design.ply, colours.txt (your colours) and design.stl (no colour) (mm, Z-up)'+(pf.length?' plus each printed piece on its own: '+pf.map(f=>f.name).join(', '):'')+'. Holes are excluded.'}
 catch(e){hint.textContent=e&&e.code==='declined'?'Export cancelled.':'Export is not available in this view.'}};
 function tab(n){n=({parts:'shapes',text:'shapes',cut:'era',wheels:'gears'})[n]||n;document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===n));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='p-'+n));try{if(n!=='era'&&['erase','cutr','cutc'].includes(tool))setTool('select')}catch(e){}}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>tab(b.dataset.p));
@@ -2028,10 +2028,213 @@ function imRefresh(){imChips();imFields()}
 function imLoad(file){return new Promise(res=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{const s=Math.min(3,1000/Math.max(im.width,im.height)),w=Math.max(1,Math.round(im.width*s)),h=Math.max(1,Math.round(im.height*s)),c=document.createElement('canvas');c.width=w;c.height=h;const q=c.getContext('2d');q.imageSmoothingEnabled=true;q.imageSmoothingQuality='high';q.drawImage(im,0,0,w,h);const dat=q.getImageData(0,0,w,h).data;let tr=0;for(let i=3;i<dat.length;i+=4)if(dat[i]<250)tr++;
 const id='i'+(++imN)+Date.now().toString(36);TXIMG[id]={w,h,dat,url:c.toDataURL('image/png'),outs:{}};URL.revokeObjectURL(u);res({id,opaque:tr<w*h*.005,ar:h/w})};im.onerror=()=>{URL.revokeObjectURL(u);res(null)};im.src=u})}
 $('im_add').onclick=()=>$('im_file').click();
-$('im_file').onchange=async ev=>{const fs=[...ev.target.files];ev.target.value='';let msg='';for(const f of fs){const r=await imLoad(f);if(!r){msg='Could not read '+f.name+'.';continue}
+async function imAddFiles(fs){let msg='';for(const f0 of fs){let f=f0;const r=await imLoad(f);if(!r){msg='Could not read '+f.name+'.';continue}
+ if(r.opaque){const ch=await imAIFlow(f,r);if(ch==='skip')continue;if(ch&&ch!=='orig'){f=ch;const r2=await imLoad(f);if(r2){r.id=r2.id;r.opaque=false}}}
  const w=14,L=TXLAY,e={id:r.id,x:L?L.bb.x1+w/2+1.5:0,z:0,w,w0:w,t:2,rot:0,same:true,col:'#e8590c',cw:r.opaque,mode:'orig',sh:false,k:8,st:0,tol:40,fill:true,flat:false,bs:'none'};TXIM.push(e);imSel=e.id;
  if(r.opaque)msg='“'+f.name+'” has no transparent background, so I am removing its background automatically. If the result is not perfect, change Bg tol. or remove the background first.';else if(!(txImgOuts(e)||[]).length)msg='Nothing visible was found in “'+f.name+'”.'}
- $('im_msg').textContent=msg;imRefresh();txSched(30)};
+ $('im_msg').textContent=msg;imRefresh();txSched(30)}
+$('im_file').onchange=ev=>{const fs=[...ev.target.files];ev.target.value='';imAddFiles(fs)};
+
+/* ===== online AI background remover (several free AIs, automatic fallback, animation, privacy note) ===== */
+const IMAI=[
+ {host:'https://briaai-bria-rmbg-1-4.hf.space',w:3},
+ {host:'https://amirgame197-remove-background.hf.space',w:3},
+ {host:'https://kenjiedec-rembg.hf.space',w:3},
+ {host:'https://schroneko-transparent-background.hf.space',w:3},
+ {host:'https://jonny001-background-remover-c1.hf.space',w:3},
+ {host:'https://tassawar-back-ground-removal.hf.space',w:3},
+ {host:'https://not-lain-locally-compatible-bg-removal.hf.space',w:3},
+ {host:'https://chuuhtetnaing-background-remover.hf.space',w:3},
+ {host:'https://tomaseo2022-eliminar-fondo-imagen.hf.space',w:2},
+ {host:'https://briaai-bria-rmbg-2-0.hf.space',w:2},
+ {host:'https://not-lain-background-removal.hf.space',w:2},
+ {host:'https://gokaygokay-inspyrenet-rembg.hf.space',w:2},
+ {host:'https://zhengpeng7-birefnet-demo.hf.space',w:2}];
+const IMAI_FREE=[['remove.bg','https://www.remove.bg/upload'],['Adobe Express','https://www.adobe.com/express/feature/image/remove-background'],['Photopea','https://www.photopea.com/'],['Canva','https://www.canva.com/features/background-remover/'],['Clipdrop','https://clipdrop.co/remove-background']];
+(function(){if(document.getElementById('imai_css'))return;const st=document.createElement('style');st.id='imai_css';st.textContent=`
+.aiov{position:fixed;inset:0;z-index:300;background:#0a0d14b8;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:14px;animation:aiFade .2s ease-out}
+.aimd{background:var(--bg);color:var(--t);border:1px solid var(--b);border-radius:18px;width:min(540px,100%);max-height:94vh;overflow:auto;box-shadow:0 24px 70px #000a;animation:aiRise .28s cubic-bezier(.2,.9,.3,1.1)}
+.aihd{display:flex;align-items:center;gap:12px;padding:16px 18px 6px}.aiic{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#3b7cff,#7a4dff);display:grid;place-items:center;font-size:19px;color:#fff;flex:none;box-shadow:0 4px 14px #7a4dff55}
+.aihd b{display:block;font-size:15px}.aihd small{color:var(--m);font-size:12px}.aix{margin-left:auto;width:30px;height:30px;padding:0!important;border:0;background:none;border-radius:50%;font-size:15px;color:var(--m)}
+.aibd{padding:10px 18px 18px}
+.aistage{position:relative;height:250px;border-radius:14px;overflow:hidden;display:grid;place-items:center;background:repeating-conic-gradient(#d4d9e1 0 25%,#f1f3f7 0 50%) 0 0/18px 18px;border:1px solid var(--b)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .aistage{background:repeating-conic-gradient(#2a303b 0 25%,#222732 0 50%) 0 0/18px 18px}}
+:root[data-theme="dark"] .aistage{background:repeating-conic-gradient(#2a303b 0 25%,#222732 0 50%) 0 0/18px 18px}
+.aistage img{max-width:88%;max-height:88%;object-fit:contain;position:relative;z-index:1;transition:filter .4s,transform .4s}
+.aistage.work img.o{animation:aiBreath 1.8s ease-in-out infinite}
+.aistage.work::before{content:"";position:absolute;inset:-60%;background:conic-gradient(from 0deg,transparent 0 55%,#3b7cff66 70%,#7a4dffcc 85%,transparent 100%);animation:aiSpin 2.4s linear infinite;z-index:0}
+.aistage.work::after{content:"";position:absolute;inset:4px;border-radius:11px;background:color-mix(in srgb,var(--bg) 55%,transparent);backdrop-filter:blur(1.5px);z-index:0}
+.aisp{position:absolute;z-index:2;font-size:15px;color:#fff;text-shadow:0 0 10px #7a4dff,0 0 18px #3b7cff;opacity:0;animation:aiTwinkle 2s ease-in-out infinite;pointer-events:none}
+.aicmp{position:absolute;inset:0;--p:55%;contain:strict}.aibase,.aitop{position:absolute;inset:0;display:grid;place-items:center;will-change:clip-path}
+.aibase{background:color-mix(in srgb,var(--bg) 94%,transparent);clip-path:inset(0 0 0 var(--p))}.aitop{clip-path:inset(0 calc(100% - var(--p)) 0 0)}
+.aicmp img{max-width:88%;max-height:88%;object-fit:contain;transition:none!important;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.ailn{position:absolute;top:0;bottom:0;left:var(--p);width:2px;margin-left:-1px;background:#fff;box-shadow:0 0 0 1px #0003,0 0 10px #0006;z-index:3;pointer-events:none;will-change:left}
+.aikn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:#fff;color:#4a5df0;font-size:9px;display:grid;place-items:center;box-shadow:0 2px 10px #0006;letter-spacing:-1px}
+
+.aipill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border:1px solid var(--b);border-radius:20px;font-size:11.5px;background:var(--p);color:var(--m);transition:all .25s}
+.aipill.ready{color:var(--t);border-color:#1a8f3c88}.aipill.run{color:var(--t);border-color:#7a4dff;box-shadow:0 0 0 3px #7a4dff22}.aipill.ok{color:#1a8f3c;border-color:#1a8f3c}.aipill.bad,.aipill.off{opacity:.55;text-decoration:line-through}
+.aipill i{width:7px;height:7px;border-radius:50%;background:var(--m);flex:none}.aipill.ready i{background:#1a8f3c}.aipill.run i{background:#7a4dff;animation:aiPulse .8s ease-in-out infinite}.aipill.ok i{background:#1a8f3c}.aipill.bad i,.aipill.off i{background:#d92d4b}.aipill.chk i{background:#d9a400;animation:aiPulse .8s ease-in-out infinite}
+.aibar{height:5px;border-radius:5px;background:color-mix(in srgb,var(--t) 10%,transparent);overflow:hidden;margin:14px 0 8px}.aibar i{display:block;height:100%;width:40%;border-radius:5px;background:linear-gradient(90deg,#3b7cff,#7a4dff,#3b7cff);background-size:200% 100%;animation:aiSlide 1.3s ease-in-out infinite,aiShim 1.3s linear infinite}
+.aist{font-size:13px;font-weight:600;text-align:center;margin:12px 0 2px}.aisub{font-size:12px;color:var(--m);text-align:center}
+.aipv{display:flex;gap:10px;margin-top:12px;padding:11px 12px;border-radius:12px;background:color-mix(in srgb,#d9a400 11%,var(--p));border:1px solid #d9a40055;font-size:12px;line-height:1.5}.aipv .lk{font-size:18px;flex:none;line-height:1.2}
+.aipv ul{margin:4px 0 0;padding-left:16px;color:var(--m)}
+.aiact{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.aiact button{flex:1 1 auto;height:auto!important;min-height:38px;border-radius:10px;font-weight:600;padding:8px 14px}.aiact button.ghost{font-weight:500;flex:0 1 auto}
+.ailinks{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ailinks a{padding:4px 11px;border:1px solid var(--b);border-radius:20px;color:var(--a);text-decoration:none;font-size:12px;background:var(--p)}.ailinks a:hover{border-color:var(--a)}
+.aislw{width:100%;margin:12px 0 0;accent-color:#7a4dff;height:auto!important;padding:0!important;border:0!important;background:none!important}
+.aichips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}
+@keyframes aiFade{from{opacity:0}to{opacity:1}}@keyframes aiRise{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes aiSpin{to{transform:rotate(360deg)}}@keyframes aiPulse{0%,100%{opacity:.4}50%{opacity:1}}@keyframes aiBreath{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.12);transform:scale(1.03)}}
+@keyframes aiTwinkle{0%{opacity:0;transform:translateY(12px) scale(.4) rotate(0)}40%{opacity:1}100%{opacity:0;transform:translateY(-34px) scale(1.15) rotate(90deg)}}
+@keyframes aiSlide{0%{margin-left:-40%}100%{margin-left:100%}}@keyframes aiShim{to{background-position:200% 0}}
+@media(prefers-reduced-motion:reduce){.aistage.work::before,.aisp,.aibar i,.aipill i,.aistage.work img.o,.aimd,.aiov{animation:none}}
+`;document.head.appendChild(st)})();
+async function imAIOne(host,file,sig){
+ const cfg=await (await fetch(host+'/config',{signal:sig})).json(),pre=cfg.api_prefix||'',comp={};(cfg.components||[]).forEach(c=>comp[c.id]=c);
+ const ok=d=>d.api_name&&d.inputs&&d.inputs.length&&d.show_api!==false&&d.api_visibility!=='private';
+ const isImg=d=>{const c=comp[d.inputs[0]];return c&&(c.type==='image'||c.type==='file')};
+ const deps=(cfg.dependencies||[]).filter(ok),dep=deps.find(isImg)||deps.find(d=>d.inputs.length===1);
+ if(!dep)throw new Error('no api');
+ const api=String(dep.api_name).replace(/^\//,'');
+ const fd=new FormData();fd.append('files',file,file.name||'image.png');
+ const up=await (await fetch(host+pre+'/upload',{method:'POST',body:fd,signal:sig})).json();
+ if(!up||!up[0])throw new Error('upload');
+ const data=dep.inputs.map((id,i)=>{if(i===0)return{path:up[0],meta:{_type:'gradio.FileData'}};const c=comp[id],v=c&&c.props?c.props.value:null;return v===undefined?null:v});
+ const r1=await (await fetch(host+pre+'/call/'+api,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data}),signal:sig})).json();
+ if(!r1.event_id)throw new Error('call');
+ const txt=await (await fetch(host+pre+'/call/'+api+'/'+r1.event_id,{signal:sig})).text();
+ const m=txt.match(/event: complete\s*\ndata: (.*)/);if(!m)throw new Error(/event: error/.test(txt)?'err '+txt.slice(0,240):'no result');
+ const out=JSON.parse(m[1]);let url=null;
+ (function walk(o){if(!o)return;if(Array.isArray(o))o.forEach(walk);else if(typeof o==='object'){const u=o.url||(o.path?host+pre+'/file='+o.path:null);if(u)url=u;else Object.values(o).forEach(walk)}else if(typeof o==='string'&&/^https?:/.test(o))url=o})(out);
+ if(!url)throw new Error('no image');
+ const bl=await (await fetch(url,{signal:sig})).blob();
+ if(bl.size<500)throw new Error('bad image');
+ const f=new File([bl],(file.name||'image').replace(/\.\w+$/,'')+'-cutout.png',{type:'image/png'});
+ /* must really contain transparency, otherwise it is not a cut-out */
+ const bm=await createImageBitmap(f),cv=document.createElement('canvas');cv.width=Math.min(200,bm.width);cv.height=Math.min(200,bm.height);const q=cv.getContext('2d');q.drawImage(bm,0,0,cv.width,cv.height);const d=q.getImageData(0,0,cv.width,cv.height).data;let tr=0;for(let i=3;i<d.length;i+=4)if(d[i]<250)tr++;
+ if(tr<d.length/4*.01)throw new Error('no transparency');
+ return f}
+/* --- smart scheduler: learns which AIs are fast and reliable, saves it on this device, never fires them all at once --- */
+const AIH_KEY='mc_ai_rank_v2',AIH_BAK='mc_ai_rank_v2_bak',AIH_HL=36*3600*1000;
+let AIH_MEM=null;
+function aiHLoad(){if(AIH_MEM)return AIH_MEM;let d=null;for(const k of [AIH_KEY,AIH_BAK]){try{const j=JSON.parse(localStorage.getItem(k));if(j&&j.v===2&&j.h){d=j;break}}catch(e){}}
+ return AIH_MEM=d||{v:2,h:{},warm:0}}
+function aiHSave(){const d=AIH_MEM;if(!d)return;try{const t=JSON.stringify(d);localStorage.setItem(AIH_KEY,t);localStorage.setItem(AIH_BAK,t)}catch(e){}}
+addEventListener('pagehide',aiHSave);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')aiHSave()});
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+function aiRec(host){const d=aiHLoad(),now=Date.now();let r=d.h[host];if(!r)r=d.h[host]={a:0,b:0,ms:0,streak:0,cool:0,t:now,n:0};
+ const k=Math.pow(.5,(now-r.t)/AIH_HL);r.a*=k;r.b*=k;r.t=now;return r}   /* old results fade, so a recovered AI gets another chance */
+/* kind: ok (ms) | fail | quota | asleep | slow */
+function aiHNote(host,kind,ms){const r=aiRec(host),now=Date.now();r.n=(r.n||0)+1;
+ if(kind==='ok'){const sp=Math.max(.4,Math.min(1.6,1.6-ms/20000));r.a+=sp;r.streak=0;r.cool=0;r.ms=r.ms?r.ms*.6+ms*.4:ms;if(ms>30000)r.b+=.3}
+ else if(kind==='liked'){r.a+=.8;r.streak=0;r.cool=0}
+ else if(kind==='rejected'){r.b+=1.6;r.a=Math.max(0,r.a-.6)}
+ else if(kind==='slow'){r.b+=.6;r.ms=r.ms?r.ms*.7+14000*.3:14000}
+ else if(kind==='asleep'){r.b+=.5;r.streak++;r.cool=now+Math.min(45,3*Math.pow(2,Math.min(r.streak-1,4)))*60000}
+ else if(kind==='quota'){r.b+=1;r.streak++;r.cool=now+(25+Math.min(r.streak,4)*10)*60000}
+ else{r.b+=1.5;r.streak++;r.cool=now+Math.min(60,4*Math.pow(2,Math.min(r.streak-1,4)))*60000}
+ aiHSave()}
+function aiScore(a,force){const r=aiRec(a.host),now=Date.now();if(!force&&r.cool>now)return null;
+ const bayes=(r.a+1.5)/(r.a+r.b+2.5),speed=r.ms?Math.max(0,1-r.ms/30000):.45,explore=.8/Math.sqrt(1+r.a+r.b);
+ return a.w*.6+bayes*3+speed*1.2+explore-Math.min(r.streak,4)*.7+Math.random()*.35}
+function aiRank(force){return IMAI.map(a=>({a,s:aiScore(a,force)})).filter(x=>x.s!=null).sort((x,y)=>y.s-x.s).map(x=>x.a)}
+async function imAIProbe(a,sig){const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),5000),t0=performance.now();if(sig)sig.addEventListener('abort',()=>ac.abort());
+ try{const r=await fetch(a.host+'/config',{signal:ac.signal});if(!r.ok)throw 0;const c=await r.json();if(!c||!c.dependencies)throw 0;clearTimeout(tm);return performance.now()-t0}catch(e){clearTimeout(tm);return null}}
+/* --- self-updating list: asks Hugging Face which background-removal demos are RUNNING right now (no picture is sent) --- */
+const AID_KEY='mc_ai_disc_v1',aiHostOf=id=>'https://'+id.toLowerCase().replace(/[\/_.]/g,'-')+'.hf.space';
+function aiAddHosts(list){list.forEach(id=>{const h=aiHostOf(id);if(!IMAI.some(a=>a.host===h))IMAI.push({host:h,w:1.6,disc:1})})}
+try{const c=JSON.parse(localStorage.getItem(AID_KEY));if(c&&c.ids)aiAddHosts(c.ids)}catch(e){}
+async function aiDiscover(){let c=null;try{c=JSON.parse(localStorage.getItem(AID_KEY))}catch(e){}
+ if(c&&Date.now()-c.t<6*3600*1000)return;
+ try{const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),7000);
+  const qs=['remove%20background','background%20removal','rmbg'];
+  const res=await Promise.all(qs.map(q=>fetch('https://huggingface.co/api/spaces?search='+q+'&sort=likes&direction=-1&limit=40&expand[]=runtime&expand[]=sdk&expand[]=likes',{signal:ac.signal}).then(r=>r.ok?r.json():[]).catch(()=>[])));clearTimeout(tm);
+  const bad=/anime|video|lama|arena|3d|face|sticker|portrait|upscal|inpaint|webgpu|-web|sam\d|tracker|matte|edit|clone|replace|swap|generat/i,seen={};const ids=[];
+  res.flat().forEach(x=>{if(!x||!x.id||seen[x.id])return;seen[x.id]=1;const st=x.runtime&&x.runtime.stage;if(x.sdk==='gradio'&&st==='RUNNING'&&(x.likes||0)>=40&&!bad.test(x.id)&&/remov|rmbg|backg|bg|matting|rembg|cutout|segment/i.test(x.id))ids.push(x.id)});
+  if(ids.length){const top=ids.slice(0,12);localStorage.setItem(AID_KEY,JSON.stringify({t:Date.now(),ids:top}));aiAddHosts(top)}
+ }catch(e){}}
+window.aiReport=()=>{const d=aiHLoad();console.table(IMAI.map(a=>{const r=d.h[a.host]||{};return{host:a.host.replace('https://','').replace('.hf.space',''),ok:+(r.a||0).toFixed(1),fail:+(r.b||0).toFixed(1),ms:Math.round(r.ms||0),cooldownMin:Math.max(0,Math.round(((r.cool||0)-Date.now())/60000)),discovered:!!a.disc}}))};
+/* while the person reads the confirmation, quietly ping the best few AIs (no picture is sent, no quota used) so the ranking is fresh */
+async function aiWarm(){const d=aiHLoad(),now=Date.now();if(now-(d.warm||0)<90000)return;d.warm=now;try{await aiDiscover()}catch(e){}
+ const list=aiRank(true).slice(0,6);
+ await Promise.all(list.map(async a=>{const t=await imAIProbe(a);const r=aiRec(a.host);if(t==null){r.b+=.3;r.cool=Math.max(r.cool,Date.now()+3*60000)}else{r.ms=r.ms?r.ms*.85+Math.min(t*3,20000)*.15:0||r.ms;if(r.cool&&r.cool>Date.now())r.cool=0}}));aiHSave()}
+function imAIRemove(file,say,cancelled,force,exclude){return new Promise(resolve=>{
+ const ex=exclude||[];let queue=aiRank(force).filter(a=>!ex.includes(a.host));if(!queue.length)queue=aiRank(true).filter(a=>!ex.includes(a.host));if(!queue.length)queue=aiRank(true);
+ const MAX=2,HEDGE=10000,master=new AbortController(),run={};let active=0,finished=false,tried=0;
+ const finish=(v,winner)=>{if(finished)return;finished=true;clearInterval(poll);
+  Object.keys(run).forEach(h=>{if(h!==winner&&run[h]&&Date.now()-run[h]>HEDGE)aiHNote(h,'slow')});   /* it was beaten and was slow: rank goes down */
+  master.abort();resolve(v)};
+ const start=()=>{if(finished||!queue.length||active>=MAX)return false;const a=queue.shift(),t0=Date.now();active++;tried++;
+  (async()=>{try{
+    if(await imAIProbe(a,master.signal)==null){if(!finished)aiHNote(a.host,'asleep');throw 0}   /* asleep: costs nothing, skip at once */
+    if(finished)return;say('Processing your picture…');run[a.host]=Date.now();
+    const ac=new AbortController();master.signal.addEventListener('abort',()=>ac.abort());const tm=setTimeout(()=>ac.abort(),75000);
+    try{const f=await imAIOne(a.host,file,ac.signal);clearTimeout(tm);if(finished)return;aiHNote(a.host,'ok',Date.now()-t0);f.aiHost=a.host;finish(f,a.host)}
+    catch(e){clearTimeout(tm);delete run[a.host];if(!finished)aiHNote(a.host,/quota|exceeded|GPU|limit/i.test(String(e&&e.message))?'quota':'fail');throw 0}
+   }catch(e){}finally{active--;if(!finished){if(!start()&&active===0)finish(null)}}})();return true};
+ const t0=Date.now();const poll=setInterval(()=>{if(cancelled())return finish(null);if(Date.now()-t0>110000)return finish(null);
+  if(active>0&&active<MAX&&(Date.now()-t0)/HEDGE>=tried&&queue.length){say('Taking a little longer – speeding things up…');start()}},700);
+ say('Finding the fastest server…');start()})}
+function imAIFlow(file,r){return new Promise(res=>{
+ const ov=document.createElement('div');ov.className='aiov';
+ const origUrl=URL.createObjectURL(file);let outUrl=null,outFile=null,dead=false;const rejected=[];
+ const done=v=>{dead=true;URL.revokeObjectURL(origUrl);if(outUrl)URL.revokeObjectURL(outUrl);ov.remove();res(v)};
+ const E=(h)=>{const d=document.createElement('div');d.innerHTML=h;return d.firstElementChild};
+ const md=E('<div class="aimd" role="dialog" aria-modal="true"><div class="aihd"><div class="aiic">✨</div><div><b id="aiT">Remove background</b><small id="aiS"></small></div><button class="aix" title="Close">✕</button></div><div class="aibd"><div class="aistage" id="aiG"><img class="o" id="aiO"></div><div id="aiB"></div></div></div>');
+ ov.appendChild(md);document.body.appendChild(ov);
+ const $q=x=>md.querySelector(x),stage=$q('#aiG'),body=$q('#aiB'),T=$q('#aiT'),S=$q('#aiS');$q('#aiO').src=origUrl;$q('.aix').onclick=()=>done('skip');
+ const pick=document.createElement('input');pick.type='file';pick.accept='image/*';pick.hidden=true;md.appendChild(pick);
+ pick.onchange=()=>{const f=pick.files[0];if(f){done('skip');setTimeout(()=>imAddFiles([f]),0)}};
+ const acts=list=>{const w=document.createElement('div');w.className='aiact';list.forEach(([t,cls,fn])=>{const b=document.createElement('button');b.textContent=t;if(cls)b.className=cls;b.onclick=fn;w.appendChild(b)});return w};
+ const sparkles=()=>{[...stage.querySelectorAll('.aisp')].forEach(x=>x.remove());for(let i=0;i<7;i++){const sp=document.createElement('span');sp.className='aisp';sp.textContent=i%2?'✦':'✧';sp.style.left=(10+Math.random()*78)+'%';sp.style.top=(35+Math.random()*50)+'%';sp.style.animationDelay=(i*.28)+'s';sp.style.fontSize=(11+Math.random()*10)+'px';stage.appendChild(sp)}};
+ /* ---------- step 1: ask before anything is uploaded ---------- */
+ function confirmStep(){try{aiWarm()}catch(e){}T.textContent='Remove background';S.textContent='Your picture has not been sent anywhere yet';
+  stage.className='aistage';[...stage.querySelectorAll('.aisp,.aicmp')].forEach(x=>x.remove());stage.querySelector('#aiO').style.display='';
+  body.innerHTML='<div class="aipv"><div class="lk">🔒</div><div><b>Before we start – where does your picture go?</b><ul><li>It is <b>uploaded</b> to free public AI demos on <b>Hugging Face</b> (Hugging Face, Inc., USA), run by independent community authors.</li><li>It is processed on their servers, outside this app. I cannot see or control how long they keep it.</li><li>Please do not use private, confidential or personal photos.</li></ul></div></div>';
+  body.appendChild(acts([['✓ I agree – remove the background','pri',()=>run()],['Use built-in remover (stays on my device)','',()=>done('orig')],['Cancel','ghost',()=>done('skip')]]))}
+ /* ---------- step 2: working ---------- */
+ async function run(force,bad){if(bad){aiHNote(bad,'rejected');if(!rejected.includes(bad))rejected.push(bad)}T.textContent='Removing background…';S.textContent='Free online AI · please wait';stage.className='aistage work';sparkles();stage.querySelector('#aiO').style.display='';stage.querySelector('#aiO').style.filter='';
+  body.innerHTML='<div class="aist" id="aiSt">Finding the fastest server…</div><div class="aibar"><i></i></div><div class="aisub">Your picture is being processed on Hugging Face. This usually takes a few seconds.</div>';
+  body.appendChild(acts([['Cancel','ghost',()=>done('skip')]]));
+  const f=await imAIRemove(file,m=>{const t=$q('#aiSt');if(t)t.textContent=m},()=>dead,force===true,rejected);
+  if(dead)return;if(!f)return fail();
+  outFile=f;if(outUrl)URL.revokeObjectURL(outUrl);outUrl=URL.createObjectURL(f);showResult()}
+ /* ---------- step 3: result with before / after slider ---------- */
+ function showResult(){T.textContent='Background removed';S.textContent='Drag the slider to compare';stage.className='aistage';[...stage.querySelectorAll('.aisp')].forEach(x=>x.remove());
+  stage.querySelector('#aiO').style.display='none';
+  const cmp=E('<div class="aicmp" style="--p:55%"><div class="aibase"><img src="'+origUrl+'" draggable="false"></div><div class="aitop"><img src="'+outUrl+'" draggable="false"></div><div class="ailn"><span class="aikn">◀ ▶</span></div></div>');
+  stage.appendChild(cmp);stage.style.touchAction='none';stage.style.cursor='ew-resize';
+  const rg=E('<input class="aislw" type="range" min="0" max="100" step="0.1" value="55" aria-label="Compare before and after">');
+  let want=55;const setP=v=>{want=Math.max(0,Math.min(100,+v||0));cmp.style.setProperty('--p',want+'%');if(+rg.value!==want)rg.value=want};
+  const fromX=x=>{const r=stage.getBoundingClientRect();setP((x-r.left)/r.width*100)};
+  let drag=false;stage.onpointerdown=e=>{drag=true;try{stage.setPointerCapture(e.pointerId)}catch(x){}fromX(e.clientX);e.preventDefault()};
+  stage.onpointermove=e=>{if(drag)fromX(e.clientX)};stage.onpointerup=stage.onpointercancel=()=>{drag=false};
+  ['input','change','pointermove'].forEach(ev=>rg.addEventListener(ev,()=>setP(rg.value)));
+  body.innerHTML='';body.appendChild(rg);body.appendChild(E('<div class="aisub" style="margin-top:4px">Drag on the picture or the slider · Left: background removed · Right: original</div>'));
+  body.appendChild(acts([['✓ Use this cut-out','pri',()=>{if(outFile&&outFile.aiHost)aiHNote(outFile.aiHost,'liked');done(outFile)}],['↻ Try again (different AI)','',()=>run(false,outFile&&outFile.aiHost)],['Use original','ghost',()=>{if(outFile&&outFile.aiHost)aiHNote(outFile.aiHost,'rejected');done('orig')}],['Cancel','ghost',()=>done('skip')]]))}
+ /* ---------- failure ---------- */
+ function fail(){T.textContent='Oops!';S.textContent='Could not reach a free AI right now';stage.className='aistage';[...stage.querySelectorAll('.aisp')].forEach(x=>x.remove());stage.querySelector('#aiO').style.filter='grayscale(1) opacity(.55)';
+  body.innerHTML='<div class="aist">😕 The free AI services are busy right now</div><div class="aisub">They are free community services. Try again in a moment, or remove the background with a free online tool, then <b>paste (Ctrl+V) or drop</b> the finished picture here.</div><div class="ailinks">'+IMAI_FREE.map(x=>'<a href="'+x[1]+'" target="_blank" rel="noopener">'+x[0]+' ↗</a>').join('')+'</div>';
+  body.appendChild(acts([['↻ Try again','pri',()=>run(true)],['Choose another picture','',()=>pick.click()],['Use built-in remover','ghost',()=>done('orig')],['Cancel','ghost',()=>done('skip')]]))}
+ confirmStep()})}
+/* drag & drop + paste */
+(function(){const isImg=dt=>!!dt&&([...(dt.items||[])].some(i=>i.kind==='file'&&(!i.type||/^image\//.test(i.type)))||[...(dt.files||[])].some(f=>/^image\//.test(f.type)));
+ const imgFiles=dt=>[...(dt&&dt.files||[])].filter(f=>/^image\//.test(f.type)||/\.(png|jpe?g|webp|gif|bmp|avif)$/i.test(f.name));
+ const zone=document.createElement('div');zone.id='im_drop';zone.style.cssText='margin:8px 0;padding:14px 10px;border:2px dashed var(--b);border-radius:10px;text-align:center;color:var(--m);font-size:12px;cursor:pointer;transition:border-color .15s,background .15s';
+ zone.innerHTML='<b style="color:var(--t)">Drop a picture anywhere on this page</b>, click here to browse, or press <b style="color:var(--t)">Ctrl+V</b> to paste.<br>Backgrounds are removed online by AI and shown in a preview first.';
+ const row=$('im_add').parentNode;row.parentNode.insertBefore(zone,row);zone.onclick=()=>$('im_file').click();
+ const hi=on=>{zone.style.borderColor=on?'var(--a)':'var(--b)';zone.style.background=on?'color-mix(in srgb,var(--a) 10%,transparent)':''};
+ let dc=0;
+ window.addEventListener('dragenter',e=>{if(isImg(e.dataTransfer)){e.preventDefault();dc++;hi(true)}},true);
+ window.addEventListener('dragover',e=>{if(isImg(e.dataTransfer)){e.preventDefault();e.dataTransfer.dropEffect='copy'}},true);
+ window.addEventListener('dragleave',e=>{if(dc>0&&--dc===0)hi(false)},true);
+ window.addEventListener('drop',e=>{dc=0;hi(false);const fs=imgFiles(e.dataTransfer);if(fs.length){e.preventDefault();e.stopPropagation();try{const tb=document.querySelector('.tabs button[data-p="shapes"]');if(tb&&!tb.classList.contains('on'))tb.click()}catch(x){}imAddFiles(fs)}},true);
+ window.addEventListener('paste',e=>{const t=e.target;if(t&&/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)&&!/^(color|checkbox|range|button)$/.test(t.type||''))return;
+  const cd=e.clipboardData;let fs=imgFiles(cd);if(!fs.length&&cd&&cd.items)fs=[...cd.items].filter(i=>i.kind==='file'&&/^image\//.test(i.type)).map(i=>i.getAsFile()).filter(Boolean);
+  if(fs.length){e.preventDefault();e.stopPropagation();try{const tb=document.querySelector('.tabs button[data-p="shapes"]');if(tb&&!tb.classList.contains('on'))tb.click()}catch(x){}imAddFiles(fs.map((f,i)=>new File([f],'pasted-'+Date.now()+'-'+i+'.png',{type:f.type||'image/png'})))}},true);
+ const pane=$('im_add').closest('.pane')||document;
+const hp=pane.querySelector('.blk p.mut');
+ const pp=[...pane.querySelectorAll('p.mut')].find(x=>/transparent-background PNG/.test(x.textContent));if(pp)pp.innerHTML='Drag &amp; drop, paste (Ctrl+V) or add a picture. If it has a background, a free online AI removes it and you see a <b>preview</b> before it is used. If the online remover is busy, paste a <b>transparent PNG</b> or a picture with a plain background. Pictures keep their <b>real colours</b> and stand up from the plate.'})();
+
 ['im_x','im_z','im_w','im_r','im_t','im_c','im_same','im_cw','im_mode','im_k','im_st','im_tol','im_fill','im_flat','im_bs','im_sw','im_sd','im_sa','im_sh'].forEach(i=>{const f=ev=>{const e=imEl(imSel);if(!e)return;if(ev&&ev.target){const tid=ev.target.id;if(tid==='im_c'){if($('im_mode').value==='orig')$('im_mode').value='one';if($('im_mode').value==='one')$('im_same').checked=false}else if(tid==='im_same'&&$('im_same').checked&&$('im_mode').value!=='one')$('im_mode').value='one'}const wch=!!(ev&&ev.target&&(ev.target.id==='im_w'||ev.target.id==='im_ws')),ob=wch?imBox(e):null;e.x=num('im_x',e.x);e.z=-num('im_z',-e.z);{const nw=Math.max(1,num('im_w',e.w));if(ev&&ev.target&&ev.target.id==='im_w'&&Math.abs(nw-e.w)>1e-9)e.ys=(e.ys||1)*e.w/nw;e.w=nw}e.rot=num('im_r',e.rot);e.t=Math.max(.2,num('im_t',e.t));e.col=$('im_c').value;e.same=$('im_same').checked;e.cw=$('im_cw').checked;e.mode=$('im_mode').value;e.k=Math.max(2,Math.min(16,Math.round(num('im_k',e.k||8))));e.st=Math.max(0,num('im_st',e.st==null?.3:e.st));e.tol=Math.max(5,Math.min(120,num('im_tol',e.tol==null?40:e.tol)));e.fill=$('im_fill').checked;e.sh=$('im_sh').value==='1';e.flat=$('im_flat').checked;e.bs=$('im_bs').value;e.sw=shOv('im_sw');e.sd=shOv('im_sd');e.sa=Math.min(150,Math.max(20,parseFloat($('im_sa').value)||60));$('im_bd').style.display=e.bs==='custom'?'':'none';imDis(e);
 if(ev&&ev.target&&ev.target.id==='im_bs'&&e.bs==='custom'&&!(e.cs&&e.cs.length>2))csOpen('pic');if(wch&&ob){imAnchor(e,ob);$('im_x').value=+e.x.toFixed(2);$('im_z').value=+(-e.z).toFixed(2)}imSyncSl(e);pvQuick(e);txSched()};if(i==='im_k'||i==='im_tol'||i==='im_st'){let tm=0;$(i).addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(()=>f(),600)});$(i).addEventListener('change',()=>{clearTimeout(tm);f()})}else{$(i).addEventListener('input',f);$(i).addEventListener('change',f)}});
 $('im_del').onclick=()=>{const i=TXIM.findIndex(e=>e.id===imSel);if(i<0)return;TXIM.splice(i,1);imSel=TXIM.length?TXIM[Math.max(0,i-1)].id:null;imRefresh();txSched(30)};
@@ -6139,7 +6342,7 @@ window.V70={TYPES,program,gearFix,fitTo,poseDeg,motions,get steps(){return STEPS
 <script>
 try{/* ===== Colour assistant v7: suggestions, picture colour editor, filament library, strict toggle, Bambu export ===== */
 (function(){
-const FC=window.FC={strict:false,ver:0,custom:[]};
+const FC=window.FC={strict:true,ver:0,custom:[]};
 const BI=[['Neutrals',[['Jade White','#FFFFFF'],['Ivory','#F4EFE2'],['Light Gray','#C8C9C9'],['Silver','#A6A9AA'],['Gray','#8E9089'],['Dark Gray','#545454'],['Black','#000000']]],
 ['Warm',[['Red','#C12E1F'],['Orange','#FF6A13'],['Sunflower','#FEC600'],['Yellow','#F4EE2A'],['Gold','#E4BD68']]],
 ['Greens',[['Lime','#A3D95B'],['Bambu Green','#00AE42'],['Mistletoe','#3F8E43'],['Dark Green','#1F5E3B']]],
@@ -6166,7 +6369,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 /* picture colour override: e.cm = [[detectedHex, newHex],...] (matched by nearest so it survives a change of colour count) */
 window.fcMap=function(en,hex){const cm=en&&en.cm;if(!cm||!cm.length)return hex;for(const x of cm)if(x[0]===hex)return x[1];let bd=1e9,bt=hex;const a=rgb(hex);for(const x of cm){const b=rgb(x[0]),d=(a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2;if(d<bd){bd=d;bt=x[1]}}return bd<700?bt:hex};
 /* export: strict = exact colours; otherwise near-identical colours share one filament (max 16 slots) */
-window.fcExport=function(C){if(FC.strict)return C;const cnt=new Map();C.forEach(h=>cnt.set(h,(cnt.get(h)||0)+1));const list=[...cnt.keys()].sort((a,b)=>cnt.get(b)-cnt.get(a)),rep=new Map(),reps=[];
+window.fcExport=function(C){if(FC.strict&&new Set(C).size<=16)return C;const cnt=new Map();C.forEach(h=>cnt.set(h,(cnt.get(h)||0)+1));const list=[...cnt.keys()].sort((a,b)=>cnt.get(b)-cnt.get(a)),rep=new Map(),reps=[];
 list.forEach(h=>{const r=reps.find(q=>dE(q,h)<8);if(r!==undefined)rep.set(h,r);else{reps.push(h);rep.set(h,h)}});
 while(reps.length>16){let bi=0,bj=1,bd=1e9;for(let i=0;i<reps.length;i++)for(let j=i+1;j<reps.length;j++){const d=dE(reps[i],reps[j]);if(d<bd){bd=d;bi=i;bj=j}}const gone=reps[bj];reps.splice(bj,1);rep.forEach((v,k)=>{if(v===gone)rep.set(k,reps[bi])})}
 return C.map(h=>rep.get(h))};
@@ -6174,15 +6377,38 @@ return C.map(h=>rep.get(h))};
 window.mf3b=async function(){const{t,c}=trisC(),E=new TextEncoder(),cm=new Map(),cols=[],G=[];
 for(let i=0;i<t.length;i+=3){const h=c[i/3];let ci=cm.get(h);if(ci===undefined){ci=cols.length;cm.set(h,ci);cols.push(h);G.push([])}G[ci].push(i)}
 if(!cols.length)return mf3();
-const hx=h=>h.toString(16).padStart(6,'0').toUpperCase(),P0=2,A=P0+cols.length;
+const hx=h=>h.toString(16).padStart(6,'0').toUpperCase(),P0=2,A=P0+cols.length,N=cols.length;
 const parts=G.map((ids,ci)=>{const idx=new Map(),vs=[],tr=[];ids.forEach(i=>{const q=[0,1,2].map(k=>{const p=t[i+k],key=Math.round(p[0]*1e4)+','+Math.round(p[1]*1e4)+','+Math.round(p[2]*1e4);let j=idx.get(key);if(j===undefined){j=vs.length;idx.set(key,j);vs.push(p)}return j});if(q[0]===q[1]||q[1]===q[2]||q[0]===q[2])return;tr.push(`<triangle v1="${q[0]}" v2="${q[1]}" v3="${q[2]}"/>`)});
 return`<object id="${P0+ci}" type="model" pid="1" pindex="${ci}"><mesh><vertices>`+vs.map(p=>`<vertex x="${p[0].toFixed(4)}" y="${p[1].toFixed(4)}" z="${p[2].toFixed(4)}"/>`).join('')+'</vertices><triangles>'+tr.join('')+'</triangles></mesh></object>'});
-const model='<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:BambuStudio="http://schemas.bambulab.com/package/2021"><metadata name="Application">MiniCAD</metadata><metadata name="BambuStudio:3mfVersion">1</metadata><resources><basematerials id="1">'+cols.map((h,i)=>`<base name="Filament ${i+1}" displaycolor="#${hx(h)}FF"/>`).join('')+'</basematerials>'+parts.join('')+`<object id="${A}" type="model"><components>`+cols.map((h,i)=>`<component objectid="${P0+i}"/>`).join('')+`</components></object></resources><build><item objectid="${A}" printable="1"/></build></model>`;
+const model='<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><metadata name="Application">MiniCAD</metadata><metadata name="Title">MiniCAD design</metadata><resources><basematerials id="1">'+cols.map((h,i)=>`<base name="Filament ${i+1} #${hx(h)}" displaycolor="#${hx(h)}FF"/>`).join('')+'</basematerials>'+parts.join('')+`<object id="${A}" type="model"><components>`+cols.map((h,i)=>`<component objectid="${P0+i}"/>`).join('')+`</components></object></resources><build><item objectid="${A}" printable="1"/></build></model>`;
 const ms='<?xml version="1.0" encoding="UTF-8"?><config><object id="'+A+'"><metadata key="name" value="MiniCAD design"/><metadata key="extruder" value="1"/>'+cols.map((h,i)=>`<part id="${P0+i}" subtype="normal_part"><metadata key="name" value="Filament ${i+1} #${hx(h)}"/><metadata key="matrix" value="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"/><metadata key="extruder" value="${i+1}"/></part>`).join('')+`</object><plate><metadata key="plater_id" value="1"/><metadata key="plater_name" value=""/><metadata key="locked" value="false"/><model_instance><metadata key="object_id" value="${A}"/><metadata key="instance_id" value="0"/></model_instance></plate></config>`;
-const ps=JSON.stringify({filament_colour:cols.map(h=>'#'+hx(h)),filament_type:cols.map(()=>'PLA')},null,1);
+/* every per-filament list has exactly one entry per colour, so Bambu Studio / Orca create the right number of filaments with the exact colours */
+const rp=(v)=>cols.map(()=>v),ps=JSON.stringify({version:'1.9.0.0',from:'project',name:'project_settings',filament_colour:cols.map(h=>'#'+hx(h)),filament_type:rp('PLA'),filament_vendor:rp('Generic'),filament_settings_id:rp('Generic PLA'),filament_diameter:rp('1.75'),filament_density:rp('1.24'),filament_cost:rp('20'),filament_flow_ratio:rp('0.98'),nozzle_temperature:rp('220'),nozzle_temperature_initial_layer:rp('220'),filament_is_support:rp('0')},null,1);
 const z=zip([{name:'[Content_Types].xml',data:E.encode('<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/><Default Extension="config" ContentType="text/xml"/></Types>')},{name:'_rels/.rels',data:E.encode('<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>')},{name:'3D/3dmodel.model',data:E.encode(model)},{name:'Metadata/model_settings.config',data:E.encode(ms)},{name:'Metadata/project_settings.config',data:E.encode(ps)}]);
 return new Uint8Array(await z.arrayBuffer())};
-
+/* Standard 3MF with Materials-extension <m:colorgroup> (one exact colour per triangle). Bambu Studio opens this with its "Standard 3MF Color Parsing" window, where "Append" adds your exact colours as new filaments */
+window.mf3c=async function(){const{t,c}=trisC(),E=new TextEncoder(),idx=new Map(),vs=[],cm=new Map(),cols=[],tr=[];
+for(let i=0;i<t.length;i+=3){const ids=[0,1,2].map(k=>{const p=t[i+k],key=Math.round(p[0]*1e4)+','+Math.round(p[1]*1e4)+','+Math.round(p[2]*1e4);let j=idx.get(key);if(j===undefined){j=vs.length;idx.set(key,j);vs.push(p)}return j});if(ids[0]===ids[1]||ids[1]===ids[2]||ids[0]===ids[2])continue;
+ const h=c[i/3];let ci=cm.get(h);if(ci===undefined){ci=cols.length;cm.set(h,ci);cols.push(h)}tr.push(`<triangle v1="${ids[0]}" v2="${ids[1]}" v3="${ids[2]}" pid="1" p1="${ci}"/>`)}
+const hx=h=>h.toString(16).padStart(6,'0').toUpperCase();
+const model='<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:m="http://schemas.microsoft.com/3dmanufacturing/material/2015/02"><metadata name="Application">MiniCAD</metadata><resources><m:colorgroup id="1">'+cols.map(h=>`<m:color color="#${hx(h)}FF"/>`).join('')+'</m:colorgroup><object id="2" type="model" pid="1" pindex="0"><mesh><vertices>'+vs.map(p=>`<vertex x="${p[0].toFixed(4)}" y="${p[1].toFixed(4)}" z="${p[2].toFixed(4)}"/>`).join('')+'</vertices><triangles>'+tr.join('')+'</triangles></mesh></object></resources><build><item objectid="2"/></build></model>';
+const z=zip([{name:'[Content_Types].xml',data:E.encode('<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/></Types>')},{name:'_rels/.rels',data:E.encode('<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>')},{name:'3D/3dmodel.model',data:E.encode(model)}]);
+return new Uint8Array(await z.arrayBuffer())};
+/* PrusaSlicer / SuperSlicer / OrcaSlicer style 3MF: one object, one volume per colour, each volume bound to its own extruder, plus the colour list */
+window.mf3p=async function(){const{t,c}=trisC(),E=new TextEncoder(),cm=new Map(),cols=[],G=[];
+for(let i=0;i<t.length;i+=3){const h=c[i/3];let ci=cm.get(h);if(ci===undefined){ci=cols.length;cm.set(h,ci);cols.push(h);G.push([])}G[ci].push(i)}
+if(!cols.length)return mf3();
+const hx=h=>h.toString(16).padStart(6,'0').toUpperCase(),idx=new Map(),vs=[],tr=[],vol=[];
+G.forEach((ids,ci)=>{const first=tr.length;ids.forEach(i=>{const q=[0,1,2].map(k=>{const p=t[i+k],key=Math.round(p[0]*1e4)+','+Math.round(p[1]*1e4)+','+Math.round(p[2]*1e4);let j=idx.get(key);if(j===undefined){j=vs.length;idx.set(key,j);vs.push(p)}return j});if(q[0]===q[1]||q[1]===q[2]||q[0]===q[2])return;tr.push(`<triangle v1="${q[0]}" v2="${q[1]}" v3="${q[2]}"/>`)});if(tr.length>first)vol.push({ci,first,last:tr.length-1})});
+const model='<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:slic3rpe="http://schemas.slic3r.org/3mf/2017/06"><metadata name="slic3rpe:Version3mf">1</metadata><metadata name="Application">MiniCAD</metadata><resources><object id="1" type="model"><mesh><vertices>'+vs.map(p=>`<vertex x="${p[0].toFixed(4)}" y="${p[1].toFixed(4)}" z="${p[2].toFixed(4)}"/>`).join('')+'</vertices><triangles>'+tr.join('')+'</triangles></mesh></object></resources><build><item objectid="1" transform="1 0 0 0 1 0 0 0 1 0 0 0" printable="1"/></build></model>';
+const cfg='<?xml version="1.0" encoding="UTF-8"?>\n<config>\n <object id="1" instances_count="1">\n  <metadata type="object" key="name" value="MiniCAD design"/>\n  <metadata type="object" key="extruder" value="1"/>\n'+vol.map(v=>`  <volume firstid="${v.first}" lastid="${v.last}">\n   <metadata type="volume" key="name" value="Colour ${v.ci+1} #${hx(cols[v.ci])}"/>\n   <metadata type="volume" key="volume_type" value="ModelPart"/>\n   <metadata type="volume" key="matrix" value="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"/>\n   <metadata type="volume" key="extruder" value="${v.ci+1}"/>\n  </volume>\n`).join('')+' </object>\n</config>\n';
+const cl=cols.map(h=>'"#'+hx(h)+'"').join(';'),pc='; extruder_colour = '+cl+'\n; filament_colour = '+cl+'\n; filament_type = '+cols.map(()=>'"PLA"').join(';')+'\n';
+const z=zip([{name:'[Content_Types].xml',data:E.encode('<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/><Default Extension="config" ContentType="text/xml"/></Types>')},{name:'_rels/.rels',data:E.encode('<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>')},{name:'3D/3dmodel.model',data:E.encode(model)},{name:'Metadata/Slic3r_PE_model.config',data:E.encode(cfg)},{name:'Metadata/Slic3r_PE.config',data:E.encode(pc)}]);
+return new Uint8Array(await z.arrayBuffer())};
+/* PLY with one exact colour per triangle (Blender, MeshLab, many viewers) + a plain list of the colours / filament slots */
+window.plyC=function(){const{t,c}=trisC(),n=t.length/3;let s='ply\nformat ascii 1.0\ncomment MiniCAD export (mm, Z up)\nelement vertex '+t.length+'\nproperty float x\nproperty float y\nproperty float z\nelement face '+n+'\nproperty list uchar int vertex_indices\nproperty uchar red\nproperty uchar green\nproperty uchar blue\nend_header\n';
+t.forEach(v=>s+=v[0].toFixed(4)+' '+v[1].toFixed(4)+' '+v[2].toFixed(4)+'\n');for(let i=0;i<n;i++){const h=c[i];s+='3 '+3*i+' '+(3*i+1)+' '+(3*i+2)+' '+((h>>16)&255)+' '+((h>>8)&255)+' '+(h&255)+'\n'}return new TextEncoder().encode(s)};
+window.colTxt=function(){const{c}=trisC(),cols=[...new Set(c)],hx=h=>'#'+h.toString(16).padStart(6,'0').toUpperCase();return new TextEncoder().encode('Colours in this design (same order as the filament slots in design-bambu.3mf and design-prusa.3mf):\n'+cols.map((h,i)=>'Colour '+(i+1)+': '+hx(h)+'  (RGB '+((h>>16)&255)+', '+((h>>8)&255)+', '+(h&255)+')').join('\n')+'\n')};
 
 if(typeof document==='undefined'||!document.getElementById('fc_pic'))return;
 const PICSIG=()=>TXIM.map(e=>e.id+e.mode+(e.sh?'S':'F')+e.k+(e.fill?1:0)+(e.cw?1:0)+e.tol+(e.mode==='one'?e.col:'')+JSON.stringify(e.cm||0)).join(';');
@@ -6258,8 +6484,8 @@ const mt=$('fc_mt');mt.innerHTML='';if(ml.length){const b=el('button','fcmb','Ma
 /* ---------- strict toggle + filament library ---------- */
 function libRender(){const box=$('fc_libchips');box.innerHTML='';FC.lib().forEach(f=>{const b=el('button','fcsw');b.type='button';b.style.background=f.hex;b.title=f.name+' '+f.hex.toUpperCase()+(f.builtin?'':' (yours – tap to remove)');if(!f.builtin)b.onclick=()=>{FC.custom=FC.custom.filter(x=>x!==f);saveLib();libRender()};box.appendChild(b)})}
 $('fc_add').onclick=()=>{const h=$('fc_nc').value.toLowerCase();if(!FC.custom.some(f=>f.hex===h))FC.custom.unshift({name:($('fc_nn').value.trim()||h).slice(0,24),hex:h,n:h2n(h),builtin:false});$('fc_nn').value='';saveLib();libRender()};
-function strictTxt(){$('fc_strict_t').textContent=FC.strict?'On: every colour is kept exactly as you picked it – nothing is merged. Only use this if you own those exact filaments.':'Off: when you export, very close shades are merged into one filament so Bambu Studio and other slicers show a short, clean filament list.'}
-$('fc_strict').checked=false;$('fc_strict').addEventListener('change',()=>{FC.strict=$('fc_strict').checked;FC.ver++;strictTxt();$('fc_needout').innerHTML='';picRender(true)});
+function strictTxt(){$('fc_strict_t').textContent=FC.strict?'On (recommended): every colour is exported exactly as you picked it – nothing is merged or changed. Only if the design has more than 16 different colours (the limit of Bambu Studio and other slicers) the closest ones are joined.':'Off: when you export, very close shades are merged into one filament so Bambu Studio and other slicers show a short, clean filament list.'}
+$('fc_strict').checked=true;$('fc_strict').addEventListener('change',()=>{FC.strict=$('fc_strict').checked;FC.ver++;strictTxt();$('fc_needout').innerHTML='';picRender(true)});
 $('fc_need').onclick=()=>{const out=$('fc_needout');let c;try{c=trisC().c}catch(e){c=[]}const cnt=[...new Set(c)];if(!cnt.length){out.textContent='Nothing in the design yet.';return}
 out.innerHTML='<div class="fcn">'+cnt.length+' filament'+(cnt.length>1?'s':'')+' needed'+(cnt.length>16?' – <span class="fcwarn">more than 16, Bambu Studio only has 16 slots</span>':'')+':</div>'+cnt.map((h,i)=>{const nn=nearest(h,1)[0];return'<div class="fcr"><span style="width:22px">'+(i+1)+'</span><span class="fcdot" style="background:'+n2h(h)+'"></span><span style="flex:1">'+n2h(h).toUpperCase()+' · '+esc(nn.f.name)+'</span></div>'}).join('')};
 libRender();strictTxt();
