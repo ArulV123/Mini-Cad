@@ -143,7 +143,7 @@ button.fctab{white-space:nowrap!important;font-size:11px!important;padding:0 2px
 .fcrow>button{white-space:nowrap!important;flex:none}
 .fcrow .fcrt small{line-height:1.35}
 </style><style>.fcrt b{display:block;white-space:nowrap}.fcxh{display:block!important;margin:1px 0 0!important}</style>
-<style>#fc_pic #fc_chips{max-height:230px;overflow-y:auto;overscroll-behavior:contain;padding-right:2px}#fc_pic .fcrow{padding-top:5px;padding-bottom:5px}#fc_pic .fcrow .fcbar{height:4px}#fc_pic{max-height:none}<style>/* colour panel: full list (no clipped scroll box), text wraps instead of running under buttons */
+<style>#fc_pic #fc_chips{max-height:230px;overflow-y:auto;overscroll-behavior:contain;padding-right:2px}#fc_pic .fcrow{padding-top:5px;padding-bottom:5px}#fc_pic .fcrow .fcbar{height:4px}#fc_pic{max-height:none}/* colour panel: full list (no clipped scroll box), text wraps instead of running under buttons */
 #fc_pic #fc_chips{max-height:none!important;overflow:visible!important;padding-right:0}
 #fc_pic .fcrow,.fcrow{flex-wrap:wrap;align-items:center;row-gap:6px;position:relative}
 .fcrt{flex:1 1 120px;min-width:0}
@@ -152,7 +152,25 @@ button.fctab{white-space:nowrap!important;font-size:11px!important;padding:0 2px
 #fc_pic .fcpk,#fc_pic .fcrow+*{position:relative;clear:both}
 #fc_pic button.fcmb{display:block;width:100%;margin-top:10px;white-space:normal;line-height:1.3;position:relative}
 button.fcdc small{max-width:70px}
-</style></head><body><div id="ld" style="position:fixed;inset:0;z-index:99998;background:var(--bg,#e8ebf0);color:#1b2330;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font:14px system-ui;transition:opacity .12s"><div style="width:38px;height:38px;border:4px solid #0002;border-top-color:#3b7cff;border-radius:50%;animation:ldspin .8s linear infinite"></div><div id="ldt">Loading project…</div></div><style>@keyframes ldspin{to{transform:rotate(360deg)}}@media(prefers-color-scheme:dark){#ld{background:#1d222a!important;color:#e6e9ef!important}}</style><script>window.__mcHideLd=function(){var e=document.getElementById("ld");if(e){e.style.opacity=0;setTimeout(function(){e.remove()},130)}};setTimeout(window.__mcHideLd,15000)</script><div id="veil" class="on"></div>
+</style><style id="fcfix">
+/* colour picker: never clipped, never overlapping */
+#fc_pic #fc_chips{display:block!important;max-height:none!important;overflow:visible!important;padding:0!important}
+#fc_pic .fcrow{flex:none!important;position:relative;z-index:0}
+#fc_pic #fc_ed{position:static!important;display:block;width:100%;clear:both;margin:8px 0 12px!important}
+#fc_pic #fc_ed[style*="display: none"],#fc_pic #fc_ed[style*="display:none"]{display:none!important}
+.fcpk{position:relative!important;z-index:1;overflow:visible!important;max-height:none!important;clear:both;flex:none}
+#fc_pic .fcbd,.fcpk .fcbd{max-height:none!important;overflow:visible!important}
+.fcpk .fctabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;position:relative}
+.fcpk button.fctab{display:block;min-width:0!important;width:100%!important;max-width:100%;margin:0!important;padding:0 4px!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap!important;text-align:center;line-height:28px;position:relative;flex:none}
+.fcpk .fcsec,.fcpk .fcgr,.fcpk .fccu,.fcpk .fcgrid,.fcpk .fcdw{min-width:0;max-width:100%;box-sizing:border-box}
+.fcpk .fcsec{position:relative;display:flow-root}
+.fcpk .fcdw button.fcdc{flex:none;max-width:100%}
+.fcpk .fccu .fcr{flex-wrap:wrap}
+.fcpk .fccu .fcnm{min-width:90px}
+#fc_pic button.fcmb{position:relative;z-index:0;margin-top:12px}
+#fc_mt{clear:both;position:relative}
+</style>
+</head><body><div id="ld" style="position:fixed;inset:0;z-index:99998;background:var(--bg,#e8ebf0);color:#1b2330;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font:14px system-ui;transition:opacity .12s"><div style="width:38px;height:38px;border:4px solid #0002;border-top-color:#3b7cff;border-radius:50%;animation:ldspin .8s linear infinite"></div><div id="ldt">Loading project…</div></div><style>@keyframes ldspin{to{transform:rotate(360deg)}}@media(prefers-color-scheme:dark){#ld{background:#1d222a!important;color:#e6e9ef!important}}</style><script>window.__mcHideLd=function(){var e=document.getElementById("ld");if(e){e.style.opacity=0;setTimeout(function(){e.remove()},130)}};setTimeout(window.__mcHideLd,15000)</script><div id="veil" class="on"></div>
 <div id="app">
 <header><button id="bk" title="Back to projects">← Back</button><svg style="width:42px;height:42px;flex:none;margin:0 4px 0 2px;filter:drop-shadow(0 3px 8px #3b7cff66)" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lgd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b7cff"/><stop offset="1" stop-color="#7a4dff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#lgd)"/><path d="M32 8 55 21.5v21L32 56 9 42.5v-21z" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="1.2"/><path d="M32 12 52 23.5 32 35 12 23.5z" fill="#fff"/><path d="M12 23.5 32 35v21L12 44.5z" fill="#fff" fill-opacity=".6"/><path d="M52 23.5 32 35v21l20-11.5z" fill="#fff" fill-opacity=".32"/><g transform="translate(32 23.5) scale(1 .577)"><path d="M9.23 -1.78L11.91 -1.44L11.91 1.44L9.23 1.78L8.52 3.98L10.49 5.83L8.79 8.17L6.42 6.87L4.55 8.23L5.05 10.88L2.31 11.78L1.15 9.33L-1.15 9.33L-2.31 11.78L-5.05 10.88L-4.55 8.23L-6.42 6.87L-8.79 8.17L-10.49 5.83L-8.52 3.98L-9.23 1.78L-11.91 1.44L-11.91 -1.44L-9.23 -1.78L-8.52 -3.98L-10.49 -5.83L-8.79 -8.17L-6.42 -6.87L-4.55 -8.23L-5.05 -10.88L-2.31 -11.78L-1.15 -9.33L1.15 -9.33L2.31 -11.78L5.05 -10.88L4.55 -8.23L6.42 -6.87L8.79 -8.17L10.49 -5.83L8.52 -3.98Z" fill="#4a5df0"/><circle r="4.4" fill="#fff"/><circle r="1.8" fill="#4a5df0"/></g><path d="M32 35v21" stroke="#fff" stroke-opacity=".5"/></svg><span class="logo" style="font-weight:300;font-size:28px;letter-spacing:-.01em">Mini<b style="font-weight:800">CAD</b></span><span id="pj"></span><button id="sv" class="pri" title="Save (Ctrl+S)">Save</button><span class="sep"></span>
 <button id="imp">Import model</button><input type="file" id="file" accept=".stl,.obj" hidden>
@@ -885,7 +903,22 @@ function txPhotoLike(R,G,B,V,w,h){const f=Math.max(1,Math.floor(Math.max(w,h)/26
  for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){let n=0,r=0,g=0,b=0;for(let dy=0;dy<f;dy++)for(let dx=0;dx<f;dx++){const q=(y*f+dy)*w+x*f+dx;if(V[q]){n++;r+=R[q];g+=G[q];b+=B[q]}}const o=y*bw+x;if(n===f*f){ok[o]=1;a[o*3]=r/n;a[o*3+1]=g/n;a[o*3+2]=b/n}}
  let tot=0,mid=0;for(let y=0;y<bh;y++)for(let x=0;x<bw-1;x++){const o=y*bw+x;if(!ok[o]||!ok[o+1])continue;tot++;const d=Math.abs(a[o*3]-a[o*3+3])+Math.abs(a[o*3+1]-a[o*3+4])+Math.abs(a[o*3+2]-a[o*3+5]);if(d>6&&d<45)mid++}
  return tot>500&&mid/tot>.25}
-function txImgQuant(en){const c=TXIMG[en.id],{w,h,dat}=c,K=Math.max(2,Math.min(16,(en.k|0)||8)),mono=en.mode==='mono',key='q5|'+K+(en.sh?'s':'f')+'|'+(en.cw?'w'+txTol(en):'n')+(en.fill?'f':'')+(mono?'m'+en.col:'');if(c.outs[key])return c.outs[key];
+const txCellB=(en,c)=>Math.round(Math.log(Math.max(3,.8*c.w/en.w))/Math.log(1.25));
+/* finds smooth colour ramps: places where the colour changes a lot over a distance but with no hard edge in between. Returns a pixel mask (same indexing as the arrays) or null when the picture has no real blends */
+function txGradMask(R,G,B,V,HO,w,h){const f=Math.max(1,Math.floor(Math.max(w,h)/160)),bw=Math.floor(w/f),bh=Math.floor(h/f);if(bw<24||bh<24)return null;const n=bw*bh,a=new Float32Array(n*3),ok=new Uint8Array(n);let nok=0;
+ for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){let r=0,g=0,b=0,m=0;for(let dy=0;dy<f;dy++)for(let dx=0;dx<f;dx++){const q=(y*f+dy)*w+x*f+dx;if(V[q]&&!HO[q]){m++;r+=R[q];g+=G[q];b+=B[q]}}if(m===f*f){const o=y*bw+x;ok[o]=1;nok++;a[o*3]=r/m;a[o*3+1]=g/m;a[o*3+2]=b/m}}
+ if(nok<400)return null;const ed=new Uint8Array(n),df=(p,q)=>Math.abs(a[p*3]-a[q*3])+Math.abs(a[p*3+1]-a[q*3+1])+Math.abs(a[p*3+2]-a[q*3+2]);
+ for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){const o=y*bw+x;if(!ok[o])continue;if(x<bw-1&&ok[o+1]&&df(o,o+1)>=24){ed[o]=ed[o+1]=1}if(y<bh-1&&ok[o+bw]&&df(o,o+bw)>=24){ed[o]=ed[o+bw]=1}}
+ const rd=6,hE=new Uint8Array(n),hMn=new Float32Array(n*3).fill(1e9),hMx=new Float32Array(n*3).fill(-1e9);
+ for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){const o=y*bw+x;for(let dx=-rd;dx<=rd;dx++){const X=x+dx;if(X<0||X>=bw)continue;const p=y*bw+X;if(!ok[p])continue;if(ed[p])hE[o]=1;for(let k=0;k<3;k++){const v=a[p*3+k];if(v<hMn[o*3+k])hMn[o*3+k]=v;if(v>hMx[o*3+k])hMx[o*3+k]=v}}}
+ const rp=new Uint8Array(n);let nr=0;
+ for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){const o=y*bw+x;if(!ok[o])continue;let e=0,mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9];for(let dy=-rd;dy<=rd;dy++){const Y=y+dy;if(Y<0||Y>=bh)continue;const p=Y*bw+x;if(hE[p])e=1;for(let k=0;k<3;k++){if(hMn[p*3+k]<mn[k])mn[k]=hMn[p*3+k];if(hMx[p*3+k]>mx[k])mx[k]=hMx[p*3+k]}}
+  if(!e&&Math.max(mx[0]-mn[0],mx[1]-mn[1],mx[2]-mn[2])>=30){rp[o]=1;nr++}}
+ if(nr<40||nr<nok*.03)return null;
+ const dl=new Uint8Array(n);for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){if(!rp[y*bw+x])continue;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const X=x+dx,Y=y+dy;if(X>=0&&Y>=0&&X<bw&&Y<bh)dl[Y*bw+X]=1}}
+ const m=new Uint8Array(w*h);let cnt=0;for(let y=0;y<h;y++)for(let i=0;i<w;i++){const bx=Math.min(bw-1,i/f|0),by=Math.min(bh-1,y/f|0);if(dl[by*bw+bx]&&ok[by*bw+bx]){m[y*w+i]=1;cnt++}}
+ return cnt?{m,n:cnt}:null}
+function txImgQuant(en){const c=TXIMG[en.id],{w,h,dat}=c,K=Math.max(2,Math.min(16,(en.k|0)||8)),mono=en.mode==='mono',bk='q5|'+K+(en.sh?'s':'f')+'|'+(en.cw?'w'+txTol(en):'n')+(en.fill?'f':'')+(mono?'m'+en.col:'');let key=bk+((c.gdf&&c.gdf[bk])?'|c'+txCellB(en,c):'');if(c.outs[key])return c.outs[key];
 const vis=txImgVis(en),bgm=en.cw?txImgBg(c,txTol(en)):null,N0=w*h,hole=q=>en.fill&&!(dat[q*4+3]>127&&!(bgm&&bgm[q])),rg=o=>mono?(g=>[g,g,g])(dat[o]*.299+dat[o+1]*.587+dat[o+2]*.114):[dat[o],dat[o+1],dat[o+2]];
 /* y-up arrays: index yi=y*w+i */
 const V=new Uint8Array(N0),HO=new Uint8Array(N0),R=new Float32Array(N0),G=new Float32Array(N0),B=new Float32Array(N0);let nv=0;
@@ -896,7 +929,7 @@ for(let y=0;y<h;y++)for(let i=0;i<w;i++){const yi=y*w+i;if(!V[yi])continue;let e
 const TRN=new Uint8Array(N0);for(let y=0;y<h;y++)for(let i=0;i<w;i++){const yi=y*w+i;if(!V[yi]||GR[yi]<17&&!isE[yi])continue;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const X=i+dx,Y=y+dy;if(X>=0&&Y>=0&&X<w&&Y<h)TRN[Y*w+X]=1}}
 /* colour samples: flat interior pixels only (no anti-aliased blends, no halo) */
 let src0=[];const pick=f=>{const a=[];for(let q=0;q<N0;q++)if(f(q))a.push(q);return a};
-src0=pick(q=>V[q]&&!HO[q]&&!TRN[q]);const photo=nv>3000&&txPhotoLike(R,G,B,V,w,h);
+src0=pick(q=>V[q]&&!HO[q]&&!TRN[q]);const GD=nv>3000&&!mono?txGradMask(R,G,B,V,HO,w,h):null,photo=nv>3000&&(txPhotoLike(R,G,B,V,w,h)||!!GD);
 if(photo){/* PHOTO CLEAN-UP before picking colours: (1) edge-preserving smoothing flattens grain and shading blotches inside a colour but never crosses a real edge, (2) a small unsharp pass makes edges and small lettering crisp again */
  const TR=new Float32Array(N0),CH=[R,G,B],OUT=CH.map(()=>new Float32Array(N0)),sg=2*22*22,sw=[];for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)sw.push([dx,dy,Math.exp(-(dx*dx+dy*dy)/(2*1.6*1.6))]);
  for(let y=0;y<h;y++)for(let i=0;i<w;i++){const q=y*w+i;if(!V[q]||HO[q]){OUT[0][q]=R[q];OUT[1][q]=G[q];OUT[2][q]=B[q];continue}let a0=0,a1=0,a2=0,ws=0;
@@ -968,6 +1001,17 @@ grow();
   while(st.length){const q=st.pop(),x=q%w;const t=[x>0?q-1:-1,x<w-1?q+1:-1,q>=w?q-w:-1,q<N0-w?q+w:-1];for(const n of t){if(n>=0&&V[n]&&!seen[n]&&LB[n]===l){seen[n]=1;st.push(n);cp.push(n)}}}
   if(cp.length<minPx){let a0=1e9,a1=-1,b0=1e9,b1=-1;cp.forEach(q=>{const x=q%w,y=(q-x)/w;if(x<a0)a0=x;if(x>a1)a1=x;if(y<b0)b0=y;if(y>b1)b1=y});if(Math.max(a1-a0,b1-b0)<4){cut=true;cp.forEach(q=>LB[q]=-2)}}}
  if(cut){for(let q=0;q<N0;q++)if(LB[q]===-2)LB[q]=-1;grow()}}
+if(GD){/* BLENDS: a smooth gradient cannot be printed as soft colour, so the two palette colours that make up each spot are mixed as evenly spaced dots (ordered dither). Dot size is never smaller than 0.8 mm and the share of each colour follows the picture, so the blend still reads as a blend */
+ const dgS=en.w/c.w,dgC=Math.max(3,Math.round(.8/dgS)),dgs=Math.max(dgC,Math.ceil(Math.sqrt(GD.n/3000))),dgx=Math.ceil(w/dgs),dgy=Math.ceil(h/dgs),dgA=new Float32Array(dgx*dgy*4),dgB=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+ for(let y=0;y<h;y++)for(let i=0;i<w;i++){const q=y*w+i;if(!GD.m[q]||!V[q]||HO[q])continue;const o=((y/dgs|0)*dgx+(i/dgs|0))*4;dgA[o]+=R[q];dgA[o+1]+=G[q];dgA[o+2]+=B[q];dgA[o+3]++}
+ const dgL=new Int16Array(dgx*dgy).fill(-1);
+ for(let cy=0;cy<dgy;cy++)for(let cx=0;cx<dgx;cx++){const o=(cy*dgx+cx)*4,n=dgA[o+3];if(n<dgs*dgs*.25)continue;const p=[dgA[o]/n,dgA[o+1]/n,dgA[o+2]/n];let bj=-1,bk=-1,bt=0,br=1e12;
+  for(let a=0;a<KK;a++){const ca=C[a],r1=(p[0]-ca[0])**2+(p[1]-ca[1])**2+(p[2]-ca[2])**2;if(r1<br){br=r1;bj=a;bk=-1;bt=0}
+   for(let b=a+1;b<KK;b++){const cb=C[b],ab=[cb[0]-ca[0],cb[1]-ca[1],cb[2]-ca[2]],L2=ab[0]*ab[0]+ab[1]*ab[1]+ab[2]*ab[2]||1;let t=((p[0]-ca[0])*ab[0]+(p[1]-ca[1])*ab[1]+(p[2]-ca[2])*ab[2])/L2;t=t<0?0:t>1?1:t;
+    const r2=(p[0]-ca[0]-t*ab[0])**2+(p[1]-ca[1]-t*ab[1])**2+(p[2]-ca[2]-t*ab[2])**2+150;if(r2<br*.8){br=r2;bj=a;bk=b;bt=t}}}
+  if(bj<0)continue;if(bk<0||br>2600){dgL[cy*dgx+cx]=bj;continue}
+  dgL[cy*dgx+cx]=bt<.12?bj:bt>.88?bk:(bt>(dgB[cy&3][cx&3]+.5)/16?bk:bj)}
+ for(let y=0;y<h;y++)for(let i=0;i<w;i++){const q=y*w+i;if(!GD.m[q]||!V[q]||HO[q])continue;const l=dgL[(y/dgs|0)*dgx+(i/dgs|0)];if(l>=0){LB[q]=l;PRI[q]=-1}}}
 if(en.sh&&!mono){const n0=C.length,rs=Math.max(4,Math.round(Math.max(w,h)/38)),T=new Float32Array(N0);
  for(let j=0;j<n0;j++){const idx=[];for(let q=0;q<N0;q++)if(LB[q]===j)idx.push(q);if(idx.length<Math.max(600,nv*.03)||Math.max(C[j][0],C[j][1],C[j][2])-Math.min(C[j][0],C[j][1],C[j][2])<60)continue;
   const m=new Float32Array(N0),l=new Float32Array(N0);let mm=0,ml=0,mc=0;idx.forEach(q=>{if(!HO[q]){m[q]=1;l[q]=R[q]*.299+G[q]*.587+B[q]*.114;ml+=l[q];mc++}});if(mc<300)continue;ml/=mc;
@@ -991,7 +1035,7 @@ const AF=new Float32Array(NN);txUpF(txVW(c,vis),w,h,U,AF);txBlur(AF,W,H,Math.max
 const layers=[];
 for(let j=0;j<KK;j++){const f=Bu[j];if(!f)continue;const E=TM;for(let n=0;n<NN;n++){const D=f[n]-(bi[n]===j?sec[n]:best[n])+.08,Aa=AF[n]-.5;E[n]=D<Aa?D:Aa}
 const outs=txLoopsS(txTraceF(E,W,H,0),U,.35,.25);if(outs.length)layers.push({hex:mono?txMonoHex(C[j][0],en.col):(Math.round(C[j][0])<<16)|(Math.round(C[j][1])<<8)|Math.round(C[j][2]),area:area[j],outs})}
-layers.sort((a,b)=>b.area-a.area);return c.outs[key]=layers}
+layers.sort((a,b)=>b.area-a.area);if(GD){(c.gdf=c.gdf||{})[bk]=1;key=bk+'|c'+txCellB(en,c)}return c.outs[key]=layers}
 function txImgXf(en,c){const sc=en.w/c.w,r=(en.rot||0)*Math.PI/180,co=Math.cos(r),si=Math.sin(r);return q=>q.map(a=>{const X=(a[0]-c.w/2)*sc,Z=-(a[1]-c.h/2)*sc*(en.ys||1);return{x:X*co-Z*si+en.x,z:X*si+Z*co+en.z}})}
 function txImgPolys(en){const outs=txImgOuts(en),c=TXIMG[en.id];if(!outs||!outs.length)return null;const cv=txImgXf(en,c);return outs.map(o=>({p:cv(o.p),h:o.h.map(cv)}))}
 function txImgLayers(en){const c=TXIMG[en.id];if(!c||en.mode==='one')return null;const Ls=txImgQuant(en);if(!Ls.length)return null;const cv=txImgXf(en,c);return Ls.map(l=>({hex:(window.fcMap?fcMap(en,l.hex):l.hex),polys:l.outs.map(o=>({p:cv(o.p),h:o.h.map(cv)}))}))}
@@ -1135,8 +1179,22 @@ function partFiles(){const out=[];if(!window.V70||!V70.asmOf)return out;objs.for
   const bb=new THREE.Box3();T.forEach(v=>bb.expandByPoint(v));const cx=(bb.min.x+bb.max.x)/2,cz=(bb.min.z+bb.max.z)/2;
   out.push({name:base+' - '+(pn[r]||r)+'.stl',data:stlOf(T.map(v=>[v.x-cx,-(v.z-cz),v.y-bb.min.y]))})})});window._pfn=out.map(f=>f.name);return out}
 let dls=null;if(window.claude)claude.use('downloads').then(d=>dls=d).catch(()=>{});
-$('exp').onclick=async()=>{if(!objs.length){hint.textContent='Nothing to export yet.';return}const pf=partFiles(),m3=await mf3(),oc=objC(),z=zip([{name:'design.3mf',data:m3},{name:'design-bambu.3mf',data:await mf3c()},{name:'design-parts.3mf',data:await mf3b()},{name:'design-prusa.3mf',data:await mf3p()},{name:'design.ply',data:plyC()},{name:'colours.txt',data:colTxt()},{name:'design.obj',data:oc.o},{name:'design.mtl',data:oc.m},{name:'design.stl',data:stl()}].concat(pf));
-try{if(dls)await dls.save({filename:'minicad-design.zip',data:z});else{const a=document.createElement('a');a.href=URL.createObjectURL(z);a.download='minicad-design.zip';a.click()}hint.textContent='Exported zip with your exact colours. Bambu Studio: open design-bambu.3mf, press OK on the "not from Bambu Lab" note, and in the colour window choose Append (colours = the number in colours.txt) so your exact colours become new filaments. Also inside: design-parts.3mf (one part per colour), design-prusa.3mf (PrusaSlicer / SuperSlicer / Orca), design.3mf (Cura, 3D Builder, Windows), design.obj + design.mtl, design.ply, colours.txt (your colours) and design.stl (no colour) (mm, Z-up)'+(pf.length?' plus each printed piece on its own: '+pf.map(f=>f.name).join(', '):'')+'. Holes are excluded.'}
+window.EXPCOL=true;
+/* plain geometry-only 3MF (no colour, no materials) for the "without colour" export */
+async function mf3n(){const t=tris(),E=new TextEncoder(),idx=new Map(),vs=[],tr=[];
+for(let i=0;i<t.length;i+=3){const ids=[0,1,2].map(k=>{const p=t[i+k],key=Math.round(p[0]*1e4)+','+Math.round(p[1]*1e4)+','+Math.round(p[2]*1e4);let j=idx.get(key);if(j===undefined){j=vs.length;idx.set(key,j);vs.push(p)}return j});if(ids[0]===ids[1]||ids[1]===ids[2]||ids[0]===ids[2])continue;tr.push(`<triangle v1="${ids[0]}" v2="${ids[1]}" v3="${ids[2]}"/>`)}
+const model='<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><metadata name="Application">MiniCAD</metadata><resources><object id="1" type="model"><mesh><vertices>'+vs.map(p=>`<vertex x="${p[0].toFixed(4)}" y="${p[1].toFixed(4)}" z="${p[2].toFixed(4)}"/>`).join('')+'</vertices><triangles>'+tr.join('')+'</triangles></mesh></object></resources><build><item objectid="1"/></build></model>';
+const z=zip([{name:'[Content_Types].xml',data:E.encode('<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/></Types>')},{name:'_rels/.rels',data:E.encode('<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>')},{name:'3D/3dmodel.model',data:E.encode(model)}]);
+return new Uint8Array(await z.arrayBuffer())}
+$('exp').onclick=async()=>{if(!objs.length){hint.textContent='Nothing to export yet.';return}const col=window.EXPCOL!==false,pf=partFiles();let files,msg,zn;
+if(col){const m3=await mf3(),oc=objC(),nc=new Set(trisC().c).size;zn='minicad-design-colour.zip';
+files=[{name:'design-bambu.3mf',data:await mf3c()},{name:'design-parts.3mf',data:await mf3b()},{name:'design-prusa.3mf',data:await mf3p()},{name:'design.3mf',data:m3},{name:'design.obj',data:oc.o},{name:'design.mtl',data:oc.m},{name:'design.ply',data:plyC()},{name:'colours.txt',data:colTxt()}];
+msg='WITH COLOUR – '+nc+' exact colour'+(nc>1?'s':'')+', nothing merged or changed (hex values are listed in colours.txt). Bambu Studio: open design-bambu.3mf (Standard 3MF), in the "Standard 3MF Color Parsing" window set the number of colours to '+nc+' and press Append so your exact colours become new filaments'+(nc>32?' (Bambu Studio reads at most 32 colours in that window)':'')+'. OrcaSlicer / Bambu Studio part-per-colour: design-parts.3mf. PrusaSlicer / SuperSlicer: design-prusa.3mf. Cura, 3D Builder, Windows: design.3mf. Blender / MeshLab / others: design.obj + design.mtl or design.ply (mm, Z-up)'}
+else{zn='minicad-design-no-colour.zip';files=[{name:'design.stl',data:stl()},{name:'design-no-colour.3mf',data:await mf3n()},{name:'design-no-colour.obj',data:obj()}];
+msg='WITHOUT COLOUR – plain geometry: design.stl (every slicer), design-no-colour.3mf and design-no-colour.obj (mm, Z-up)'}
+msg+=(pf.length?' plus each printed piece on its own: '+pf.map(f=>f.name).join(', '):'')+'. Holes are excluded.';window._expMsg=msg;
+const z=zip(files.concat(pf));
+try{if(dls)await dls.save({filename:zn,data:z});else{const a=document.createElement('a');a.href=URL.createObjectURL(z);a.download=zn;a.click()}hint.textContent='Exported '+msg}
 catch(e){hint.textContent=e&&e.code==='declined'?'Export cancelled.':'Export is not available in this view.'}};
 function tab(n){n=({parts:'shapes',text:'shapes',cut:'era',wheels:'gears'})[n]||n;document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===n));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='p-'+n));try{if(n!=='era'&&['erase','cutr','cutc'].includes(tool))setTool('select')}catch(e){}}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>tab(b.dataset.p));
@@ -1645,19 +1703,19 @@ const inc=c=>{const k=kindOf(c);return k==='w'?EXC.w:k==='m'?EXC.m:true};
 function expDlg(){return new Promise(res=>{let nW=0,nM=0;objs.forEach(o=>o.traverse(c=>{const u=c.userData||{};if(u.isWheel&&!(c.parent&&c.parent.userData&&c.parent.userData.isWheel))nW++;if(u.hw)nM++}));
 const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;z-index:99';
 const opt=a=>a.map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
-d.innerHTML=`<div style="background:var(--bg);color:var(--t);border:1px solid var(--b);border-radius:10px;padding:16px;width:min(400px,92vw);font:13px system-ui;line-height:1.5"><h3 style="margin:0 0 6px;font-size:15px">Send to print – do you need wheels?</h3>
+d.innerHTML=`<div style="background:var(--bg);color:var(--t);border:1px solid var(--b);border-radius:10px;padding:16px;width:min(400px,92vw);font:13px system-ui;line-height:1.5"><h3 style="margin:0 0 6px;font-size:15px">Export – wheels &amp; colour</h3>
  <label style="display:block;margin:6px 0"><input type="checkbox" id="xw" ${nW?'checked':'disabled'} style="height:auto"> Include the <b>${nW}</b> wheel(s) in my design</label>
  <div style="margin:6px 0">Extra wheels to print: <input id="xn" type="number" min="0" max="12" value="0" style="width:52px"> <select id="xt">${opt(Object.keys(WT).map(k=>[k,WT[k].n]))}</select></div>
  <div style="margin:6px 0">Hub for the extra wheels: <select id="xh">${opt(HUBS)}</select></div>
  <label style="display:block;margin:6px 0"><input type="checkbox" id="xm" ${nM?'':'disabled'} style="height:auto"> Include ${nM} motor / servo reference model(s) <span class="mut">(normally bought, not printed)</span></label>
- <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button id="xc">Cancel</button><button class="pri" id="xo">Export</button></div></div>`;
+ <div class="mut" style="margin:8px 0 0;font-size:12px"><b>With colour</b>: your exact colours for Bambu Studio, OrcaSlicer, PrusaSlicer, Cura and others (nothing merged). <b>Without colour</b>: plain geometry (STL / 3MF / OBJ).</div><div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:10px"><button id="xc">Cancel</button><button id="xn0">Export without colour</button><button class="pri" id="xo">Export with colour</button></div></div>`;
 document.body.appendChild(d);const q=i=>d.querySelector('#'+i),done=v=>{d.remove();res(v)};q('xc').onclick=()=>done(null);
-q('xo').onclick=()=>done({w:q('xw').checked,m:q('xm').checked,n:Math.max(0,Math.min(12,+q('xn').value|0)),t:q('xt').value,h:q('xh').value})})}
+const rd=c=>done({c,w:q('xw').checked,m:q('xm').checked,n:Math.max(0,Math.min(12,+q('xn').value|0)),t:q('xt').value,h:q('xh').value});q('xo').onclick=()=>rd(true);q('xn0').onclick=()=>rd(false)})}
 const _exp=$('exp').onclick;
-$('exp').onclick=async()=>{if(!objs.length){_exp();return}const r=await expDlg();if(!r)return;EXC.w=r.w;EXC.m=r.m;const ex=[];let x=-1e9;objs.forEach(o=>{x=Math.max(x,bbx(o).max.x)});x+=15;
+$('exp').onclick=async()=>{if(!objs.length){_exp();return}const r=await expDlg();if(!r)return;EXC.w=r.w;EXC.m=r.m;window.EXPCOL=r.c;const ex=[];let x=-1e9;objs.forEach(o=>{x=Math.max(x,bbx(o).max.x)});x+=15;
 for(let i=0;i<r.n;i++){const g=mkWheel({t:r.t,hub:r.h,bore:5});g.userData.isWheel=1;g.userData.extra=1;const D=WT[r.t].D;g.position.set(x+D/2,r.h==='stub'?TT.SL:0,0);x+=D+6;S.add(g);objs.push(g);ex.push(g)}
 try{await _exp()}finally{ex.forEach(g=>{S.remove(g);const i=objs.indexOf(g);if(i>=0)objs.splice(i,1)});EXC.w=true;EXC.m=false}
-hint.textContent='Exported'+(r.w||r.n?' with wheels':' without wheels')+(r.m?' and motor models':'')+'. Holes are excluded. Colours are stored in design.3mf and design.obj/.mtl (STL has no colour).'+(window._pfn&&window._pfn.length?' Each joint piece is also in the zip as its own STL, ready to print: '+window._pfn.join(', ')+'.':'')};
+if(!/^Export (cancelled|is not)/.test(hint.textContent))hint.textContent='Exported'+(r.w||r.n?' with wheels':' without wheels')+(r.m?' and motor models':'')+'. '+(window._expMsg||'')};
 $('gsv').onclick=()=>{const g=sel.find(isG);if(!g){hint.textContent='Select a gear first.';return}const k=$('gsk').value,s=SV[k],op=gp(g),rr=op.m*op.N/2-1.25*op.m;
 if(rr-(s.rM+.12)<1.3){hint.textContent='Gear too small for the '+s.nm+' spline – use more teeth or a bigger module.';return}
 commit();objs.filter(o=>o.userData.motor&&o.userData.link===g).forEach(killObj);
@@ -2052,19 +2110,57 @@ const IMAI=[
  {host:'https://zhengpeng7-birefnet-demo.hf.space',w:2}];
 const IMAI_FREE=[['remove.bg','https://www.remove.bg/upload'],['Adobe Express','https://www.adobe.com/express/feature/image/remove-background'],['Photopea','https://www.photopea.com/'],['Canva','https://www.canva.com/features/background-remover/'],['Clipdrop','https://clipdrop.co/remove-background']];
 (function(){if(document.getElementById('imai_css'))return;const st=document.createElement('style');st.id='imai_css';st.textContent=`
-.aiov{position:fixed;inset:0;z-index:300;background:#0a0d14b8;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:14px;animation:aiFade .2s ease-out}
-.aimd{background:var(--bg);color:var(--t);border:1px solid var(--b);border-radius:18px;width:min(540px,100%);max-height:94vh;overflow:auto;box-shadow:0 24px 70px #000a;animation:aiRise .28s cubic-bezier(.2,.9,.3,1.1)}
-.aihd{display:flex;align-items:center;gap:12px;padding:16px 18px 6px}.aiic{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#3b7cff,#7a4dff);display:grid;place-items:center;font-size:19px;color:#fff;flex:none;box-shadow:0 4px 14px #7a4dff55}
+.aiov{position:fixed;inset:0;z-index:300;background:#0a0d14b8;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:14px;animation:aiFade .3s ease}
+.aimd{background:var(--bg);color:var(--t);border:1px solid var(--b);border-radius:18px;width:min(540px,100%);max-height:94vh;overflow:auto;box-shadow:0 24px 70px #000a;animation:aiRise .45s cubic-bezier(.16,1,.3,1)}
+.aihd{display:flex;align-items:center;gap:12px;padding:16px 18px 6px}.aiic{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#3b7cff,#5a5cf0);display:grid;place-items:center;color:#fff;flex:none;box-shadow:0 2px 10px #3b7cff44}
 .aihd b{display:block;font-size:15px}.aihd small{color:var(--m);font-size:12px}.aix{margin-left:auto;width:30px;height:30px;padding:0!important;border:0;background:none;border-radius:50%;font-size:15px;color:var(--m)}
 .aibd{padding:10px 18px 18px}
 .aistage{position:relative;height:250px;border-radius:14px;overflow:hidden;display:grid;place-items:center;background:repeating-conic-gradient(#d4d9e1 0 25%,#f1f3f7 0 50%) 0 0/18px 18px;border:1px solid var(--b)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .aistage{background:repeating-conic-gradient(#2a303b 0 25%,#222732 0 50%) 0 0/18px 18px}}
 :root[data-theme="dark"] .aistage{background:repeating-conic-gradient(#2a303b 0 25%,#222732 0 50%) 0 0/18px 18px}
-.aistage img{max-width:88%;max-height:88%;object-fit:contain;position:relative;z-index:1;transition:filter .4s,transform .4s}
-.aistage.work img.o{animation:aiBreath 1.8s ease-in-out infinite}
-.aistage.work::before{content:"";position:absolute;inset:-60%;background:conic-gradient(from 0deg,transparent 0 55%,#3b7cff66 70%,#7a4dffcc 85%,transparent 100%);animation:aiSpin 2.4s linear infinite;z-index:0}
-.aistage.work::after{content:"";position:absolute;inset:4px;border-radius:11px;background:color-mix(in srgb,var(--bg) 55%,transparent);backdrop-filter:blur(1.5px);z-index:0}
-.aisp{position:absolute;z-index:2;font-size:15px;color:#fff;text-shadow:0 0 10px #7a4dff,0 0 18px #3b7cff;opacity:0;animation:aiTwinkle 2s ease-in-out infinite;pointer-events:none}
+.aistage img{max-width:88%;max-height:88%;object-fit:contain;position:relative;z-index:1;transition:filter .7s ease,transform .7s ease}
+.aistage.work img.o{filter:brightness(.88) saturate(.8)}
+.aistage::before{content:"";position:absolute;inset:0;z-index:0;opacity:0;transition:opacity .6s ease;background:radial-gradient(120% 90% at 50% 50%,transparent 35%,#0a0d1466 100%),linear-gradient(180deg,#3b7cff14,#7a4dff24);pointer-events:none}
+.aistage.work::before{opacity:1}
+.aifx{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden;animation:aiFade .6s ease backwards;transition:opacity .6s ease}
+.aifx.out{opacity:0}
+.fxedge{position:absolute;inset:0;box-shadow:inset 0 0 46px 0 #5b7cff59;animation:aiBreathe 3s ease-in-out infinite}
+@keyframes aiBreathe{0%,100%{opacity:.3}50%{opacity:.85}}
+.fxdots{position:absolute;inset:0;background-image:radial-gradient(#a9c0ff66 1px,transparent 1.3px);background-size:16px 16px;-webkit-mask:radial-gradient(ellipse at 50% 50%,#000 15%,transparent 75%);mask:radial-gradient(ellipse at 50% 50%,#000 15%,transparent 75%);opacity:.55}
+.fxbox{position:absolute;left:6%;top:6%;width:88%;height:88%}
+.fxcm{position:absolute;width:12px;height:12px;border:0 solid #d6e4ffd9;animation:aiFade .9s ease backwards .25s}
+.fxcm.tl{left:-7px;top:-7px;border-left-width:1.5px;border-top-width:1.5px;border-top-left-radius:3px}.fxcm.tr{right:-7px;top:-7px;border-right-width:1.5px;border-top-width:1.5px;border-top-right-radius:3px}
+.fxcm.bl{left:-7px;bottom:-7px;border-left-width:1.5px;border-bottom-width:1.5px;border-bottom-left-radius:3px}.fxcm.br{right:-7px;bottom:-7px;border-right-width:1.5px;border-bottom-width:1.5px;border-bottom-right-radius:3px}
+.fxclip{position:absolute;inset:0;overflow:hidden;animation:aiScanOp 3.6s linear infinite}
+.fxrv{position:absolute;inset:0;transform:translate3d(0,-100%,0);animation:aiRvA 3.6s linear infinite;will-change:transform}
+.fxcv{position:absolute;inset:0;animation:aiRvB 3.6s linear infinite;will-change:transform}
+.fxcv canvas{width:100%;height:100%;display:block}
+.fxbm{position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,#cfe0ff 12%,#fff 50%,#cfe0ff 88%,transparent);box-shadow:0 0 10px 1px #5b8cffaa}
+.fxbm::before{content:"";position:absolute;left:0;right:0;bottom:1px;height:56px;background:linear-gradient(0deg,#5b8cff38,transparent)}
+@keyframes aiRvA{0%,6%{transform:translate3d(0,-100%,0);animation-timing-function:cubic-bezier(.6,0,.3,1)}64%,100%{transform:translate3d(0,0,0)}}
+@keyframes aiRvB{0%,6%{transform:translate3d(0,100%,0);animation-timing-function:cubic-bezier(.6,0,.3,1)}64%,100%{transform:translate3d(0,0,0)}}
+@keyframes aiScanOp{0%,78%{opacity:1}92%,100%{opacity:0}}
+.aisteps{display:flex;margin:18px 0 8px}
+.aistp{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;font-size:11.5px;color:var(--m);text-align:center;transition:color .4s ease}
+.aistp::before,.aistp::after{content:"";position:absolute;top:8px;right:50%;width:100%;height:2px;border-radius:2px}
+.aistp::before{background:color-mix(in srgb,var(--t) 12%,transparent)}
+.aistp::after{background:#4d7dff;transform:scaleX(0);transform-origin:left;transition:transform .7s cubic-bezier(.16,1,.3,1)}
+.aistp:first-child::before,.aistp:first-child::after{display:none}
+.aistp i{position:relative;z-index:1;width:18px;height:18px;box-sizing:border-box;border-radius:50%;background:var(--bg);border:2px solid color-mix(in srgb,var(--t) 18%,transparent);transition:background .4s ease,border-color .4s ease}
+.aistp.act,.aistp.done{color:var(--t)}
+.aistp.act::after,.aistp.done::after{transform:scaleX(1)}
+.aistp.act i{border-color:#4d7dff33;border-top-color:#4d7dff;animation:aiSpin .9s linear infinite}
+.aistp.done i{background:#4d7dff;border-color:#4d7dff}
+.aistp.done i::after{content:"";position:absolute;left:4px;top:1px;width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.fxtag{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);display:flex;gap:8px;align-items:center;padding:6px 13px 6px 11px;border-radius:20px;background:#0a0d14c7;color:#e4ecff;font:500 12px/1 system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.01em;white-space:nowrap;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 2px 10px #0004}
+.fxtag i{width:11px;height:11px;border-radius:50%;border:1.5px solid #ffffff40;border-top-color:#fff;flex:none;animation:aiSpin .9s linear infinite}
+.fxtag span{display:inline-block;transition:opacity .26s ease,transform .26s ease}
+.fxtag span.x{opacity:0;transform:translateY(3px)}
+.aicmp{z-index:2;opacity:0;transition:opacity .7s ease}.aicmp.in{opacity:1}
+.aibase{transition:background .8s ease}.aicmp.rv .aibase{background:transparent}
+.ailn{transition:box-shadow .6s ease}.aicmp.rv .ailn{box-shadow:0 0 0 1px #fff9,0 0 12px 2px #7aa8ff80}
+.aibd #aiB>*{animation:aiRise .5s cubic-bezier(.16,1,.3,1) both}.aibd #aiB>*:nth-child(2){animation-delay:.07s}.aibd #aiB>*:nth-child(3){animation-delay:.14s}.aibd #aiB>*:nth-child(4){animation-delay:.21s}
+@media(prefers-reduced-motion:reduce){.aifx *,.aicmp,.aibd #aiB>*{animation:none!important;transition:none!important}}
 .aicmp{position:absolute;inset:0;--p:55%;contain:strict}.aibase,.aitop{position:absolute;inset:0;display:grid;place-items:center;will-change:clip-path}
 .aibase{background:color-mix(in srgb,var(--bg) 94%,transparent);clip-path:inset(0 0 0 var(--p))}.aitop{clip-path:inset(0 calc(100% - var(--p)) 0 0)}
 .aicmp img{max-width:88%;max-height:88%;object-fit:contain;transition:none!important;user-select:none;-webkit-user-drag:none;pointer-events:none}
@@ -2074,7 +2170,8 @@ const IMAI_FREE=[['remove.bg','https://www.remove.bg/upload'],['Adobe Express','
 .aipill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border:1px solid var(--b);border-radius:20px;font-size:11.5px;background:var(--p);color:var(--m);transition:all .25s}
 .aipill.ready{color:var(--t);border-color:#1a8f3c88}.aipill.run{color:var(--t);border-color:#7a4dff;box-shadow:0 0 0 3px #7a4dff22}.aipill.ok{color:#1a8f3c;border-color:#1a8f3c}.aipill.bad,.aipill.off{opacity:.55;text-decoration:line-through}
 .aipill i{width:7px;height:7px;border-radius:50%;background:var(--m);flex:none}.aipill.ready i{background:#1a8f3c}.aipill.run i{background:#7a4dff;animation:aiPulse .8s ease-in-out infinite}.aipill.ok i{background:#1a8f3c}.aipill.bad i,.aipill.off i{background:#d92d4b}.aipill.chk i{background:#d9a400;animation:aiPulse .8s ease-in-out infinite}
-.aibar{height:5px;border-radius:5px;background:color-mix(in srgb,var(--t) 10%,transparent);overflow:hidden;margin:14px 0 8px}.aibar i{display:block;height:100%;width:40%;border-radius:5px;background:linear-gradient(90deg,#3b7cff,#7a4dff,#3b7cff);background-size:200% 100%;animation:aiSlide 1.3s ease-in-out infinite,aiShim 1.3s linear infinite}
+.aibar{position:relative;height:3px;border-radius:3px;background:color-mix(in srgb,var(--t) 10%,transparent);overflow:hidden;margin:16px 0 10px}.aibar i{position:absolute;left:0;top:0;bottom:0;width:40%;border-radius:3px;background:linear-gradient(90deg,transparent,#4d7dff 35%,#6a6cf5 65%,transparent);transform:translate3d(-100%,0,0);animation:aiBar 1.7s cubic-bezier(.65,0,.35,1) infinite;will-change:transform}
+@keyframes aiBar{0%{transform:translate3d(-100%,0,0)}100%{transform:translate3d(250%,0,0)}}
 .aist{font-size:13px;font-weight:600;text-align:center;margin:12px 0 2px}.aisub{font-size:12px;color:var(--m);text-align:center}
 .aipv{display:flex;gap:10px;margin-top:12px;padding:11px 12px;border-radius:12px;background:color-mix(in srgb,#d9a400 11%,var(--p));border:1px solid #d9a40055;font-size:12px;line-height:1.5}.aipv .lk{font-size:18px;flex:none;line-height:1.2}
 .aipv ul{margin:4px 0 0;padding-left:16px;color:var(--m)}
@@ -2082,11 +2179,11 @@ const IMAI_FREE=[['remove.bg','https://www.remove.bg/upload'],['Adobe Express','
 .ailinks{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ailinks a{padding:4px 11px;border:1px solid var(--b);border-radius:20px;color:var(--a);text-decoration:none;font-size:12px;background:var(--p)}.ailinks a:hover{border-color:var(--a)}
 .aislw{width:100%;margin:12px 0 0;accent-color:#7a4dff;height:auto!important;padding:0!important;border:0!important;background:none!important}
 .aichips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}
-@keyframes aiFade{from{opacity:0}to{opacity:1}}@keyframes aiRise{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
-@keyframes aiSpin{to{transform:rotate(360deg)}}@keyframes aiPulse{0%,100%{opacity:.4}50%{opacity:1}}@keyframes aiBreath{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.12);transform:scale(1.03)}}
+@keyframes aiFade{from{opacity:0}to{opacity:1}}@keyframes aiRise{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes aiSpin{to{transform:rotate(360deg)}}@keyframes aiPulse{0%,100%{opacity:.45}50%{opacity:1}}@keyframes aiBreath{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.12);transform:scale(1.03)}}
 @keyframes aiTwinkle{0%{opacity:0;transform:translateY(12px) scale(.4) rotate(0)}40%{opacity:1}100%{opacity:0;transform:translateY(-34px) scale(1.15) rotate(90deg)}}
 @keyframes aiSlide{0%{margin-left:-40%}100%{margin-left:100%}}@keyframes aiShim{to{background-position:200% 0}}
-@media(prefers-reduced-motion:reduce){.aistage.work::before,.aisp,.aibar i,.aipill i,.aistage.work img.o,.aimd,.aiov{animation:none}}
+@media(prefers-reduced-motion:reduce){.fxrv,.fxcv{transform:none!important;animation:none!important}.fxclip{animation:none!important}.aistage.work::before,.fxedge,.aibar i,.aipill i,.aistage.work img.o,.aimd,.aiov{animation:none}}
 `;document.head.appendChild(st)})();
 async function imAIOne(host,file,sig){
  const cfg=await (await fetch(host+'/config',{signal:sig})).json(),pre=cfg.api_prefix||'',comp={};(cfg.components||[]).forEach(c=>comp[c.id]=c);
@@ -2176,44 +2273,60 @@ function imAIRemove(file,say,cancelled,force,exclude){return new Promise(resolve
  say('Finding the fastest server…');start()})}
 function imAIFlow(file,r){return new Promise(res=>{
  const ov=document.createElement('div');ov.className='aiov';
- const origUrl=URL.createObjectURL(file);let outUrl=null,outFile=null,dead=false;const rejected=[];
- const done=v=>{dead=true;URL.revokeObjectURL(origUrl);if(outUrl)URL.revokeObjectURL(outUrl);ov.remove();res(v)};
+ const origUrl=URL.createObjectURL(file);let fx=null,tagT=0,outUrl=null,outFile=null,dead=false,stepN=-1,stepT=[];const rejected=[];
+ const done=v=>{dead=true;stepT.forEach(clearTimeout);try{clearInterval(tagT)}catch(e){}URL.revokeObjectURL(origUrl);if(outUrl)URL.revokeObjectURL(outUrl);ov.remove();res(v)};
  const E=(h)=>{const d=document.createElement('div');d.innerHTML=h;return d.firstElementChild};
- const md=E('<div class="aimd" role="dialog" aria-modal="true"><div class="aihd"><div class="aiic">✨</div><div><b id="aiT">Remove background</b><small id="aiS"></small></div><button class="aix" title="Close">✕</button></div><div class="aibd"><div class="aistage" id="aiG"><img class="o" id="aiO"></div><div id="aiB"></div></div></div>');
+ const md=E('<div class="aimd" role="dialog" aria-modal="true"><div class="aihd"><div class="aiic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.6"/><path d="M21 15l-5-5L5 21"/></svg></div><div><b id="aiT">Remove background</b><small id="aiS"></small></div><button class="aix" title="Close">✕</button></div><div class="aibd"><div class="aistage" id="aiG"><img class="o" id="aiO"></div><div id="aiB"></div></div></div>');
  ov.appendChild(md);document.body.appendChild(ov);
  const $q=x=>md.querySelector(x),stage=$q('#aiG'),body=$q('#aiB'),T=$q('#aiT'),S=$q('#aiS');$q('#aiO').src=origUrl;$q('.aix').onclick=()=>done('skip');
  const pick=document.createElement('input');pick.type='file';pick.accept='image/*';pick.hidden=true;md.appendChild(pick);
  pick.onchange=()=>{const f=pick.files[0];if(f){done('skip');setTimeout(()=>imAddFiles([f]),0)}};
  const acts=list=>{const w=document.createElement('div');w.className='aiact';list.forEach(([t,cls,fn])=>{const b=document.createElement('button');b.textContent=t;if(cls)b.className=cls;b.onclick=fn;w.appendChild(b)});return w};
- const sparkles=()=>{[...stage.querySelectorAll('.aisp')].forEach(x=>x.remove());for(let i=0;i<7;i++){const sp=document.createElement('span');sp.className='aisp';sp.textContent=i%2?'✦':'✧';sp.style.left=(10+Math.random()*78)+'%';sp.style.top=(35+Math.random()*50)+'%';sp.style.animationDelay=(i*.28)+'s';sp.style.fontSize=(11+Math.random()*10)+'px';stage.appendChild(sp)}};
+ const sparkles=()=>{};
+ /* ---------- AI working effects ---------- */
+ const FXH='<div class="aifx"><i class="fxdots"></i><i class="fxedge"></i><div class="fxbox"><i class="fxcm tl"></i><i class="fxcm tr"></i><i class="fxcm bl"></i><i class="fxcm br"></i><div class="fxclip"><div class="fxrv"><div class="fxcv"></div><i class="fxbm"></i></div></div></div><div class="fxtag"></div></div>';
+ const SL=['Connecting to server','Analysing image','Separating subject','Refining edges'];
+ /* real edge map of the person's own picture (Sobel), drawn once and revealed by the scan line */
+ const edgeCanvas=(src,cb)=>{const im=new Image();im.onload=()=>{try{const S=320,k=Math.min(1,S/Math.max(im.naturalWidth,im.naturalHeight)),w=Math.max(3,Math.round(im.naturalWidth*k)),h=Math.max(3,Math.round(im.naturalHeight*k)),c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d',{willReadFrequently:true});x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);const d=x.getImageData(0,0,w,h).data,L=new Float32Array(w*h);for(let i=0;i<w*h;i++)L[i]=.299*d[i*4]+.587*d[i*4+1]+.114*d[i*4+2];const o=x.createImageData(w,h),od=o.data;for(let y=1;y<h-1;y++)for(let q=1;q<w-1;q++){const i=y*w+q,gx=-L[i-w-1]-2*L[i-1]-L[i+w-1]+L[i-w+1]+2*L[i+1]+L[i+w+1],gy=-L[i-w-1]-2*L[i-w]-L[i-w+1]+L[i+w-1]+2*L[i+w]+L[i+w+1],m=Math.sqrt(gx*gx+gy*gy),a=Math.max(0,Math.min(1,(m-50)/230)),j=i*4;od[j]=196;od[j+1]=218;od[j+2]=255;od[j+3]=a*255}x.putImageData(o,0,0);cb(c)}catch(e){}};im.src=src};
+ const setStep=n=>{stepN=n;body.querySelectorAll('.aistp').forEach((e,i)=>{e.classList.toggle('done',i<n);e.classList.toggle('act',i===n)});const sp=fx&&fx.querySelector('.fxtag span');if(sp&&sp.textContent!==SL[n]){sp.classList.add('x');setTimeout(()=>{if(sp.isConnected){sp.textContent=SL[n];sp.classList.remove('x')}},260)}};
+ const startFx=()=>{if(fx)return;const f=fx=E(FXH);stage.appendChild(f);f.querySelector('.fxtag').innerHTML='<i></i><span>'+SL[0]+'</span>';
+  requestAnimationFrame(()=>{const o=stage.querySelector('#aiO'),b=f.querySelector('.fxbox');if(!b)return;if(o&&o.offsetWidth>4)b.style.cssText='left:'+o.offsetLeft+'px;top:'+o.offsetTop+'px;width:'+o.offsetWidth+'px;height:'+o.offsetHeight+'px'});
+  edgeCanvas(origUrl,c=>{const h=f.querySelector('.fxcv');if(h)h.appendChild(c)})};
+ const endFx=burst=>{clearInterval(tagT);stepT.forEach(clearTimeout);stepT=[];if(!fx)return;const f=fx;fx=null;setTimeout(()=>f.classList.add('out'),burst?120:0);setTimeout(()=>f.remove(),burst?900:700)};
+ const RM=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
  /* ---------- step 1: ask before anything is uploaded ---------- */
  function confirmStep(){try{aiWarm()}catch(e){}T.textContent='Remove background';S.textContent='Your picture has not been sent anywhere yet';
-  stage.className='aistage';[...stage.querySelectorAll('.aisp,.aicmp')].forEach(x=>x.remove());stage.querySelector('#aiO').style.display='';
-  body.innerHTML='<div class="aipv"><div class="lk">🔒</div><div><b>Before we start – where does your picture go?</b><ul><li>It is <b>uploaded</b> to free public AI demos on <b>Hugging Face</b> (Hugging Face, Inc., USA), run by independent community authors.</li><li>It is processed on their servers, outside this app. I cannot see or control how long they keep it.</li><li>Please do not use private, confidential or personal photos.</li></ul></div></div>';
+  stage.className='aistage';[...stage.querySelectorAll('.aisp,.aicmp,.aifx')].forEach(x=>x.remove());fx=null;clearInterval(tagT);stage.querySelector('#aiO').style.display='';
+  body.innerHTML='<div class="aipv"><div class="lk"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div><div><b>Before we start – where does your picture go?</b><ul><li>It is <b>uploaded</b> to free public AI demos on <b>Hugging Face</b> (Hugging Face, Inc., USA), run by independent community authors.</li><li>It is processed on their servers, outside this app. I cannot see or control how long they keep it.</li><li>Please do not use private, confidential or personal photos.</li></ul></div></div>';
   body.appendChild(acts([['✓ I agree – remove the background','pri',()=>run()],['Use built-in remover (stays on my device)','',()=>done('orig')],['Cancel','ghost',()=>done('skip')]]))}
  /* ---------- step 2: working ---------- */
- async function run(force,bad){if(bad){aiHNote(bad,'rejected');if(!rejected.includes(bad))rejected.push(bad)}T.textContent='Removing background…';S.textContent='Free online AI · please wait';stage.className='aistage work';sparkles();stage.querySelector('#aiO').style.display='';stage.querySelector('#aiO').style.filter='';
-  body.innerHTML='<div class="aist" id="aiSt">Finding the fastest server…</div><div class="aibar"><i></i></div><div class="aisub">Your picture is being processed on Hugging Face. This usually takes a few seconds.</div>';
+ async function run(force,bad){stepN=-1;stepT.forEach(clearTimeout);stepT=[];if(bad){aiHNote(bad,'rejected');if(!rejected.includes(bad))rejected.push(bad)}T.textContent='Removing background…';S.textContent='Free online AI · please wait';stage.className='aistage work';{const oc=stage.querySelector('.aicmp');if(oc){oc.classList.remove('in');setTimeout(()=>oc.remove(),450)}stage.onpointerdown=stage.onpointermove=stage.onpointerup=stage.onpointercancel=null;stage.style.cursor='';stage.style.touchAction=''}startFx();sparkles();stage.querySelector('#aiO').style.display='';stage.querySelector('#aiO').style.filter='';
+  body.innerHTML='<div class="aisteps"><div class="aistp"><i></i><span>Connect</span></div><div class="aistp"><i></i><span>Analyse</span></div><div class="aistp"><i></i><span>Cut out</span></div><div class="aistp"><i></i><span>Refine</span></div></div><div class="aisub" id="aiSt">Your picture is being processed on Hugging Face. This usually takes a few seconds.</div>';setStep(0);
   body.appendChild(acts([['Cancel','ghost',()=>done('skip')]]));
-  const f=await imAIRemove(file,m=>{const t=$q('#aiSt');if(t)t.textContent=m},()=>dead,force===true,rejected);
+  const f=await imAIRemove(file,m=>{if(/^Processing/.test(m)&&stepN<1){setStep(1);stepT.forEach(clearTimeout);stepT=[setTimeout(()=>setStep(2),3200),setTimeout(()=>setStep(3),8500)]}else if(/^Taking/.test(m)){const t=$q('#aiSt');if(t)t.textContent='Taking a little longer than usual – trying a faster server as well.'}},()=>dead,force===true,rejected);
   if(dead)return;if(!f)return fail();
   outFile=f;if(outUrl)URL.revokeObjectURL(outUrl);outUrl=URL.createObjectURL(f);showResult()}
  /* ---------- step 3: result with before / after slider ---------- */
- function showResult(){T.textContent='Background removed';S.textContent='Drag the slider to compare';stage.className='aistage';[...stage.querySelectorAll('.aisp')].forEach(x=>x.remove());
-  stage.querySelector('#aiO').style.display='none';
-  const cmp=E('<div class="aicmp" style="--p:55%"><div class="aibase"><img src="'+origUrl+'" draggable="false"></div><div class="aitop"><img src="'+outUrl+'" draggable="false"></div><div class="ailn"><span class="aikn">◀ ▶</span></div></div>');
+ function showResult(){T.textContent='Background removed';S.textContent='Drag the slider to compare';stage.className='aistage';
+  const cmp=E('<div class="aicmp rv" style="--p:0%"><div class="aibase"><img src="'+origUrl+'" draggable="false"></div><div class="aitop"><img src="'+outUrl+'" draggable="false"></div><div class="ailn"><span class="aikn">◀ ▶</span></div></div>');
   stage.appendChild(cmp);stage.style.touchAction='none';stage.style.cursor='ew-resize';
-  const rg=E('<input class="aislw" type="range" min="0" max="100" step="0.1" value="55" aria-label="Compare before and after">');
-  let want=55;const setP=v=>{want=Math.max(0,Math.min(100,+v||0));cmp.style.setProperty('--p',want+'%');if(+rg.value!==want)rg.value=want};
-  const fromX=x=>{const r=stage.getBoundingClientRect();setP((x-r.left)/r.width*100)};
+  const rg=E('<input class="aislw" type="range" min="0" max="100" step="0.1" value="0" aria-label="Compare before and after">');
+  let want=0,raf=0,anim=true;const setP=v=>{want=Math.max(0,Math.min(100,+v||0));cmp.style.setProperty('--p',want+'%');if(+rg.value!==want)rg.value=want};
+  const user=v=>{if(anim){anim=false;cancelAnimationFrame(raf);cmp.classList.remove('rv')}setP(v)};
+  const fromX=x=>{const r=stage.getBoundingClientRect();user((x-r.left)/r.width*100)};
   let drag=false;stage.onpointerdown=e=>{drag=true;try{stage.setPointerCapture(e.pointerId)}catch(x){}fromX(e.clientX);e.preventDefault()};
   stage.onpointermove=e=>{if(drag)fromX(e.clientX)};stage.onpointerup=stage.onpointercancel=()=>{drag=false};
-  ['input','change','pointermove'].forEach(ev=>rg.addEventListener(ev,()=>setP(rg.value)));
+  ['input','change','pointermove'].forEach(ev=>rg.addEventListener(ev,()=>user(rg.value)));
   body.innerHTML='';body.appendChild(rg);body.appendChild(E('<div class="aisub" style="margin-top:4px">Drag on the picture or the slider · Left: background removed · Right: original</div>'));
-  body.appendChild(acts([['✓ Use this cut-out','pri',()=>{if(outFile&&outFile.aiHost)aiHNote(outFile.aiHost,'liked');done(outFile)}],['↻ Try again (different AI)','',()=>run(false,outFile&&outFile.aiHost)],['Use original','ghost',()=>{if(outFile&&outFile.aiHost)aiHNote(outFile.aiHost,'rejected');done('orig')}],['Cancel','ghost',()=>done('skip')]]))}
+  body.appendChild(acts([['✓ Use this cut-out','pri',()=>{if(outFile&&outFile.aiHost)aiHNote(outFile.aiHost,'liked');done(outFile)}],['↻ Try again (different AI)','',()=>run(false,outFile&&outFile.aiHost)],['Use original','ghost',()=>{if(outFile&&outFile.aiHost)aiHNote(outFile.aiHost,'rejected');done('orig')}],['Cancel','ghost',()=>done('skip')]]))
+  /* smooth hand-over: scan effects flash and fade, cut-out fades in over the dimmed original, divider sweeps in */
+  endFx(true);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>cmp.classList.add('in')));
+  setTimeout(()=>{if(dead||!cmp.classList.contains('in'))return;const o=stage.querySelector('#aiO');if(o)o.style.display='none';if(!anim)return;
+   const t0=performance.now(),D=RM?1:1300,step=now=>{if(!anim||dead)return;const k=Math.min(1,(now-t0)/D),e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;setP(55*e);if(k<1)raf=requestAnimationFrame(step);else{anim=false;cmp.classList.remove('rv')}};raf=requestAnimationFrame(step)},RM?0:750)}
  /* ---------- failure ---------- */
- function fail(){T.textContent='Oops!';S.textContent='Could not reach a free AI right now';stage.className='aistage';[...stage.querySelectorAll('.aisp')].forEach(x=>x.remove());stage.querySelector('#aiO').style.filter='grayscale(1) opacity(.55)';
-  body.innerHTML='<div class="aist">😕 The free AI services are busy right now</div><div class="aisub">They are free community services. Try again in a moment, or remove the background with a free online tool, then <b>paste (Ctrl+V) or drop</b> the finished picture here.</div><div class="ailinks">'+IMAI_FREE.map(x=>'<a href="'+x[1]+'" target="_blank" rel="noopener">'+x[0]+' ↗</a>').join('')+'</div>';
+ function fail(){endFx(false);T.textContent='Background removal unavailable';S.textContent='Could not reach a free AI right now';stage.className='aistage';[...stage.querySelectorAll('.aisp')].forEach(x=>x.remove());stage.querySelector('#aiO').style.filter='grayscale(1) opacity(.55)';
+  body.innerHTML='<div class="aist">The free AI services are busy right now</div><div class="aisub">They are free community services. Try again in a moment, or remove the background with a free online tool, then <b>paste (Ctrl+V) or drop</b> the finished picture here.</div><div class="ailinks">'+IMAI_FREE.map(x=>'<a href="'+x[1]+'" target="_blank" rel="noopener">'+x[0]+' ↗</a>').join('')+'</div>';
   body.appendChild(acts([['↻ Try again','pri',()=>run(true)],['Choose another picture','',()=>pick.click()],['Use built-in remover','ghost',()=>done('orig')],['Cancel','ghost',()=>done('skip')]]))}
  confirmStep()})}
 /* drag & drop + paste */
@@ -6369,7 +6482,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 /* picture colour override: e.cm = [[detectedHex, newHex],...] (matched by nearest so it survives a change of colour count) */
 window.fcMap=function(en,hex){const cm=en&&en.cm;if(!cm||!cm.length)return hex;for(const x of cm)if(x[0]===hex)return x[1];let bd=1e9,bt=hex;const a=rgb(hex);for(const x of cm){const b=rgb(x[0]),d=(a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2;if(d<bd){bd=d;bt=x[1]}}return bd<700?bt:hex};
 /* export: strict = exact colours; otherwise near-identical colours share one filament (max 16 slots) */
-window.fcExport=function(C){if(FC.strict&&new Set(C).size<=16)return C;const cnt=new Map();C.forEach(h=>cnt.set(h,(cnt.get(h)||0)+1));const list=[...cnt.keys()].sort((a,b)=>cnt.get(b)-cnt.get(a)),rep=new Map(),reps=[];
+window.fcExport=function(C){if(FC.strict)return C;const cnt=new Map();C.forEach(h=>cnt.set(h,(cnt.get(h)||0)+1));const list=[...cnt.keys()].sort((a,b)=>cnt.get(b)-cnt.get(a)),rep=new Map(),reps=[];
 list.forEach(h=>{const r=reps.find(q=>dE(q,h)<8);if(r!==undefined)rep.set(h,r);else{reps.push(h);rep.set(h,h)}});
 while(reps.length>16){let bi=0,bj=1,bd=1e9;for(let i=0;i<reps.length;i++)for(let j=i+1;j<reps.length;j++){const d=dE(reps[i],reps[j]);if(d<bd){bd=d;bi=i;bj=j}}const gone=reps[bj];reps.splice(bj,1);rep.forEach((v,k)=>{if(v===gone)rep.set(k,reps[bi])})}
 return C.map(h=>rep.get(h))};
@@ -6484,10 +6597,10 @@ const mt=$('fc_mt');mt.innerHTML='';if(ml.length){const b=el('button','fcmb','Ma
 /* ---------- strict toggle + filament library ---------- */
 function libRender(){const box=$('fc_libchips');box.innerHTML='';FC.lib().forEach(f=>{const b=el('button','fcsw');b.type='button';b.style.background=f.hex;b.title=f.name+' '+f.hex.toUpperCase()+(f.builtin?'':' (yours – tap to remove)');if(!f.builtin)b.onclick=()=>{FC.custom=FC.custom.filter(x=>x!==f);saveLib();libRender()};box.appendChild(b)})}
 $('fc_add').onclick=()=>{const h=$('fc_nc').value.toLowerCase();if(!FC.custom.some(f=>f.hex===h))FC.custom.unshift({name:($('fc_nn').value.trim()||h).slice(0,24),hex:h,n:h2n(h),builtin:false});$('fc_nn').value='';saveLib();libRender()};
-function strictTxt(){$('fc_strict_t').textContent=FC.strict?'On (recommended): every colour is exported exactly as you picked it – nothing is merged or changed. Only if the design has more than 16 different colours (the limit of Bambu Studio and other slicers) the closest ones are joined.':'Off: when you export, very close shades are merged into one filament so Bambu Studio and other slicers show a short, clean filament list.'}
+function strictTxt(){$('fc_strict_t').textContent=FC.strict?'On (recommended): every colour is exported exactly as you picked it – nothing is merged or changed. Colours are never merged or changed, however many there are.':'Off: when you export, very close shades are merged into one filament so Bambu Studio and other slicers show a short, clean filament list.'}
 $('fc_strict').checked=true;$('fc_strict').addEventListener('change',()=>{FC.strict=$('fc_strict').checked;FC.ver++;strictTxt();$('fc_needout').innerHTML='';picRender(true)});
 $('fc_need').onclick=()=>{const out=$('fc_needout');let c;try{c=trisC().c}catch(e){c=[]}const cnt=[...new Set(c)];if(!cnt.length){out.textContent='Nothing in the design yet.';return}
-out.innerHTML='<div class="fcn">'+cnt.length+' filament'+(cnt.length>1?'s':'')+' needed'+(cnt.length>16?' – <span class="fcwarn">more than 16, Bambu Studio only has 16 slots</span>':'')+':</div>'+cnt.map((h,i)=>{const nn=nearest(h,1)[0];return'<div class="fcr"><span style="width:22px">'+(i+1)+'</span><span class="fcdot" style="background:'+n2h(h)+'"></span><span style="flex:1">'+n2h(h).toUpperCase()+' · '+esc(nn.f.name)+'</span></div>'}).join('')};
+out.innerHTML='<div class="fcn">'+cnt.length+' filament'+(cnt.length>1?'s':'')+' needed'+(cnt.length>32?' – <span class="fcwarn">more than 32: Bambu Studio\'s colour window reads at most 32 colours</span>':'')+':</div>'+cnt.map((h,i)=>{const nn=nearest(h,1)[0];return'<div class="fcr"><span style="width:22px">'+(i+1)+'</span><span class="fcdot" style="background:'+n2h(h)+'"></span><span style="flex:1">'+n2h(h).toUpperCase()+' · '+esc(nn.f.name)+'</span></div>'}).join('')};
 libRender();strictTxt();
 setInterval(()=>{try{const ds=designSig();FIELDS.forEach(f=>{if(f.inp.value!==f.last||f.ver!==FC.ver)f.sync();if(f.open&&(f.ds!==ds)){f.ds=ds;f.pk.render()}});picRender(false)}catch(e){}},350);
 })();
