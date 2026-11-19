@@ -77,6 +77,81 @@ h4{margin:14px 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.07e
 header{gap:6px;padding:5px 12px}header button,header select{padding:4px 8px;white-space:nowrap}
 #pj{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--m);font-size:12px}
 #views button{padding:4px 8px}header .sep{margin:0 2px}
+.fct{margin:0 0 8px;padding:10px;border:1px solid var(--b);border-radius:10px}.fct p{margin:4px 0 0;font-size:11.5px}.fct details{margin-top:8px}.fct summary{cursor:pointer;font-size:12px;color:var(--m)}
+.fch{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--m);margin:0 0 6px}.fch small{text-transform:none;letter-spacing:0;font-weight:400;margin-left:6px}
+.fcn{color:var(--m);margin-bottom:6px;font-size:11.5px}.fcwarn{color:#d92d4b}.fcemp{color:var(--m);font-size:11.5px;margin-top:4px}
+.fcr{display:flex;gap:8px;align-items:center;margin:4px 0}
+.fcw{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+.fcdot{display:inline-block;width:20px;height:20px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px #0003}
+button.fctr{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 10px 0 5px!important;border-radius:16px;grid-column:2/5;justify-self:start;min-width:112px}
+button.fctr .fctx{flex:1;text-align:left;font-size:12.5px}button.fctr .fccar{color:var(--m);font-size:10px}
+.fcpk{flex-basis:100%;grid-column:1/-1;width:100%;box-sizing:border-box;margin-top:8px;padding:10px;border:1px solid var(--b);border-radius:10px;background:var(--bg);max-height:340px;overflow:auto;text-align:left}
+.fcsec+.fcsec{margin-top:12px;padding-top:10px;border-top:1px solid var(--b)}
+.fcdw{display:flex;flex-wrap:wrap;gap:8px}
+button.fcdc{display:flex;flex-direction:column;align-items:center;gap:3px;padding:3px 4px!important;height:auto;border:1px solid transparent;border-radius:8px;background:none;opacity:.55}
+button.fcdc .fcdot{width:28px;height:28px}button.fcdc small{font-size:10px;color:var(--t);max-width:62px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+button.fcdc.near{opacity:1;border-color:var(--a);background:color-mix(in srgb,var(--a) 8%,transparent)}button.fcdc.on{opacity:1;box-shadow:0 0 0 2px var(--a)}button.fcdc:hover{opacity:1}
+.fcgr{display:flex;align-items:center;gap:8px;margin:5px 0}.fcgn{width:84px;flex:none;font-size:11px;color:var(--m)}
+button.fcsw{width:24px;height:24px;padding:0!important;min-height:0!important;border-radius:50%;border:0;box-shadow:inset 0 0 0 1px #0003;position:relative}
+button.fcsw:hover{transform:scale(1.15)}button.fcsw.on{box-shadow:inset 0 0 0 1px #0003,0 0 0 2px var(--bg),0 0 0 4px var(--a)}
+.fccap{margin-top:8px;font-size:12px;color:var(--m);min-height:18px}.fccap b{color:var(--t)}
+.fcci{width:36px}.fchx{width:88px}
+.fcp{margin:8px 0;padding:10px;border:1px solid var(--b);border-radius:10px}
+.fcc{display:flex;flex-direction:column;align-items:center;gap:2px}.fcc small{font-size:10px;color:var(--m)}
+button.fcchip{position:relative;width:32px;height:32px;padding:0!important;border-radius:50%;border:2px solid var(--bg);box-shadow:0 0 0 1px var(--b)}button.fcchip.on{box-shadow:0 0 0 3px var(--a)}
+button.fcchip i,button.fcchip u{position:absolute;background:var(--a);color:#fff;font:700 9px/14px system-ui;width:14px;height:14px;border-radius:50%;text-align:center;text-decoration:none}
+button.fcchip i{right:-6px;top:-6px}button.fcchip u{right:-6px;bottom:-6px;background:#1a8f3c}
+button.fcmb{height:auto;padding:5px 10px;border-radius:14px;border-color:#1a8f3c;color:#1a8f3c;font-size:12px}
+.fcrow{display:flex;align-items:center;gap:10px;padding:7px 9px;border:1px solid var(--b);border-radius:10px;margin:6px 0;cursor:pointer}.fcrow.on{border-color:var(--a)}.fcrt{flex:1;min-width:0}.fcrt b{font-size:12.5px}.fcrt small{display:block;color:var(--m);font-size:11px;margin-top:1px}.fcdot.big{width:32px;height:32px}.fcrh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+#txsw{display:none!important}
+.fcadd{display:flex;gap:6px;align-items:center;margin-top:8px}.fcadd input:not([type=color]){flex:1;min-width:0}
+</style><style>
+/* colour picker v8: no badge marks, tabbed premium layout */
+.fct button::after,.fcp button::after,.fcpk button::after,.fcrow button::after,.fcw button::after,button.fctr::after,#side .fct button[data-tip]::after,#side .fcp button[data-tip]::after,#side .fcpk button[data-tip]::after,#side button.fcsw[data-tip]::after,#side button.fcdc[data-tip]::after,#side button.fctr[data-tip]::after{content:none!important;display:none!important}
+.fcpk{padding:0!important;border-radius:14px!important;max-height:none!important;overflow:visible!important;box-shadow:0 8px 24px #0000001f,0 0 0 1px var(--b)!important;border:0!important;background:var(--p,var(--bg))!important}
+.fcph{display:flex;align-items:center;gap:12px;padding:12px 14px 10px}.fcph .fcdot.big{width:36px;height:36px;box-shadow:inset 0 0 0 1px #0003,0 2px 8px #0002}
+.fcht b{display:block;font-size:13.5px;letter-spacing:.03em}.fcht small{display:block;color:var(--m);font-size:11.5px;margin-top:1px}
+.fctabs{display:flex;gap:4px;margin:0 14px;padding:3px;border-radius:10px;background:color-mix(in srgb,var(--t) 7%,transparent)}
+button.fctab{flex:1;height:28px;min-height:0;padding:0 6px!important;border:0!important;border-radius:8px;background:none;color:var(--m);font-size:12px;font-weight:600;box-shadow:none}
+button.fctab.on{background:var(--bg);color:var(--t);box-shadow:0 1px 4px #0002}
+.fcbd{padding:10px 14px 14px;max-height:300px;overflow:auto}
+.fcpk .fcsec+.fcsec{margin-top:14px;padding-top:12px;border-top:1px solid var(--b)}
+.fcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(30px,1fr));gap:8px}
+button.fcsw.lg{width:100%;height:auto;aspect-ratio:1;max-width:36px;min-width:26px}
+button.fcsw{width:26px;height:26px;transition:transform .12s}
+.fcgr{align-items:center;margin:8px 0}.fcgn{width:78px}
+.fcdw{gap:6px}button.fcdc{opacity:.9}button.fcdc.near{background:color-mix(in srgb,var(--a) 10%,transparent)}
+.fccu .fcr{gap:8px;margin:6px 0}.fccu .fcci{width:44px;height:36px;padding:2px;border-radius:8px}.fccu .fchx{width:110px;height:36px;border-radius:8px}
+.fccu .fcnm{flex:1;min-width:0;height:36px;border-radius:8px}.fccu .fcsv{height:36px;padding:0 14px;border-radius:8px;border-color:var(--a);color:var(--a);font-weight:600}
+.fcsm{font-size:11.5px;color:#1a8f3c;min-height:16px;margin-top:4px}
+.fcrow{padding:10px 12px;border-radius:12px;transition:border-color .15s,box-shadow .15s}.fcrow:hover{border-color:var(--a)}.fcrow.on{box-shadow:0 0 0 1px var(--a)}
+.fcrow .fcdot.big{width:38px;height:38px;box-shadow:inset 0 0 0 1px #0003,0 2px 6px #0002}
+.fcbar{height:4px;border-radius:2px;background:color-mix(in srgb,var(--t) 10%,transparent);margin:5px 0 3px;overflow:hidden}.fcbar i{display:block;height:100%;border-radius:2px}
+.fcrow>button{height:28px;padding:0 12px;border-radius:14px;font-size:12px}
+#fc_ed{margin:8px 0 10px!important}
+button.fctr{height:34px;border-radius:17px}
+</style><style>
+.fcgr{display:block!important;margin:10px 0!important}.fcgn{display:block;width:auto!important;margin:0 0 6px;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.fcgrid{display:flex!important;flex-wrap:wrap;gap:8px;grid-template-columns:none}
+.fcpk button.fcsw,.fct button.fcsw{flex:none!important;display:block;width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important;border-radius:50%!important;border:0!important;padding:0!important;box-shadow:inset 0 0 0 1px #0003}
+.fcpk button.fcsw.on{box-shadow:inset 0 0 0 1px #0003,0 0 0 2px var(--bg),0 0 0 4px var(--a)}
+.fcpk button.fcsw.lg{width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;max-width:none}
+#fc_libchips{display:flex;flex-wrap:wrap;gap:8px}
+</style><style>
+button.fctab{white-space:nowrap!important;font-size:11px!important;padding:0 2px!important;min-width:0}
+.fcxh{margin-left:8px;font-size:11.5px;color:var(--m);font-weight:600;letter-spacing:.03em}
+.fcrow>button{white-space:nowrap!important;flex:none}
+.fcrow .fcrt small{line-height:1.35}
+</style><style>.fcrt b{display:block;white-space:nowrap}.fcxh{display:block!important;margin:1px 0 0!important}</style>
+<style>#fc_pic #fc_chips{max-height:230px;overflow-y:auto;overscroll-behavior:contain;padding-right:2px}#fc_pic .fcrow{padding-top:5px;padding-bottom:5px}#fc_pic .fcrow .fcbar{height:4px}#fc_pic{max-height:none}<style>/* colour panel: full list (no clipped scroll box), text wraps instead of running under buttons */
+#fc_pic #fc_chips{max-height:none!important;overflow:visible!important;padding-right:0}
+#fc_pic .fcrow,.fcrow{flex-wrap:wrap;align-items:center;row-gap:6px;position:relative}
+.fcrt{flex:1 1 120px;min-width:0}
+.fcrt b,.fcrt small,.fcht b,.fcht small,.fcxh{display:block;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere;line-height:1.35}
+.fcrow>button{flex:none;margin-left:auto}
+#fc_pic .fcpk,#fc_pic .fcrow+*{position:relative;clear:both}
+#fc_pic button.fcmb{display:block;width:100%;margin-top:10px;white-space:normal;line-height:1.3;position:relative}
+button.fcdc small{max-width:70px}
 </style></head><body><div id="ld" style="position:fixed;inset:0;z-index:99998;background:var(--bg,#e8ebf0);color:#1b2330;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font:14px system-ui;transition:opacity .12s"><div style="width:38px;height:38px;border:4px solid #0002;border-top-color:#3b7cff;border-radius:50%;animation:ldspin .8s linear infinite"></div><div id="ldt">Loading project…</div></div><style>@keyframes ldspin{to{transform:rotate(360deg)}}@media(prefers-color-scheme:dark){#ld{background:#1d222a!important;color:#e6e9ef!important}}</style><script>window.__mcHideLd=function(){var e=document.getElementById("ld");if(e){e.style.opacity=0;setTimeout(function(){e.remove()},130)}};setTimeout(window.__mcHideLd,15000)</script><div id="veil" class="on"></div>
 <div id="app">
 <header><button id="bk" title="Back to projects">← Back</button><svg style="width:42px;height:42px;flex:none;margin:0 4px 0 2px;filter:drop-shadow(0 3px 8px #3b7cff66)" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lgd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b7cff"/><stop offset="1" stop-color="#7a4dff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#lgd)"/><path d="M32 8 55 21.5v21L32 56 9 42.5v-21z" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="1.2"/><path d="M32 12 52 23.5 32 35 12 23.5z" fill="#fff"/><path d="M12 23.5 32 35v21L12 44.5z" fill="#fff" fill-opacity=".6"/><path d="M52 23.5 32 35v21l20-11.5z" fill="#fff" fill-opacity=".32"/><g transform="translate(32 23.5) scale(1 .577)"><path d="M9.23 -1.78L11.91 -1.44L11.91 1.44L9.23 1.78L8.52 3.98L10.49 5.83L8.79 8.17L6.42 6.87L4.55 8.23L5.05 10.88L2.31 11.78L1.15 9.33L-1.15 9.33L-2.31 11.78L-5.05 10.88L-4.55 8.23L-6.42 6.87L-8.79 8.17L-10.49 5.83L-8.52 3.98L-9.23 1.78L-11.91 1.44L-11.91 -1.44L-9.23 -1.78L-8.52 -3.98L-10.49 -5.83L-8.79 -8.17L-6.42 -6.87L-4.55 -8.23L-5.05 -10.88L-2.31 -11.78L-1.15 -9.33L1.15 -9.33L2.31 -11.78L5.05 -10.88L4.55 -8.23L6.42 -6.87L8.79 -8.17L10.49 -5.83L8.52 -3.98Z" fill="#4a5df0"/><circle r="4.4" fill="#fff"/><circle r="1.8" fill="#4a5df0"/></g><path d="M32 35v21" stroke="#fff" stroke-opacity=".5"/></svg><span class="logo" style="font-weight:300;font-size:28px;letter-spacing:-.01em">Mini<b style="font-weight:800">CAD</b></span><span id="pj"></span><button id="sv" class="pri" title="Save (Ctrl+S)">Save</button><span class="sep"></span>
@@ -164,7 +239,8 @@ header{gap:6px;padding:5px 12px}header button,header select{padding:4px 8px;whit
 <div class="br" id="cdb"></div>
 <div class="row"><span style="width:50px">Presets</span><span id="qd" style="display:flex;gap:4px;flex-wrap:wrap"></span></div>
 <p class="mut" id="cdi" style="margin:4px 0 0"></p></div></div>
-<div class="pane" id="p-text"><h4>3D text &amp; keychain</h4>
+<div class="pane" id="p-text"><h4>3D text &amp; keychain</h4><div class="fct"><label class="chk"><input type="checkbox" id="fc_strict"> <b>Strictly use the same colour</b></label><p class="mut" id="fc_strict_t"></p>
+<details><summary>My filaments &amp; colours needed</summary><div><p class="mut">Tap a colour of yours to remove it. Built-in colours are approximate Bambu PLA Basic shades.</p><div class="fcw" id="fc_libchips" style="margin-top:6px"></div><div class="fcadd"><input type="color" id="fc_nc" value="#2b6cb0" style="width:34px"><input id="fc_nn" placeholder="Filament name (optional)"><button id="fc_add">Add</button></div><button id="fc_need" style="margin-top:8px">Show filaments this design needs</button><div id="fc_needout" style="margin-top:6px"></div></div></details></div>
 <style>#pv_sticky{position:sticky;top:-10px;z-index:6;background:var(--p);padding:10px 0 6px;margin-top:-4px}@media(max-width:780px){#pv_sticky canvas{max-height:22vh;width:auto!important;max-width:100%;margin:0 auto}}</style><div id="pv_sticky"><div class="br" style="margin:0 0 6px"><button id="pv_top" class="pri">Top view</button><button id="pv_3d">3D view</button></div>
 <canvas id="kp_pv" width="600" height="320" style="width:100%;height:auto;display:block;border:1px solid var(--b);border-radius:8px;background:var(--bg);touch-action:none"></canvas>
 <canvas id="kp_pv3" width="600" height="320" style="width:100%;height:auto;display:none;border:1px solid var(--b);border-radius:8px;background:var(--bg);touch-action:none;cursor:grab"></canvas></div>
@@ -203,13 +279,14 @@ header{gap:6px;padding:5px 12px}header button,header select{padding:4px 8px;whit
 <div class="br" id="im_chips"></div>
 <p class="mut" id="im_none" style="margin:6px 0 0;font-size:11.5px">No pictures yet. Add as many as you like.</p>
 <p id="im_msg" class="mut" style="margin:6px 0 0;font-size:11.5px"></p>
-<div id="im_ed" style="display:none;margin-top:8px"><div id="im_stb" style="margin:0 0 10px;padding:8px;border:1px solid var(--b);border-radius:8px"><div style="font-weight:700;font-size:12.5px">Picture size buttons</div><div class="mut" style="font-size:11px;margin-top:2px">Use the little arrows, or type an exact number in the boxes.</div><div style="display:flex;align-items:center;gap:8px;margin-top:6px"><b style="width:110px;font-size:12.5px">Height (raise)</b><input type="number" id="im_hv" step=".5" min=".2" style="width:90px"></div><div style="display:flex;align-items:center;gap:8px;margin-top:6px"><b style="width:110px;font-size:12.5px">Width</b><input type="number" id="im_wv" step="1" min="1" style="width:90px"><b style="font-size:12.5px;margin-left:6px">Length</b><input type="number" id="im_lv" step="1" min="1" style="width:90px"></div><div style="display:flex;align-items:center;gap:8px;margin-top:6px"><b style="width:110px;font-size:12.5px">Scale (same ratio)</b><input type="number" id="im_sv" step="5" min="5" style="width:90px"></div></div><div class="fl">
+<div id="im_ed" style="display:none;margin-top:8px"><div id="im_stb" style="margin:0 0 10px;padding:8px;border:1px solid var(--b);border-radius:8px"><div style="font-weight:700;font-size:12.5px">Picture size buttons</div><div class="mut" style="font-size:11px;margin-top:2px">Use the little arrows, or type an exact number in the boxes.</div><div style="display:flex;align-items:center;gap:8px;margin-top:6px"><b style="width:110px;font-size:12.5px">Height (raise)</b><input type="number" id="im_hv" step=".5" min=".2" style="width:90px"></div><div style="display:flex;align-items:center;gap:8px;margin-top:6px"><b style="width:110px;font-size:12.5px">Width</b><input type="number" id="im_wv" step="1" min="1" style="width:90px"><b style="font-size:12.5px;margin-left:6px">Length</b><input type="number" id="im_lv" step="1" min="1" style="width:90px"></div><div style="display:flex;align-items:center;gap:8px;margin-top:6px"><b style="width:110px;font-size:12.5px">Scale (same ratio)</b><input type="number" id="im_sv" step="5" min="5" style="width:90px"></div></div><div class="fl" id="im_ts" style="margin:0 0 10px"><label>Turn °</label><input id="im_r" type="number" step="5" title="Rotate the picture (degrees)"><label title="Width and length change together, same ratio">Scale %</label><input id="im_sc" type="number" min="5" step="5" title="Bigger / smaller, same proportions"></div><div class="fl">
 <label>Across</label><input id="im_x" type="number" step=".5" title="Left / right position from the middle of the text (mm)"><label>Up</label><input id="im_z" type="number" step=".5" title="Up / down position (mm)">
 <label>Width</label><input id="im_w" type="number" min="1" step=".5"><label title="Only the up/down size of the picture changes">Length</label><input id="im_l" type="number" min="1" step=".5" title="Picture size up/down (mm) – the width stays the same">
 <label>Height</label><input id="im_t" type="number" min=".2" step=".2" title="How far the picture stands up from the plate (mm)"><label>Style</label><select id="im_mode"><option value="orig">Real colours</option><option value="one">One colour</option><option value="mono">Monochrome (shades of one colour)</option></select>
-<label>Colours</label><input id="im_k" type="number" min="2" max="10" step="1" title="How many colours to keep from the picture (2-10)"><label>Step</label><input id="im_st" type="number" min="0" step=".1" title="Each extra colour stands this much taller, for a layered relief (0 = flat)">
+<label>Shading</label><select id="im_sh" style="grid-column:2/5" title="Flat = every colour one clean flat area. Smooth shades = soft light-to-dark steps without lines"><option value="0">Flat colours (clean)</option><option value="1">Smooth shades (no lines)</option></select>
+<label>Colours</label><input id="im_k" type="number" min="2" max="16" step="1" title="How many colours to keep from the picture (2-16)"><label>Step</label><input id="im_st" type="number" min="0" step=".1" title="Each extra colour stands this much taller, for a layered relief (0 = flat)">
 <label>Colour</label><input id="im_c" type="color" style="width:34px"><label>Bg tol.</label><input id="im_tol" type="number" min="5" max="120" step="5" title="How close to the corner colour counts as background"></div>
-<div class="fl" style="margin-top:6px"><label>Turn °</label><input id="im_r" type="number" step="5"><label title="Width and length change together, same ratio">Scale %</label><input id="im_sc" type="number" min="5" step="5" title="Bigger / smaller, same proportions"></div>
+<div class="fcp" id="fc_pic" style="display:none"></div>
 <label class="chk" style="margin-top:8px"><input type="checkbox" id="im_same" checked> One colour: use the plate colour</label>
 <label class="chk" style="margin-top:4px"><input type="checkbox" id="im_cw"> Auto background remover (untick if the picture is already transparent)</label>
 <label class="chk" style="margin-top:4px"><input type="checkbox" id="im_fill"> Solid fill (not hollow)</label>
@@ -575,7 +652,7 @@ if(ph>=.5&&RC.ray.intersectPlane(new THREE.Plane(nrmOf(m),0),u)&&Math.abs(m==='f
 if(tu<tg){hovM=m;hovOff=0}else if(tg<1e9)hovM='ground'}
 function down(e){if(pe&&tool!=='select')return;if(DRAWT.includes(tool)&&!start&&!pts.length&&!fh)faceM(e);
 if(tool==='select'){if(cutDragStart(e))return;setRay(e);const multi=e.shiftKey||e.ctrlKey||e.metaKey;
-if(sel.length===1){const rg=gm==='rot'?RC.intersectObjects(rings,false)[0]:null;if(rg){startRot(rg.object.userData.i,e);return}const h=gm==='size'?RC.intersectObjects(handles,false)[0]:null;if(h){startHd(h.object.userData.d);return}}
+if(sel.length===1&&!isKC(sel[0])){const rg=gm==='rot'?RC.intersectObjects(rings,false)[0]:null;if(rg){startRot(rg.object.userData.i,e);return}const h=gm==='size'?RC.intersectObjects(handles,false)[0]:null;if(h){startHd(h.object.userData.d);return}}
 const r=pick(e,true);if(r&&r.obj){if(multi)pickObj(r.obj,true);else if(!sel.includes(r.obj))select([r.obj]);
 setRay(e);const g=ground();if(g&&sel.includes(r.obj))mv={g0:g.clone(),c:false,s:sel.map(o=>({o,p:o.position.clone(),off:o.userData.gearAttach?{...o.userData.gearAttach.offset}:null,base:o.userData.gearAttach&&o.userData.gearAttach.gear?o.userData.gearAttach.gear:null}))}}else{if(!multi)select([]);mq={x:e.clientX,y:e.clientY,m:multi}}return}
 if(tool==='erase'&&$('esh').value==='click'){const r=pick(e,true);if(r&&r.obj){if($('emd').value==='obj'){select([r.obj]);ACT.del()}else{workY=Math.round(r.p.y*100)/100;pl.constant=-workY;cutRegion(circ(r.p.x,r.p.z,Math.max(.25,+$('ebr').value||3),24))}}return}
@@ -692,6 +769,30 @@ switch(q){case 1:S(B,L);break;case 2:S(R,B);break;case 4:S(T,R);break;case 8:S(L
 case 5:if((a+b+c+e)/4>=.5){S(B,R);S(T,L)}else{S(B,L);S(T,R)}break;
 case 10:if((a+b+c+e)/4>=.5){S(L,B);S(R,T)}else{S(R,B);S(L,T)}break}}
 const loops=[];for(const k0 of [...nx.keys()]){if(!nx.has(k0))continue;const p=[];let k=k0;while(nx.has(k)){p.push(pt.get(k));const n=nx.get(k);nx.delete(k);k=n}if(p.length>2)loops.push(p)}return loops}
+function txTraceF(d,w,h,thr){const W2=w+2,H2=h+2,V=new Float32Array(W2*H2).fill(-1);
+for(let y=0;y<h;y++){const r=y*w;for(let i=0;i<w;i++)V[(y+1)*W2+i+1]=d[r+i]}
+const nx=new Map(),pt=new Map(),hp=(i,y)=>{const k=((y+1)*W2+i+1)*2;if(!pt.has(k)){const a=V[(y+1)*W2+i+1],b=V[(y+1)*W2+i+2];pt.set(k,[i+.5+(thr-a)/(b-a),y+.5])}return k},vp=(i,y)=>{const k=((y+1)*W2+i+1)*2+1;if(!pt.has(k)){const a=V[(y+1)*W2+i+1],b=V[(y+2)*W2+i+1];pt.set(k,[i+.5,y+.5+(thr-a)/(b-a)])}return k};
+for(let y=-1;y<h;y++)for(let i=-1;i<w;i++){const a=V[(y+1)*W2+i+1],b=V[(y+1)*W2+i+2],c=V[(y+2)*W2+i+2],e=V[(y+2)*W2+i+1],q=(a>=thr?1:0)|(b>=thr?2:0)|(c>=thr?4:0)|(e>=thr?8:0);if(q===0||q===15)continue;
+const B=()=>hp(i,y),R=()=>vp(i+1,y),T=()=>hp(i,y+1),L=()=>vp(i,y),S=(f,t)=>nx.set(f(),t());
+switch(q){case 1:S(B,L);break;case 2:S(R,B);break;case 4:S(T,R);break;case 8:S(L,T);break;case 3:S(R,L);break;case 6:S(T,B);break;case 12:S(L,R);break;case 9:S(B,T);break;case 14:S(L,B);break;case 13:S(B,R);break;case 11:S(R,T);break;case 7:S(T,L);break;
+case 5:if((a+b+c+e)/4>=thr){S(B,R);S(T,L)}else{S(B,L);S(T,R)}break;
+case 10:if((a+b+c+e)/4>=thr){S(L,B);S(R,T)}else{S(R,B);S(L,T)}break}}
+const loops=[];for(const k0 of [...nx.keys()]){if(!nx.has(k0))continue;const p=[];let k=k0;while(nx.has(k)){p.push(pt.get(k));const n=nx.get(k);nx.delete(k);k=n}if(p.length>2)loops.push(p)}return loops}
+
+/* ===== smooth picture tracing: supersampled soft fields + sub-pixel contours (no pixel staircase, shared edges, no gaps) ===== */
+function txUp(w,h){const m=Math.max(w,h);let U=Math.max(2,Math.min(6,Math.round(2400/m)));while(U>2&&w*h*U*U>3.2e6)U--;return{U,W:w*U,H:h*U}}
+function txUpF(S,w,h,U,out){const W=w*U,H=h*U,x0=new Int32Array(W),x1=new Int32Array(W),fx=new Float32Array(W);
+for(let X=0;X<W;X++){let s=(X+.5)/U-.5;if(s<0)s=0;if(s>w-1)s=w-1;const a=Math.floor(s);x0[X]=a;x1[X]=Math.min(w-1,a+1);fx[X]=s-a}
+for(let Y=0;Y<H;Y++){let s=(Y+.5)/U-.5;if(s<0)s=0;if(s>h-1)s=h-1;const a=Math.floor(s),b=Math.min(h-1,a+1),fy=s-a,r0=a*w,r1=b*w,o=Y*W;
+for(let X=0;X<W;X++){const p=x0[X],q=x1[X],f=fx[X],v0=S[r0+p]*(1-f)+S[r0+q]*f,v1=S[r1+p]*(1-f)+S[r1+q]*f;out[o+X]=v0*(1-fy)+v1*fy}}}
+function txBlur(A,w,h,r,T){const n=2*r+1;for(let p=0;p<2;p++){
+for(let y=0;y<h;y++){const o=y*w;let s=0;for(let i=-r;i<=r;i++)s+=A[o+(i<0?0:i>=w?w-1:i)];for(let i=0;i<w;i++){T[o+i]=s/n;const a=i+r+1,b=i-r;s+=A[o+(a>=w?w-1:a)]-A[o+(b<0?0:b)]}}
+for(let x=0;x<w;x++){let s=0;for(let j=-r;j<=r;j++)s+=T[(j<0?0:j>=h?h-1:j)*w+x];for(let y=0;y<h;y++){A[y*w+x]=s/n;const a=y+r+1,b=y-r;s+=T[(a>=h?h-1:a)*w+x]-T[(b<0?0:b)*w+x]}}}}
+/* coverage of the visible picture (0..1, y-up), keeps the soft alpha of transparent PNGs */
+function txVW(c,vis){const{w,h,dat}=c,VW=new Float32Array(w*h);for(let y=0;y<h;y++)for(let i=0;i<w;i++){const a=dat[((h-1-y)*w+i)*4+3];VW[y*w+i]=vis(i,y)?(a>127&&a<255?a/255:1):(a<=127?a/255:0)}return VW}
+function txLoopsS(L,U,minO,minH){const S=L.map(q=>txDP(q.map(a=>[a[0]/U,a[1]/U]),.2)).filter(q=>q.length>2),outs=S.filter(q=>txArea(q)>minO).map(q=>({p:q,a:txArea(q),h:[]}));
+S.filter(q=>txArea(q)<-minH).forEach(q=>{const pt=[q[0][0]+.05,q[0][1]+.05],c=outs.filter(o=>txInside(pt,o.p)||txInside(q[0],o.p)).sort((a,b)=>a.a-b.a)[0];if(c)c.h.push(q)});return outs.map(o=>({p:o.p,h:o.h}))}
+function txSilS(en){const c=TXIMG[en.id],{w,h}=c,vis=txImgVis(en),{U,W,H}=txUp(w,h),VW=txVW(c,vis),A=new Float32Array(W*H);txUpF(VW,w,h,U,A);txBlur(A,W,H,Math.max(1,Math.round(U*.5)),new Float32Array(W*H));return txLoopsS(txTraceF(A,W,H,.5),U,1.2,.8)}
 function txArea(p){return p.reduce((s,q,i)=>{const n=p[(i+1)%p.length];return s+q[0]*n[1]-n[0]*q[1]},0)/2}
 function txInside(pt,p){let r=false;for(let i=0,j=p.length-1;i<p.length;j=i++)if((p[i][1]>pt[1])!==(p[j][1]>pt[1])&&pt[0]<(p[j][0]-p[i][0])*(pt[1]-p[i][1])/(p[j][1]-p[i][1])+p[i][0])r=!r;return r}
 function txTrace(F,w,h){const E=new Map(),ad=(a,b,c2,e)=>{const q=a+','+b;if(!E.has(q))E.set(q,[]);E.get(q).push([c2,e])};
@@ -777,29 +878,123 @@ const open=a=>{const m=a.length,k=new Uint8Array(m);k[0]=k[m-1]=1;const st=[[0,m
 const A=open(p.slice(0,fi+1)),B=open(p.slice(fi).concat([p[0]]));return A.slice(0,-1).concat(B.slice(0,-1))}
 function txLoops2(F,w,h,sm){const L=txTrace(F,w,h),S=q=>sm?txDP(q,.75):q,outs=L.filter(q=>txArea(q)>3).map(q=>({p:S(q),h:[]})).filter(o=>o.p.length>2);
 L.filter(q=>txArea(q)<-3).forEach(q=>{const o=outs.find(o=>txInside([q[0][0]+.1,q[0][1]+.1],o.p))||outs.find(o=>txInside(q[0],o.p));if(o)o.h.push(S(q))});return outs}
-function txImgOuts(en){const c=TXIMG[en.id];if(!c)return null;const key=(en.cw?'w'+txTol(en):'n')+(en.fill?'f':'');if(c.outs[key])return c.outs[key];return c.outs[key]=txLoops2(txImgVis(en),c.w,c.h,1)}
+function txImgOuts(en){const c=TXIMG[en.id];if(!c)return null;const key=(en.cw?'w'+txTol(en):'n')+(en.fill?'f':'')+'|s2';if(c.outs[key])return c.outs[key];return c.outs[key]=txSilS(en)}
 /* reduce the picture to a few real colours (k-means) and trace every colour as its own shape */
-function txImgQuant(en){const c=TXIMG[en.id],{w,h,dat}=c,K=Math.max(2,Math.min(10,(en.k|0)||5)),mono=en.mode==='mono',key='q'+K+'|'+(en.cw?'w'+txTol(en):'n')+(en.fill?'f':'')+(mono?'m'+en.col:'');if(c.outs[key])return c.outs[key];
-const vis=txImgVis(en),lab=new Int16Array(w*h).fill(-1),px=[],bgm=en.cw?txImgBg(c,txTol(en)):null,hole=q=>en.fill&&!(dat[q*4+3]>127&&!(bgm&&bgm[q])),rg=o=>mono?(g=>[g,g,g])(dat[o]*.299+dat[o+1]*.587+dat[o+2]*.114):[dat[o],dat[o+1],dat[o+2]];
-for(let y=0;y<h;y++)for(let i=0;i<w;i++)if(vis(i,y))px.push((h-1-y)*w+i);
-if(!px.length)return c.outs[key]=[];
-const isE=new Uint8Array(w*h);for(let y=0;y<h;y++)for(let i=0;i<w;i++)if(vis(i,y)&&(!vis(i-1,y)||!vis(i+1,y)||!vis(i,y-1)||!vis(i,y+1)))isE[(h-1-y)*w+i]=1;
-let src0=px.filter(q=>!isE[q]&&!hole(q));if(src0.length<50)src0=px.filter(q=>!hole(q));if(!src0.length)src0=px;
-const step=Math.max(1,Math.floor(src0.length/12000)),S=[];for(let i=0;i<src0.length;i+=step){const o=src0[i]*4;S.push(rg(o))}
+/* photo or flat artwork? Measured at a fixed small size (so the picture's resolution does not matter): in a photo, a large share of neighbouring pixels differ by a small-to-medium amount (shading, grain, soft edges); in flat artwork most neighbours are identical or differ by a lot. */
+function txPhotoLike(R,G,B,V,w,h){const f=Math.max(1,Math.floor(Math.max(w,h)/260)),bw=Math.floor(w/f),bh=Math.floor(h/f);if(bw<8||bh<8)return false;const a=new Float32Array(bw*bh*3),ok=new Uint8Array(bw*bh);
+ for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){let n=0,r=0,g=0,b=0;for(let dy=0;dy<f;dy++)for(let dx=0;dx<f;dx++){const q=(y*f+dy)*w+x*f+dx;if(V[q]){n++;r+=R[q];g+=G[q];b+=B[q]}}const o=y*bw+x;if(n===f*f){ok[o]=1;a[o*3]=r/n;a[o*3+1]=g/n;a[o*3+2]=b/n}}
+ let tot=0,mid=0;for(let y=0;y<bh;y++)for(let x=0;x<bw-1;x++){const o=y*bw+x;if(!ok[o]||!ok[o+1])continue;tot++;const d=Math.abs(a[o*3]-a[o*3+3])+Math.abs(a[o*3+1]-a[o*3+4])+Math.abs(a[o*3+2]-a[o*3+5]);if(d>6&&d<45)mid++}
+ return tot>500&&mid/tot>.25}
+function txImgQuant(en){const c=TXIMG[en.id],{w,h,dat}=c,K=Math.max(2,Math.min(16,(en.k|0)||8)),mono=en.mode==='mono',key='q5|'+K+(en.sh?'s':'f')+'|'+(en.cw?'w'+txTol(en):'n')+(en.fill?'f':'')+(mono?'m'+en.col:'');if(c.outs[key])return c.outs[key];
+const vis=txImgVis(en),bgm=en.cw?txImgBg(c,txTol(en)):null,N0=w*h,hole=q=>en.fill&&!(dat[q*4+3]>127&&!(bgm&&bgm[q])),rg=o=>mono?(g=>[g,g,g])(dat[o]*.299+dat[o+1]*.587+dat[o+2]*.114):[dat[o],dat[o+1],dat[o+2]];
+/* y-up arrays: index yi=y*w+i */
+const V=new Uint8Array(N0),HO=new Uint8Array(N0),R=new Float32Array(N0),G=new Float32Array(N0),B=new Float32Array(N0);let nv=0;
+for(let y=0;y<h;y++)for(let i=0;i<w;i++){const yi=y*w+i,q=(h-1-y)*w+i;if(!vis(i,y))continue;V[yi]=1;nv++;if(hole(q)){HO[yi]=1;continue}const s=rg(q*4);R[yi]=s[0];G[yi]=s[1];B[yi]=s[2]}
+if(!nv)return c.outs[key]=[];
+const isE=new Uint8Array(N0),GR=new Float32Array(N0),dx4=[1,-1,0,0],dy4=[0,0,1,-1];
+for(let y=0;y<h;y++)for(let i=0;i<w;i++){const yi=y*w+i;if(!V[yi])continue;let e=0,g=0;for(let k=0;k<4;k++){const X=i+dx4[k],Y=y+dy4[k];if(X<0||Y<0||X>=w||Y>=h||!V[Y*w+X]){e=1;continue}const n=Y*w+X;if(HO[n]||HO[yi])continue;const d=Math.hypot(R[n]-R[yi],G[n]-G[yi],B[n]-B[yi]);if(d>g)g=d}isE[yi]=e;GR[yi]=g}
+const TRN=new Uint8Array(N0);for(let y=0;y<h;y++)for(let i=0;i<w;i++){const yi=y*w+i;if(!V[yi]||GR[yi]<17&&!isE[yi])continue;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const X=i+dx,Y=y+dy;if(X>=0&&Y>=0&&X<w&&Y<h)TRN[Y*w+X]=1}}
+/* colour samples: flat interior pixels only (no anti-aliased blends, no halo) */
+let src0=[];const pick=f=>{const a=[];for(let q=0;q<N0;q++)if(f(q))a.push(q);return a};
+src0=pick(q=>V[q]&&!HO[q]&&!TRN[q]);const photo=nv>3000&&txPhotoLike(R,G,B,V,w,h);
+if(photo){/* PHOTO CLEAN-UP before picking colours: (1) edge-preserving smoothing flattens grain and shading blotches inside a colour but never crosses a real edge, (2) a small unsharp pass makes edges and small lettering crisp again */
+ const TR=new Float32Array(N0),CH=[R,G,B],OUT=CH.map(()=>new Float32Array(N0)),sg=2*22*22,sw=[];for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)sw.push([dx,dy,Math.exp(-(dx*dx+dy*dy)/(2*1.6*1.6))]);
+ for(let y=0;y<h;y++)for(let i=0;i<w;i++){const q=y*w+i;if(!V[q]||HO[q]){OUT[0][q]=R[q];OUT[1][q]=G[q];OUT[2][q]=B[q];continue}let a0=0,a1=0,a2=0,ws=0;
+  for(const[dx,dy,sp]of sw){const X=i+dx,Y=y+dy;if(X<0||Y<0||X>=w||Y>=h)continue;const p=Y*w+X;if(!V[p]||HO[p])continue;const d=(R[p]-R[q])**2+(G[p]-G[q])**2+(B[p]-B[q])**2,wt=sp*Math.exp(-d/sg);a0+=R[p]*wt;a1+=G[p]*wt;a2+=B[p]*wt;ws+=wt}
+  OUT[0][q]=a0/ws;OUT[1][q]=a1/ws;OUT[2][q]=a2/ws}
+ for(let c=0;c<3;c++){const src=OUT[c],bl=src.slice();txBlur(bl,w,h,2,TR);for(let q=0;q<N0;q++){if(!V[q]||HO[q])continue;const v=src[q]+.9*(src[q]-bl[q]);CH[c][q]=v<0?0:v>255?255:v}}}if(src0.length<80)src0=pick(q=>V[q]&&!HO[q]&&!isE[q]&&GR[q]<28);if(src0.length<80)src0=pick(q=>V[q]&&!HO[q]&&!isE[q]);if(src0.length<20)src0=pick(q=>V[q]&&!HO[q]);if(!src0.length)src0=pick(q=>V[q]);
+const step=Math.max(1,Math.floor(src0.length/12000)),S=[];for(let i=0;i<src0.length;i+=step){const q=src0[i];S.push([R[q],G[q],B[q]])}
+if(photo){/* PHOTO: nearly every pixel is shaded, so 'flat' pixels say nothing. Take colour samples from the whole picture instead */const all=pick(q=>V[q]&&!HO[q]),st2=Math.max(1,Math.floor(all.length/16000));S.length=0;for(let i=0;i<all.length;i+=st2){const q=all[i];S.push([R[q],G[q],B[q]])}}
 const d2=(a,b)=>(a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2;let mr=0,mg=0,mb=0;S.forEach(s=>{mr+=s[0];mg+=s[1];mb+=s[2]});const mean=[mr/S.length,mg/S.length,mb/S.length];
-let C=[S.reduce((b,s)=>d2(s,mean)<d2(b,mean)?s:b,S[0]).slice()];const md=S.map(s=>d2(s,C[0]));
-while(C.length<K){let bi=0;for(let i=1;i<S.length;i++)if(md[i]>md[bi])bi=i;if(md[bi]<400)break;const nc=S[bi].slice();C.push(nc);for(let i=0;i<S.length;i++)md[i]=Math.min(md[i],d2(S[i],nc))}
-for(let it=0;it<8;it++){const A=C.map(()=>[0,0,0,0]);S.forEach(s=>{let bi=0,bd=1e12;C.forEach((q,j)=>{const d=d2(s,q);if(d<bd){bd=d;bi=j}});const a=A[bi];a[0]+=s[0];a[1]+=s[1];a[2]+=s[2];a[3]++});C=C.map((q,j)=>A[j][3]?[A[j][0]/A[j][3],A[j][1]/A[j][3],A[j][2]/A[j][3]]:q)}
-px.forEach(q=>{if(hole(q))return;const s=rg(q*4);let bi=0,bd=1e12;for(let j=0;j<C.length;j++){const d=d2(s,C[j]);if(d<bd){bd=d;bi=j}}lab[q]=bi});
-{const qh=px.filter(q=>lab[q]>=0);for(let a=0;a<qh.length;a++){const q=qh[a],x=q%w;for(const n of[x>0?q-1:-1,x<w-1?q+1:-1,q>=w?q-w:-1,q<w*(h-1)?q+w:-1]){if(n>=0&&lab[n]<0&&vis(n%w,h-1-((n/w)|0))){lab[n]=lab[q];qh.push(n)}}}}
-{const l2=lab.slice();px.forEach(q=>{if(!isE[q])return;const x=q%w,y=(q-x)/w,cnt={};let bi=-1,bn=0;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){const X=x+dx,Y=y+dy;if(X<0||Y<0||X>=w||Y>=h)continue;const n=Y*w+X;if(lab[n]<0||isE[n])continue;cnt[lab[n]]=(cnt[lab[n]]||0)+1}for(const l in cnt)if(cnt[l]>bn){bn=cnt[l];bi=+l}if(bi>=0)l2[q]=bi});lab.set(l2)}
-for(let pass=0;pass<2;pass++){const nl=lab.slice();px.forEach(q=>{const x=q%w,y=(q-x)/w,cnt={};let bi=lab[q],bn=0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const X=x+dx,Y=y+dy;if(X<0||Y<0||X>=w||Y>=h)continue;const l=lab[Y*w+X];if(l<0)continue;cnt[l]=(cnt[l]||0)+1}for(const l in cnt)if(cnt[l]>bn){bn=cnt[l];bi=+l}if(bn>=5)nl[q]=bi});lab.set(nl)}
-const area=C.map(()=>0);px.forEach(q=>area[lab[q]]++);const layers=[];
-C.forEach((q,j)=>{if(!area[j])return;const F=(i,y)=>i>=0&&y>=0&&i<w&&y<h&&lab[(h-1-y)*w+i]===j,outs=txLoops2(F,w,h,3);if(outs.length)layers.push({hex:mono?txMonoHex(q[0],en.col):(Math.round(q[0])<<16)|(Math.round(q[1])<<8)|Math.round(q[2]),area:area[j],outs})});
+const labf=c=>{const f=v=>{v/=255;return v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4)},r=f(c[0]),g=f(c[1]),b=f(c[2]),X=(r*.4124+g*.3576+b*.1805)/.95047,Y=r*.2126+g*.7152+b*.0722,Z=(r*.0193+g*.1192+b*.9505)/1.08883,t=v=>v>.008856?Math.cbrt(v):7.787*v+16/116,fx=t(X),fy=t(Y),fz=t(Z);return[116*fy-16,500*(fx-fy),200*(fy-fz)]},dlab=(a,b)=>{const p=labf(a),q=labf(b);return(p[0]-q[0])**2+(p[1]-q[1])**2+(p[2]-q[2])**2};
+let C;
+if(photo){/* k-means++ in a perceptual (Lab) space: dominant colours AND distinct small ones (red stripe, flag, lettering) get their own entry */
+ const lab=labf,
+ SL=S.map(lab),dl=(a,b)=>(a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2;let sd=12345;const rnd=()=>{sd=(sd+0x6D2B79F5)|0;let t=Math.imul(sd^sd>>>15,1|sd);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+ const ci=[Math.floor(rnd()*SL.length)],mdl=SL.map(s=>dl(s,SL[ci[0]]));
+ while(ci.length<K){let tot=0;for(let i=0;i<SL.length;i++)tot+=mdl[i];if(tot<1)break;let r=rnd()*tot,bi=0;for(;bi<SL.length-1;bi++){r-=mdl[bi];if(r<=0)break}ci.push(bi);for(let i=0;i<SL.length;i++){const d=dl(SL[i],SL[bi]);if(d<mdl[i])mdl[i]=d}}
+ let CL=ci.map(i=>SL[i].slice());
+ for(let it=0;it<16;it++){const A=CL.map(()=>[0,0,0,0]);SL.forEach(s=>{let bi=0,bd=1e12;CL.forEach((q,j)=>{const d=dl(s,q);if(d<bd){bd=d;bi=j}});const a=A[bi];a[0]+=s[0];a[1]+=s[1];a[2]+=s[2];a[3]++});CL=CL.map((q,j)=>A[j][3]?[A[j][0]/A[j][3],A[j][1]/A[j][3],A[j][2]/A[j][3]]:q)}
+ /* SMALL BUT DISTINCT COLOURS (a flag stripe, a logo, a red line): k-means only follows the big areas. Find colours that no palette entry is close to but that many samples share, and give them a place */
+ for(let rr=0;rr<4;rr++){const res=SL.map(p=>{let m=1e12;for(const q of CL){const d=dl(p,q);if(d<m)m=d}return m}),idx0=[...res.keys()].filter(i=>res[i]>700),idx=idx0.filter((_,k)=>k%Math.max(1,Math.floor(idx0.length/160))===0);if(!idx.length)break;
+  let bi=-1,bs=0;idx.forEach(i=>{let sp=0;for(let k=0;k<SL.length;k++)if(dl(SL[k],SL[i])<200)sp++;if(sp>bs){bs=sp;bi=i}});if(bi<0||bs<SL.length*.0015)break;
+  let sm=[0,0,0],sn=0;for(let k=0;k<SL.length;k++)if(dl(SL[k],SL[bi])<200){sm[0]+=SL[k][0];sm[1]+=SL[k][1];sm[2]+=SL[k][2];sn++}const nc=[sm[0]/sn,sm[1]/sn,sm[2]/sn];
+  if(CL.length<K+3)CL.push(nc);else{const cn=CL.map(()=>0);SL.forEach(p=>{let b=0,m=1e12;CL.forEach((q,j)=>{const d=dl(p,q);if(d<m){m=d;b=j}});cn[b]++});let lo=0;for(let j=1;j<CL.length;j++)if(cn[j]<cn[lo])lo=j;if(cn[lo]>=bs)break;CL[lo]=nc}}
+ const A=CL.map(()=>[0,0,0,0]);S.forEach((s,i)=>{let bi=0,bd=1e12;CL.forEach((q,j)=>{const d=dl(SL[i],q);if(d<bd){bd=d;bi=j}});const a=A[bi];a[0]+=s[0];a[1]+=s[1];a[2]+=s[2];a[3]++});
+ C=A.filter(a=>a[3]>0).map(a=>[a[0]/a[3],a[1]/a[3],a[2]/a[3]])}
+else{C=[S.reduce((b,s)=>d2(s,mean)<d2(b,mean)?s:b,S[0]).slice()];const md=S.map(s=>d2(s,C[0]));
+while(C.length<K){let bi=0;for(let i=1;i<S.length;i++)if(md[i]>md[bi])bi=i;if(md[bi]<700)break;const nc=S[bi].slice();C.push(nc);for(let i=0;i<S.length;i++)md[i]=Math.min(md[i],d2(S[i],nc))}}
+for(let it=0;it<14;it++){const A=C.map(()=>[0,0,0,0]);S.forEach(s=>{let bi=0,bd=1e12;C.forEach((q,j)=>{const d=d2(s,q);if(d<bd){bd=d;bi=j}});const a=A[bi];a[0]+=s[0];a[1]+=s[1];a[2]+=s[2];a[3]++});C=C.map((q,j)=>A[j][3]?[A[j][0]/A[j][3],A[j][1]/A[j][3],A[j][2]/A[j][3]]:q)}
+{let ch=true;while(ch&&C.length>2){ch=false;const cn=C.map(()=>0);S.forEach(s=>{let bi=0,bd=1e12;C.forEach((q,j)=>{const d=d2(s,q);if(d<bd){bd=d;bi=j}});cn[bi]++});
+ let bi=-1,bj=-1,bd=photo?81:5200;for(let i=0;i<C.length;i++)for(let j=i+1;j<C.length;j++){const d=photo?dlab(C[i],C[j]):d2(C[i],C[j]);if(d<bd){bd=d;bi=i;bj=j}}
+ if(bi>=0){const a=cn[bi]+1,b=cn[bj]+1;C[bi]=[0,1,2].map(k=>(C[bi][k]*a+C[bj][k]*b)/(a+b));C.splice(bj,1);ch=true}}}
+
+let KK=C.length;const M=C.map(()=>new Float32Array(N0)),LB=new Int16Array(N0).fill(-1);
+/* EXACT colours: only flat pixels pick a colour (the nearest one of the picture). Pixels in the soft transition between two colours are never given a made-up in-between colour – they join the nearest flat pixel, so every edge sits exactly where the picture's edge is and no fringe shades appear */
+const nearC=q=>{let bi=0,bd=1e12;for(let j=0;j<KK;j++){const d=(R[q]-C[j][0])**2+(G[q]-C[j][1])**2+(B[q]-C[j][2])**2;if(d<bd){bd=d;bi=j}}return bi};
+const flatOK=q=>V[q]&&!HO[q]&&!TRN[q];
+const nbg=q=>{const x=q%w,y=(q-x)/w;for(let dy=-3;dy<=3;dy++)for(let dx=-3;dx<=3;dx++){const X=x+dx,Y=y+dy;if(X>=0&&Y>=0&&X<w&&Y<h&&!V[Y*w+X])return true}return false};
+let nfl=0;for(let q=0;q<N0;q++)if(V[q]&&!HO[q]&&flatOK(q)){LB[q]=nearC(q);nfl++}
+if(photo){/* PHOTO: label EVERY pixel with its nearest colour (perceptual distance), then remove only blur fringes: a pixel whose colour is a blend of the two different colours on its opposite sides. Real strokes and lettering are not blends, so they stay. */
+ const CLb=C.map(labf),nearP=q=>{const p=labf([R[q],G[q],B[q]]);let bi=0,bd=1e12;for(let j=0;j<KK;j++){const d=(p[0]-CLb[j][0])**2+(p[1]-CLb[j][1])**2+(p[2]-CLb[j][2])**2;if(d<bd){bd=d;bi=j}}return bi};
+ for(let q=0;q<N0;q++)if(V[q]&&!HO[q]){LB[q]=nearP(q);nfl++}
+ for(let pass=0;pass<2;pass++){const fx=[];
+  for(let y=1;y<h-1;y++)for(let i=1;i<w-1;i++){const q=y*w+i;if(!V[q]||HO[q])continue;const j=LB[q];
+   for(let ax=0;ax<2;ax++){const A=ax?q-1:q-w,Bq=ax?q+1:q+w;if(!V[A]||!V[Bq])continue;const a1=LB[A],b1=LB[Bq];if(a1<0||b1<0||a1===b1||a1===j||b1===j)continue;
+    const ca=C[a1],cb=C[b1],ab=[cb[0]-ca[0],cb[1]-ca[1],cb[2]-ca[2]],L2=ab[0]*ab[0]+ab[1]*ab[1]+ab[2]*ab[2]||1,px=[R[q],G[q],B[q]];let t=((px[0]-ca[0])*ab[0]+(px[1]-ca[1])*ab[1]+(px[2]-ca[2])*ab[2])/L2;
+    if(t<.1||t>.9)continue;const r2=(px[0]-ca[0]-t*ab[0])**2+(px[1]-ca[1]-t*ab[1])**2+(px[2]-ca[2]-t*ab[2])**2;
+    if(r2<1100){fx.push([q,t<.5?a1:b1]);break}}}
+  fx.forEach(f=>LB[f[0]]=f[1])}}
+if(nfl<30)for(let q=0;q<N0;q++)if(V[q]&&!HO[q])LB[q]=nearC(q);
+/* IN-BETWEEN PIXELS: a pixel on an edge or on a hair-line is a mix of the colours around it. Look at the pure colours within 2 px and decide which of them (or which pair) explains it best, then give the pixel to the dominant one. A thin line therefore keeps its own pixels instead of being swallowed by the colour beside it, and a blend can never turn into some unrelated third colour. */
+const blk=C.map((c,j)=>{for(let a=0;a<C.length;a++)for(let b=a+1;b<C.length;b++){if(a===j||b===j)continue;const ab=[C[b][0]-C[a][0],C[b][1]-C[a][1],C[b][2]-C[a][2]],L2=ab[0]*ab[0]+ab[1]*ab[1]+ab[2]*ab[2]||1,t=((c[0]-C[a][0])*ab[0]+(c[1]-C[a][1])*ab[1]+(c[2]-C[a][2])*ab[2])/L2;if(t<.12||t>.88)continue;const d=(c[0]-C[a][0]-t*ab[0])**2+(c[1]-C[a][1]-t*ab[1])**2+(c[2]-C[a][2]-t*ab[2])**2;if(d<1500)return true}return false});
+const PRI=new Int16Array(N0).fill(-1),SEC=new Int16Array(N0).fill(-1),WP=new Float32Array(N0).fill(1);
+{const PUR=new Int16Array(N0).fill(-1);for(let q=0;q<N0;q++){if(!V[q]||HO[q])continue;const j=nearC(q);if(!blk[j]&&(R[q]-C[j][0])**2+(G[q]-C[j][1])**2+(B[q]-C[j][2])**2<=4200)PUR[q]=j}
+ const todo=[];for(let q=0;q<N0;q++)if(V[q]&&!HO[q]&&LB[q]<0)todo.push(q);
+ for(const q of todo){const x=q%w,y=(q-x)/w,cd=[];
+  for(let dy=-3;dy<=3;dy++)for(let dx=-3;dx<=3;dx++){const X=x+dx,Y=y+dy;if(X<0||Y<0||X>=w||Y>=h)continue;const p=PUR[Y*w+X];if(p>=0&&cd.indexOf(p)<0)cd.push(p)}
+  if(!cd.length)continue;const px=[R[q],G[q],B[q]];let bj=-1,br=1e12,bk=-1,bw=1;
+  for(let i=0;i<cd.length;i++){const a=C[cd[i]],r1=(px[0]-a[0])**2+(px[1]-a[1])**2+(px[2]-a[2])**2;if(r1<br){br=r1;bj=cd[i];bk=-1;bw=1}
+   for(let k=i+1;k<cd.length;k++){const b=C[cd[k]],ab=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],L2=ab[0]*ab[0]+ab[1]*ab[1]+ab[2]*ab[2]||1;let t=((px[0]-a[0])*ab[0]+(px[1]-a[1])*ab[1]+(px[2]-a[2])*ab[2])/L2;if(t<0)t=0;if(t>1)t=1;
+    const r2=(px[0]-a[0]-t*ab[0])**2+(px[1]-a[1]-t*ab[1])**2+(px[2]-a[2]-t*ab[2])**2+120;if(r2<br*.8){br=r2;if(t>=.5){bj=cd[k];bk=cd[i];bw=t}else{bj=cd[i];bk=cd[k];bw=1-t}}}}
+  if(bj>=0){LB[q]=bj;PRI[q]=bj;SEC[q]=bk;WP[q]=bw}}}
+const grow=()=>{let fr=[];for(let q=0;q<N0;q++)if(LB[q]>=0)fr.push(q);const nb=[1,-1,w,-w,w+1,w-1,-w+1,-w-1];
+ while(fr.length){const nx=[];for(const q of fr){const x=q%w;for(let k=0;k<8;k++){const dx=k===0||k===4||k===6?1:k===1||k===5||k===7?-1:0,n=q+nb[k];if(x+dx<0||x+dx>=w||n<0||n>=N0||!V[n]||LB[n]>=0)continue;LB[n]=LB[q];nx.push(n)}}fr=nx}
+ for(let q=0;q<N0;q++)if(V[q]&&LB[q]<0)LB[q]=nearC(q)};
+grow();
+/* tiny specks and 1-pixel slivers are not real parts of the picture: hand them to the colour around them */
+{const minPx=Math.max(3,Math.round(nv*.00002)),seen=new Uint8Array(N0);let cut=false;
+ for(let q0=0;q0<N0;q0++){if(!V[q0]||seen[q0])continue;const l=LB[q0],st=[q0],cp=[q0];seen[q0]=1;
+  while(st.length){const q=st.pop(),x=q%w;const t=[x>0?q-1:-1,x<w-1?q+1:-1,q>=w?q-w:-1,q<N0-w?q+w:-1];for(const n of t){if(n>=0&&V[n]&&!seen[n]&&LB[n]===l){seen[n]=1;st.push(n);cp.push(n)}}}
+  if(cp.length<minPx){let a0=1e9,a1=-1,b0=1e9,b1=-1;cp.forEach(q=>{const x=q%w,y=(q-x)/w;if(x<a0)a0=x;if(x>a1)a1=x;if(y<b0)b0=y;if(y>b1)b1=y});if(Math.max(a1-a0,b1-b0)<4){cut=true;cp.forEach(q=>LB[q]=-2)}}}
+ if(cut){for(let q=0;q<N0;q++)if(LB[q]===-2)LB[q]=-1;grow()}}
+if(en.sh&&!mono){const n0=C.length,rs=Math.max(4,Math.round(Math.max(w,h)/38)),T=new Float32Array(N0);
+ for(let j=0;j<n0;j++){const idx=[];for(let q=0;q<N0;q++)if(LB[q]===j)idx.push(q);if(idx.length<Math.max(600,nv*.03)||Math.max(C[j][0],C[j][1],C[j][2])-Math.min(C[j][0],C[j][1],C[j][2])<60)continue;
+  const m=new Float32Array(N0),l=new Float32Array(N0);let mm=0,ml=0,mc=0;idx.forEach(q=>{if(!HO[q]){m[q]=1;l[q]=R[q]*.299+G[q]*.587+B[q]*.114;ml+=l[q];mc++}});if(mc<300)continue;ml/=mc;
+  txBlur(m,w,h,rs,T);txBlur(l,w,h,rs,T);
+  const Ls=idx.map(q=>m[q]>1e-3?l[q]/m[q]:ml),so=Ls.slice().sort((a,b)=>a-b),lo=so[Math.floor(so.length*.04)],hi=so[Math.floor(so.length*.96)],rg=hi-lo,nl=Math.max(1,Math.min(5,Math.round(rg/16)));if(nl<2)continue;
+  const lv=idx.map((q,k)=>Math.max(0,Math.min(nl-1,Math.floor((Ls[k]-lo)/rg*nl))));
+  const sm=[];for(let t=0;t<nl;t++)sm.push([0,0,0,0]);idx.forEach((q,k)=>{if(HO[q])return;const a=sm[lv[k]];a[0]+=R[q];a[1]+=G[q];a[2]+=B[q];a[3]++});
+  const ids=[];for(let t=0;t<nl;t++){const a=sm[t],col=a[3]?[a[0]/a[3],a[1]/a[3],a[2]/a[3]]:C[j].slice();if(t===0){C[j]=col;ids.push(j)}else{C.push(col);M.push(new Float32Array(N0));ids.push(C.length-1)}}
+  idx.forEach((q,k)=>{LB[q]=ids[lv[k]]})}
+ KK=C.length}
+for(let q=0;q<N0;q++)if(V[q]&&LB[q]>=0){if(PRI[q]===LB[q]&&SEC[q]>=0){M[LB[q]][q]=WP[q];M[SEC[q]][q]=1-WP[q]}else M[LB[q]][q]=1}
+const area=C.map((_,j)=>{let s=0;for(let q=0;q<N0;q++)if(V[q])s+=M[j][q];return s});
+/* supersample, soften a hair, and let the strongest colour win each spot */
+const{U,W,H}=txUp(w,h),NN=W*H,TM=new Float32Array(NN),r=Math.max(1,Math.round(U*.55)),Bu=[];
+const rsh=Math.max(2,Math.round(U*1.7)),G2=new Float32Array(NN);
+/* RIDGE BOOST: a hair-line is blurred in the picture, so its colour only reaches 30-40 % at its centre and would lose to the wide colours beside it. Sharpen every colour field (field minus its blurred copy): thin ridges rise above the neighbours, while a normal edge between two colours stays exactly where it was. */
+for(let j=0;j<KK;j++){if(area[j]<1){Bu.push(null);continue}const f=new Float32Array(NN);txUpF(M[j],w,h,U,f);txBlur(f,W,H,r,TM);G2.set(f);txBlur(G2,W,H,rsh,TM);for(let n=0;n<NN;n++){const v=f[n]+1.3*(f[n]-G2[n]);f[n]=v<0?0:v}Bu.push(f)}
+const best=new Float32Array(NN),sec=new Float32Array(NN),bi=new Int8Array(NN);
+for(let j=0;j<KK;j++){const f=Bu[j];if(!f)continue;for(let n=0;n<NN;n++){const v=f[n];if(v>best[n]){sec[n]=best[n];best[n]=v;bi[n]=j}else if(v>sec[n])sec[n]=v}}
+const AF=new Float32Array(NN);txUpF(txVW(c,vis),w,h,U,AF);txBlur(AF,W,H,Math.max(1,Math.round(U*.7)),TM);
+const layers=[];
+for(let j=0;j<KK;j++){const f=Bu[j];if(!f)continue;const E=TM;for(let n=0;n<NN;n++){const D=f[n]-(bi[n]===j?sec[n]:best[n])+.08,Aa=AF[n]-.5;E[n]=D<Aa?D:Aa}
+const outs=txLoopsS(txTraceF(E,W,H,0),U,.35,.25);if(outs.length)layers.push({hex:mono?txMonoHex(C[j][0],en.col):(Math.round(C[j][0])<<16)|(Math.round(C[j][1])<<8)|Math.round(C[j][2]),area:area[j],outs})}
 layers.sort((a,b)=>b.area-a.area);return c.outs[key]=layers}
 function txImgXf(en,c){const sc=en.w/c.w,r=(en.rot||0)*Math.PI/180,co=Math.cos(r),si=Math.sin(r);return q=>q.map(a=>{const X=(a[0]-c.w/2)*sc,Z=-(a[1]-c.h/2)*sc*(en.ys||1);return{x:X*co-Z*si+en.x,z:X*si+Z*co+en.z}})}
 function txImgPolys(en){const outs=txImgOuts(en),c=TXIMG[en.id];if(!outs||!outs.length)return null;const cv=txImgXf(en,c);return outs.map(o=>({p:cv(o.p),h:o.h.map(cv)}))}
-function txImgLayers(en){const c=TXIMG[en.id];if(!c||en.mode==='one')return null;const Ls=txImgQuant(en);if(!Ls.length)return null;const cv=txImgXf(en,c);return Ls.map(l=>({hex:l.hex,polys:l.outs.map(o=>({p:cv(o.p),h:o.h.map(cv)}))}))}
+function txImgLayers(en){const c=TXIMG[en.id];if(!c||en.mode==='one')return null;const Ls=txImgQuant(en);if(!Ls.length)return null;const cv=txImgXf(en,c);return Ls.map(l=>({hex:(window.fcMap?fcMap(en,l.hex):l.hex),polys:l.outs.map(o=>({p:cv(o.p),h:o.h.map(cv)}))}))}
 function txMonoHex(g,col){const t=Math.max(0,Math.min(1,g/255)),k=.22+.78*t,c=parseInt(String(col||'#888888').slice(1),16)||0;return(Math.round((c>>16&255)*k)<<16)|(Math.round((c>>8&255)*k)<<8)|Math.round((c&255)*k)}
 const txHex6=h=>'#'+h.toString(16).padStart(6,'0');
 /* ---- key-ring hole shapes + plate union ---- */
@@ -856,7 +1051,7 @@ const k=R.k;let x0=0,x1=0,z0=0,z1=0;if(outs.length){x0=1e9;x1=-1e9;z0=1e9;z1=-1e
 const cx=(x0+x1)/2,cz=(z0+z1)/2,cvt=q=>q.map(a=>({x:a[0]*k-cx,z:-a[1]*k-cz})),tp=outs.map(o=>({p:cvt(o.p),h:o.h.map(cvt)})),ip=imgs.map(en=>({en,polys:txImgPolys(en),layers:txImgLayers(en)})).filter(o=>o.polys);
 let bb=null;const grow=a=>{if(!bb)bb={x0:a.x,x1:a.x,z0:a.z,z1:a.z};else{bb.x0=Math.min(bb.x0,a.x);bb.x1=Math.max(bb.x1,a.x);bb.z0=Math.min(bb.z0,a.z);bb.z1=Math.max(bb.z1,a.z)}};
 tp.forEach(o=>o.p.forEach(grow));ip.forEach(o=>o.polys.forEach(pl=>pl.p.forEach(grow)));if(!bb)return null;
-const g=new THREE.Group(),put=(f,t)=>{if(lo)return;const m=f();m.userData.tp=t;g.add(m)},hexOf=c=>new THREE.Color(c).getHex();
+const g=new THREE.Group(),put=(f,t)=>{if(lo)return;const m=f();m.userData.tp=t;if(t==='image')m.userData.noEdges=true;g.add(m)},hexOf=c=>new THREE.Color(c).getHex();
 const baseP=[];ip.forEach(o=>{const en=o.en;if(!en.bs||en.bs==='none')return;let a=1e9,b=-1e9,c=1e9,d=-1e9;o.polys.forEach(pl=>pl.p.forEach(r=>{a=Math.min(a,r.x);b=Math.max(b,r.x);c=Math.min(c,r.z);d=Math.max(d,r.z)}));if(a>1e8)return;const g0=Math.max(0,p.gap),sh=txShape(en.bs,(b-a)/2+g0,(d-c)/2+g0,en.cs,{w:en.sw>0?en.sw:0,d:en.sd>0?en.sd:0,a:en.sa}),_sb=(TXSBI[en.id]=txBox(sh));baseP.push(sh.map(q=>({x:q.x+(a+b)/2,z:q.z+(c+d)/2})))});
 const plOn=p.pl||baseP.length>0;
 let ty=0,PL=[],hole=null;
@@ -879,15 +1074,16 @@ if(plOn){const gap=p.gap,hm=p.pl?(p.hm||(p.ring?'tab':'none')):'none',bw=p.bw,bd
  const pt=p.pth;ty=pt;const hIn=P=>hole&&txIn({x:hole.cx,z:hole.cz},P)?[bdOn?hole.Hout:hole.H]:[];
  if(!lo){PL.forEach(P=>{if(bdOn){const inn=txInset(P,bw);put(()=>M(ext(P,pt+p.bh,inn),hexOf(p.bcol)),'border');inn.forEach(q=>put(()=>M(ext(q,pt,hIn(q)),hexOf(p.pcol)),'plate'))}else put(()=>M(ext(P,pt,hIn(P)),hexOf(p.pcol)),'plate')});
   if(hole&&bdOn)put(()=>M(ext(hole.Hout,pt+p.bh,[hole.H]),hexOf(p.bcol)),'ring')}}
-ip.forEach(o=>{const en=o.en,ty2=(p.pl||(en.bs&&en.bs!=='none'))?ty:0,T=imT(en);if(o.layers){const st=imS(en);o.layers.forEach((l,li)=>{const hgt=T+li*st;l.polys.forEach(pl=>put(()=>M(ext(pl.p,hgt+.02,pl.h),l.hex,0,ty2-.02,0),'image'))})}
+ip.forEach(o=>{const en=o.en,ty2=(p.pl||(en.bs&&en.bs!=='none'))?ty:0,T=imT(en);if(o.layers){const st=imS(en);o.layers.forEach((l,li)=>{const hgt=T+li*st+li*.01;l.polys.forEach(pl=>put(()=>M(ext(pl.p,hgt+.02,pl.h),l.hex,0,ty2-.02,0),'image'))})}
  else{const c=hexOf(en.same?p.pcol:en.col);o.polys.forEach(pl=>put(()=>M(ext(pl.p,T+.02,pl.h),c,0,ty2-.02,0),'image'))}});
 const tc=hexOf(p.col),tyT=p.pl?ty:0;tp.forEach(o=>put(()=>M(ext(o.p,(p.flat?.2:p.d)+.02,o.h),tc,0,tyT-.02,0),'text'));
+if(imgs.some(e=>e.sh&&e.mode!=='one'))g.traverse(n=>{n.userData.noEdges=true});
 TXLAY={p,PL:plOn?PL:[],hole:plOn?hole:null,tp,ip:ip.map(o=>({id:o.en.id,polys:o.polys,layers:o.layers})),bb};return g}
 function txRead(){const v=i=>$(i).value,n=(i,d,lo)=>Math.max(lo,Number.isFinite(parseFloat(v(i)))?parseFloat(v(i)):d);return{txt:v('tx'),font:(TXFONTS.find(f=>f[0]===v('txf'))||TXFONTS[0])[1],fname:v('txf'),h:n('th',12,1),d:n('td',3,.2),col:v('txc'),pl:$('kp_on').checked,shape:v('kp_sh'),gap:n('kp_gap',2.5,0),pth:n('kp_th',2,.4),pcol:v('kp_col'),bd:$('kp_bd').checked,bw:n('kp_bw',1.2,.3),bh:n('kp_bh',.8,0),bcol:v('kp_bcol'),ring:$('kp_hm').value!=='none',hm:v('kp_hm'),hs:v('kp_hs'),rd:n('kp_rd',4,2),hwall:n('kp_hw',2,.6),hside:v('kp_hside'),hoff:Number.isFinite(parseFloat(v('kp_hoff')))?parseFloat(v('kp_hoff')):0,hsl:Number.isFinite(parseFloat(v('kp_hsl')))?parseFloat(v('kp_hsl')):0,imgs:JSON.parse(JSON.stringify(TXIM)),lw:n('tx_w',100,40),sw:shOv('kp_sw'),sd:shOv('kp_sd'),sa:Math.min(150,Math.max(20,parseFloat($('kp_sa').value)||60)),pex:n('kp_ex',0,0),ag:n('kp_ag',0,0),jw:n('kp_jw',0,0),bold:$('tx_b').checked,ital:$('tx_i').checked,flat:$('tx_fl').checked,cs:TXCS.plate?TXCS.plate.map(q=>q.slice()):null}}
 function txRebuild(w){const p=w.userData.tx,g=txBuild(p);if(!g){hint.textContent='Could not create text.';return}
 w.children.slice().forEach(c=>{w.remove(c);c.traverse(n=>{if(n.geometry)n.geometry.dispose()})});
 const b=new THREE.Box3().setFromObject(g),c=b.getCenter(V(0,0,0));g.position.set(-c.x,-b.min.y,-c.z);w.add(g);
-g.traverse(n=>{if(n.isMesh&&n.geometry.attributes.position.count<40000)n.add(new THREE.LineSegments(new THREE.EdgesGeometry(n.geometry,25),new THREE.LineBasicMaterial({color:edc})))});
+g.traverse(n=>{if(n.isMesh&&!n.userData.noEdges&&n.geometry.attributes.position.count<40000)n.add(new THREE.LineSegments(new THREE.EdgesGeometry(n.geometry,25),new THREE.LineBasicMaterial({color:edc})))});
 own(w);w.userData.name=w.userData.name.replace(/^Text “[\s\S]*”( \d+)$/,(m,s)=>'Text “'+(p.txt.trim()||'pictures').slice(0,12)+'”'+s);if(w.userData.hole)setHole(w,true);select([w]);
 if(p.pl&&p.bd&&p.bw>=p.gap)hint.textContent='Tip: the border is as wide as the gap, so it touches the letters – raise the gap or thin the border.'}
 
@@ -905,7 +1101,7 @@ function tris(){const o=[];objs.filter(r=>!r.userData.hole).forEach(r=>{r.update
 for(let i=0;i<n;i++){v.fromBufferAttribute(pos,ix?ix.getX(i):i).applyMatrix4(c.matrixWorld);o.push([v.x,-v.z,v.y])}})});return o}
 /* coloured exports: every triangle keeps the colour of the mesh it belongs to */
 function trisC(){const T=[],C=[];objs.filter(r=>!r.userData.hole).forEach(r=>{r.updateMatrixWorld(true);r.traverse(c=>{if(!c.isMesh||!inc(c))return;const pos=c.geometry.attributes.position,ix=c.geometry.index,n=ix?ix.count:pos.count,v=V(0,0,0);let hex=0x8a93a3;try{const mt=Array.isArray(c.material)?c.material[0]:c.material;if(mt&&mt.color)hex=mt.color.getHex()}catch(e){}
-for(let i=0;i<n;i++){v.fromBufferAttribute(pos,ix?ix.getX(i):i).applyMatrix4(c.matrixWorld);T.push([v.x,-v.z,v.y]);if(i%3===2)C.push(hex)}})});return{t:T,c:C}}
+for(let i=0;i<n;i++){v.fromBufferAttribute(pos,ix?ix.getX(i):i).applyMatrix4(c.matrixWorld);T.push([v.x,-v.z,v.y]);if(i%3===2)C.push(hex)}})});return{t:T,c:(window.fcExport?fcExport(C):C)}}
 const hx6=h=>h.toString(16).padStart(6,'0');
 function objC(){const{t,c}=trisC(),E=new TextEncoder(),cols=[...new Set(c)];let s='# MiniCAD export (mm, Z up)\nmtllib design.mtl\n';t.forEach(v=>s+=`v ${v[0]} ${v[1]} ${v[2]}\n`);
 const by=new Map();c.forEach((h,i)=>{if(!by.has(h))by.set(h,[]);by.get(h).push(i)});by.forEach((ids,h)=>{s+=`usemtl c_${hx6(h)}\n`;ids.forEach(i=>{s+=`f ${3*i+1} ${3*i+2} ${3*i+3}\n`})});
@@ -939,8 +1135,8 @@ function partFiles(){const out=[];if(!window.V70||!V70.asmOf)return out;objs.for
   const bb=new THREE.Box3();T.forEach(v=>bb.expandByPoint(v));const cx=(bb.min.x+bb.max.x)/2,cz=(bb.min.z+bb.max.z)/2;
   out.push({name:base+' - '+(pn[r]||r)+'.stl',data:stlOf(T.map(v=>[v.x-cx,-(v.z-cz),v.y-bb.min.y]))})})});window._pfn=out.map(f=>f.name);return out}
 let dls=null;if(window.claude)claude.use('downloads').then(d=>dls=d).catch(()=>{});
-$('exp').onclick=async()=>{if(!objs.length){hint.textContent='Nothing to export yet.';return}const pf=partFiles(),m3=await mf3(),oc=objC(),z=zip([{name:'design.3mf',data:m3},{name:'design.obj',data:oc.o},{name:'design.mtl',data:oc.m},{name:'design.stl',data:stl()}].concat(pf));
-try{if(dls)await dls.save({filename:'minicad-design.zip',data:z});else{const a=document.createElement('a');a.href=URL.createObjectURL(z);a.download='minicad-design.zip';a.click()}hint.textContent='Exported zip: design.3mf (coloured – open this one in your slicer), design.obj + design.mtl (coloured) and design.stl (STL cannot store colour) (mm, Z-up)'+(pf.length?' plus each printed piece on its own: '+pf.map(f=>f.name).join(', '):'')+'. Holes are excluded.'}
+$('exp').onclick=async()=>{if(!objs.length){hint.textContent='Nothing to export yet.';return}const pf=partFiles(),m3=await mf3(),oc=objC(),z=zip([{name:'design.3mf',data:m3},{name:'design-bambu.3mf',data:await mf3b()},{name:'design.obj',data:oc.o},{name:'design.mtl',data:oc.m},{name:'design.stl',data:stl()}].concat(pf));
+try{if(dls)await dls.save({filename:'minicad-design.zip',data:z});else{const a=document.createElement('a');a.href=URL.createObjectURL(z);a.download='minicad-design.zip';a.click()}hint.textContent='Exported zip: design.3mf (coloured, any slicer) + design-bambu.3mf (one filament slot per colour, for Bambu Studio / Orca), design.obj + design.mtl (coloured) and design.stl (STL cannot store colour) (mm, Z-up)'+(pf.length?' plus each printed piece on its own: '+pf.map(f=>f.name).join(', '):'')+'. Holes are excluded.'}
 catch(e){hint.textContent=e&&e.code==='declined'?'Export cancelled.':'Export is not available in this view.'}};
 function tab(n){n=({parts:'shapes',text:'shapes',cut:'era',wheels:'gears'})[n]||n;document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===n));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='p-'+n));try{if(n!=='era'&&['erase','cutr','cutc'].includes(tool))setTool('select')}catch(e){}}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>tab(b.dataset.p));
@@ -1301,7 +1497,7 @@ $('pe_ok').onclick=pendOk;$('pe_no').onclick=pendNo;
 $('pend').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();pendOk()}else if(e.key==='Escape')pendNo()});
 const pv=V(0,0,0);
 (function loop(){requestAnimationFrame(loop);objs.forEach(o=>{const l=o.userData.link;if(!l)return;if(o.userData.gearAttach){__syncGearAttachment(o);if(o.userData.drv&&o.userData.drv.R)o.userData.drv.R.rotation[o.userData.drv.R.userData.ax]=l.rotation.y-((gp(l)||{}).da||0)-o.rotation.y;return}if(!objs.includes(l)){delete o.userData.link;return}if(!(l.userData&&l.userData.hz)){o.position.x=l.position.x;o.position.z=l.position.z}if(o.userData.drv&&o.userData.drv.R)o.userData.drv.R.rotation[o.userData.drv.R.userData.ax]=l.rotation.y-((gp(l)||{}).da||0)-o.rotation.y;else o.rotation.y=l.rotation.y});if(lf){lf=false;keepAbove()}tick();bx.forEach(b=>b.update());
-const on=tool==='select'&&sel.length===1;const _gearSel=on&&isG(sel[0]);handles.forEach(h=>h.visible=on&&gm==='size'&&!(_gearSel&&!h.userData.d.lift));rings.forEach(r=>r.visible=on&&gm==='rot');
+const on=tool==='select'&&sel.length===1&&!isKC(sel[0]);const _gearSel=on&&isG(sel[0]);handles.forEach(h=>h.visible=on&&gm==='size'&&!(_gearSel&&!h.userData.d.lift));rings.forEach(r=>r.visible=on&&gm==='rot');
 if(on){const b=new THREE.Box3().setFromObject(sel[0]),m=b.getCenter(V(0,0,0)),k=dist*.012;handles.forEach(h=>{const d=h.userData.d;if(d.cn)h.position.set(d.sx>0?b.max.x:b.min.x,d.sy>0?b.max.y:b.min.y,d.sz>0?b.max.z:b.min.z);else if(d.lift)h.position.set(m.x,b.max.y+k*3.2,m.z);else{h.position.copy(m);h.position[d.ax]=d.sg>0?b.max[d.ax]:b.min[d.ax]}h.scale.setScalar(d.cn?k*.9:k)})}
 $('pbar').style.display=(pts.length&&(tool==='poly'||tool==='erase'))?'flex':'none';cutUi();if(on&&gm==='rot'){const b=bbx(sel[0]),c=b.getCenter(V(0,0,0)),Rr=b.getSize(V(0,0,0)).length()*.4+6;rings.forEach(r=>{r.position.copy(c);r.scale.setScalar(Rr)})}
 updDpm();R.render(S,cam);meas.forEach(m=>{pv.copy(m.a).add(m.b).multiplyScalar(.5).project(cam);m.el.style.display=pv.z<1?'block':'none';m.el.style.left=(pv.x*.5+.5)*vp.clientWidth+'px';m.el.style.top=(-pv.y*.5+.5)*vp.clientHeight+'px'})})();
@@ -1752,8 +1948,9 @@ info();hint.textContent=(fits?'Arranged '+G.length+' group(s) on the bed':'⚠ A
 $('dropb').onclick=()=>{const T=(sel.length?sel:objs.filter(o=>!o.userData.link&&!o.userData.hubOf&&!o.userData.hole));if(!T.length){hint.textContent='Nothing to lay on the bed.';return}commit();const seen=new Set();T.forEach(o=>{const r=rootOf2(o);if(seen.has(r))return;seen.add(r);const dy=-famBox(r).min.y;fam(r).forEach(k=>k.position.y+=dy)});info();hint.textContent='Laid flat on the bed.'};
 TXFONTS.forEach(f=>{const o=document.createElement('option');o.textContent=f[0];$('txf').appendChild(o)});KPSHAPES.forEach(s=>{const o=document.createElement('option');o.value=s[0];o.textContent=s[1];$('kp_sh').appendChild(o)});
 ['#2b6cb0','#d92d4b','#1a8f3c','#e8590c','#7a4de0','#0e9384','#1b2330','#ffffff'].forEach(c=>{const b=document.createElement('button');b.style.cssText='width:20px;height:20px;padding:0!important;min-height:0!important;border-radius:50%;background:'+c;b.onclick=()=>{$('txc').value=c;$('txc').dispatchEvent(new Event('input'))};$('txsw').appendChild(b)});
+function isKC(o){return!!(o&&o.userData&&o.userData.tx&&o.userData.tx.pl)}
 const isTxt=o=>/^Text “/.test(nameOf(o)),txSel=()=>{const o=sel.length===1&&sel[0];return o&&isTxt(o)&&o.userData.tx?o:null};
-let txTm=0,imSel=null,imN=0,PV=null,imDrag=null;
+let txTm=0,imSel=null,imN=0,PV=null,imDrag=null;window.__fcIm={sel:()=>imSel,el:id=>TXIM.find(e=>e.id===id)};
 const imEl=id=>TXIM.find(e=>e.id===id),num=(i,d)=>{const v=parseFloat($(i).value);return Number.isFinite(v)?v:d};
 function txVis(){window.shSync&&shSync();$('td').disabled=$('tx_fl').checked;$('kp_draw').style.display=$('kp_sh').value==='custom'?'':'none';$('kp_pb').style.display=$('kp_on').checked?'':'none';$('kp_bdb').style.display=$('kp_bd').checked?'':'none';$('kp_rgb').style.display=$('kp_hm').value!=='none'?'':'none'}
 /* ---- live preview (top view) ---- */
@@ -1791,7 +1988,7 @@ if(!PV3){const r=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
  cv.addEventListener('wheel',e=>{e.preventDefault();PV3.dist=Math.max(15,Math.min(800,PV3.dist*(e.deltaY>0?1.1:.9)));pv3Render()},{passive:false})}
 const g=txBuild(TXLAY.p);if(!g)return;
 if(PV3.g){PV3.sc.remove(PV3.g);PV3.g.traverse(n=>{if(n.geometry)n.geometry.dispose()})}
-g.traverse(n=>{if(n.isMesh){n.castShadow=true;n.receiveShadow=true;if(n.geometry.attributes.position.count<60000)n.add(new THREE.LineSegments(new THREE.EdgesGeometry(n.geometry,28),new THREE.LineBasicMaterial({color:0x1b2330,transparent:true,opacity:.35})))}});
+g.traverse(n=>{if(n.isMesh){n.castShadow=true;n.receiveShadow=true;if(!n.userData.noEdges&&n.geometry.attributes.position.count<60000)n.add(new THREE.LineSegments(new THREE.EdgesGeometry(n.geometry,28),new THREE.LineBasicMaterial({color:0x1b2330,transparent:true,opacity:.35})))}});
 PV3.sc.add(g);PV3.g=g;const bx=new THREE.Box3().setFromObject(g),sz=bx.getSize(new THREE.Vector3()),ct=bx.getCenter(new THREE.Vector3());
 if(!PV3.box||PV3.fresh!==false){PV3.dist=Math.max(sz.x/(2*Math.tan(.28)*(cv.width/cv.height)),sz.z/(2*Math.tan(.28)))*1.25+sz.y*2;PV3.fresh=false}
 PV3.tg.copy(ct);PV3.box=bx;const m=Math.max(sz.x,sz.z);const sh=PV3.d1.shadow.camera;sh.left=sh.bottom=-m;sh.right=sh.top=m;sh.near=1;sh.far=600;sh.updateProjectionMatrix();PV3.d1.target.position.copy(ct);PV3.d1.position.set(ct.x-m*.8,ct.y+m*1.6,ct.z+m*1.1);pv3Render()}
@@ -1824,18 +2021,18 @@ var txRaf=0;
 function txApplyFast(){txRaf=0;TXFAST=true;try{const p=txRead();if(!txBuild(p,true))TXLAY=null;PV=null;pvDraw();shSync()}catch(e){}finally{TXFAST=false}}
 function txSched(ms){clearTimeout(txTm);if(ms==null){if(!txRaf)txRaf=requestAnimationFrame(txApplyFast);ms=380}else{cancelAnimationFrame(txRaf);txRaf=0}txTm=setTimeout(txApply,ms)}
 /* ---- pictures ---- */
-function imFields(){const e=imEl(imSel),ed=$('im_ed');ed.style.display=e?'':'none';if(!e)return;const s=(i,v)=>{const el=$(i);if(document.activeElement===el)return;if(el.value!==String(v))el.value=v};{const c=TXIMG[e.id],V=c?c.h*e.w/c.w*(e.ys||1):0;const w0=e.w0||(e.w0=e.w);[['im_hv',+(+e.t).toFixed(1)],['im_wv',+(+e.w).toFixed(1)],['im_lv',+V.toFixed(1)],['im_sv',Math.round(e.w/w0*100)]].forEach(([i,v])=>{const el=$(i);if(document.activeElement!==el&&el.value!==String(v))el.value=v});s('im_l',+V.toFixed(1));s('im_sc',Math.round(e.w/w0*100))}s('im_x',+e.x.toFixed(2));s('im_z',+(-e.z).toFixed(2));s('im_w',+e.w.toFixed(2));s('im_r',e.rot);s('im_t',e.t);s('im_c',e.col);s('im_mode',e.mode||'orig');s('im_k',e.k||5);s('im_st',e.st==null?.3:e.st);s('im_tol',e.tol==null?40:e.tol);s('im_bs',e.bs||'none');shLoadIm(e);shSync();$('im_bd').style.display=e.bs==='custom'?'':'none';$('im_same').checked=e.same;$('im_cw').checked=e.cw;$('im_fill').checked=!!e.fill;$('im_flat').checked=!!e.flat;imDis(e)}
+function imFields(){const e=imEl(imSel),ed=$('im_ed');ed.style.display=e?'':'none';if(!e)return;const s=(i,v)=>{const el=$(i);if(document.activeElement===el)return;if(el.value!==String(v))el.value=v};{const c=TXIMG[e.id],V=c?c.h*e.w/c.w*(e.ys||1):0;const w0=e.w0||(e.w0=e.w);[['im_hv',+(+e.t).toFixed(1)],['im_wv',+(+e.w).toFixed(1)],['im_lv',+V.toFixed(1)],['im_sv',Math.round(e.w/w0*100)]].forEach(([i,v])=>{const el=$(i);if(document.activeElement!==el&&el.value!==String(v))el.value=v});s('im_l',+V.toFixed(1));s('im_sc',Math.round(e.w/w0*100))}s('im_x',+e.x.toFixed(2));s('im_z',+(-e.z).toFixed(2));s('im_w',+e.w.toFixed(2));s('im_r',e.rot);s('im_t',e.t);s('im_c',e.col);s('im_mode',e.mode||'orig');s('im_k',e.k||8);s('im_sh',e.sh?'1':'0');s('im_st',e.st==null?.3:e.st);s('im_tol',e.tol==null?40:e.tol);s('im_bs',e.bs||'none');shLoadIm(e);shSync();$('im_bd').style.display=e.bs==='custom'?'':'none';$('im_same').checked=e.same;$('im_cw').checked=e.cw;$('im_fill').checked=!!e.fill;$('im_flat').checked=!!e.flat;imDis(e)}
 function imDis(e){const one=e.mode==='one',mono=e.mode==='mono';$('im_c').disabled=false;$('im_same').disabled=false;$('im_hv').disabled=!!e.flat;$('im_k').disabled=one;$('im_st').disabled=one||!!e.flat;$('im_t').disabled=!!e.flat;$('im_tol').disabled=!e.cw}
 function imChips(){const box=$('im_chips');box.innerHTML='';TXIM.forEach((e,i)=>{const b=document.createElement('button');b.style.cssText='display:flex;align-items:center;gap:5px;flex:0 0 auto;padding:2px 8px 2px 3px!important'+(e.id===imSel?';border-color:var(--a);box-shadow:0 0 0 1px var(--a)':'');const im=document.createElement('img');im.src=TXIMG[e.id]?TXIMG[e.id].url:'';im.style.cssText='width:24px;height:24px;object-fit:contain;border-radius:3px;background:repeating-conic-gradient(#c9ced6 0 25%,#fff 0 50%) 0 0/8px 8px';b.appendChild(im);b.appendChild(document.createTextNode(' '+(i+1)));b.onclick=()=>{imSel=e.id;imChips();imFields();pvDraw(true)};box.appendChild(b)});$('im_none').style.display=TXIM.length?'none':''}
 function imRefresh(){imChips();imFields()}
-function imLoad(file){return new Promise(res=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{const s=Math.min(1,640/Math.max(im.width,im.height)),w=Math.max(1,Math.round(im.width*s)),h=Math.max(1,Math.round(im.height*s)),c=document.createElement('canvas');c.width=w;c.height=h;const q=c.getContext('2d');q.drawImage(im,0,0,w,h);const dat=q.getImageData(0,0,w,h).data;let tr=0;for(let i=3;i<dat.length;i+=4)if(dat[i]<250)tr++;
+function imLoad(file){return new Promise(res=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{const s=Math.min(3,1000/Math.max(im.width,im.height)),w=Math.max(1,Math.round(im.width*s)),h=Math.max(1,Math.round(im.height*s)),c=document.createElement('canvas');c.width=w;c.height=h;const q=c.getContext('2d');q.imageSmoothingEnabled=true;q.imageSmoothingQuality='high';q.drawImage(im,0,0,w,h);const dat=q.getImageData(0,0,w,h).data;let tr=0;for(let i=3;i<dat.length;i+=4)if(dat[i]<250)tr++;
 const id='i'+(++imN)+Date.now().toString(36);TXIMG[id]={w,h,dat,url:c.toDataURL('image/png'),outs:{}};URL.revokeObjectURL(u);res({id,opaque:tr<w*h*.005,ar:h/w})};im.onerror=()=>{URL.revokeObjectURL(u);res(null)};im.src=u})}
 $('im_add').onclick=()=>$('im_file').click();
 $('im_file').onchange=async ev=>{const fs=[...ev.target.files];ev.target.value='';let msg='';for(const f of fs){const r=await imLoad(f);if(!r){msg='Could not read '+f.name+'.';continue}
- const w=14,L=TXLAY,e={id:r.id,x:L?L.bb.x1+w/2+1.5:0,z:0,w,w0:w,t:2,rot:0,same:true,col:'#e8590c',cw:r.opaque,mode:'orig',k:5,st:.3,tol:40,fill:true,flat:false,bs:'none'};TXIM.push(e);imSel=e.id;
+ const w=14,L=TXLAY,e={id:r.id,x:L?L.bb.x1+w/2+1.5:0,z:0,w,w0:w,t:2,rot:0,same:true,col:'#e8590c',cw:r.opaque,mode:'orig',sh:false,k:8,st:0,tol:40,fill:true,flat:false,bs:'none'};TXIM.push(e);imSel=e.id;
  if(r.opaque)msg='“'+f.name+'” has no transparent background, so I am removing its background automatically. If the result is not perfect, change Bg tol. or remove the background first.';else if(!(txImgOuts(e)||[]).length)msg='Nothing visible was found in “'+f.name+'”.'}
  $('im_msg').textContent=msg;imRefresh();txSched(30)};
-['im_x','im_z','im_w','im_r','im_t','im_c','im_same','im_cw','im_mode','im_k','im_st','im_tol','im_fill','im_flat','im_bs','im_sw','im_sd','im_sa'].forEach(i=>{const f=ev=>{const e=imEl(imSel);if(!e)return;if(ev&&ev.target){const tid=ev.target.id;if(tid==='im_c'){if($('im_mode').value==='orig')$('im_mode').value='one';if($('im_mode').value==='one')$('im_same').checked=false}else if(tid==='im_same'&&$('im_same').checked&&$('im_mode').value!=='one')$('im_mode').value='one'}const wch=!!(ev&&ev.target&&(ev.target.id==='im_w'||ev.target.id==='im_ws')),ob=wch?imBox(e):null;e.x=num('im_x',e.x);e.z=-num('im_z',-e.z);{const nw=Math.max(1,num('im_w',e.w));if(ev&&ev.target&&ev.target.id==='im_w'&&Math.abs(nw-e.w)>1e-9)e.ys=(e.ys||1)*e.w/nw;e.w=nw}e.rot=num('im_r',e.rot);e.t=Math.max(.2,num('im_t',e.t));e.col=$('im_c').value;e.same=$('im_same').checked;e.cw=$('im_cw').checked;e.mode=$('im_mode').value;e.k=Math.max(2,Math.min(10,Math.round(num('im_k',e.k||5))));e.st=Math.max(0,num('im_st',e.st==null?.3:e.st));e.tol=Math.max(5,Math.min(120,num('im_tol',e.tol==null?40:e.tol)));e.fill=$('im_fill').checked;e.flat=$('im_flat').checked;e.bs=$('im_bs').value;e.sw=shOv('im_sw');e.sd=shOv('im_sd');e.sa=Math.min(150,Math.max(20,parseFloat($('im_sa').value)||60));$('im_bd').style.display=e.bs==='custom'?'':'none';imDis(e);
+['im_x','im_z','im_w','im_r','im_t','im_c','im_same','im_cw','im_mode','im_k','im_st','im_tol','im_fill','im_flat','im_bs','im_sw','im_sd','im_sa','im_sh'].forEach(i=>{const f=ev=>{const e=imEl(imSel);if(!e)return;if(ev&&ev.target){const tid=ev.target.id;if(tid==='im_c'){if($('im_mode').value==='orig')$('im_mode').value='one';if($('im_mode').value==='one')$('im_same').checked=false}else if(tid==='im_same'&&$('im_same').checked&&$('im_mode').value!=='one')$('im_mode').value='one'}const wch=!!(ev&&ev.target&&(ev.target.id==='im_w'||ev.target.id==='im_ws')),ob=wch?imBox(e):null;e.x=num('im_x',e.x);e.z=-num('im_z',-e.z);{const nw=Math.max(1,num('im_w',e.w));if(ev&&ev.target&&ev.target.id==='im_w'&&Math.abs(nw-e.w)>1e-9)e.ys=(e.ys||1)*e.w/nw;e.w=nw}e.rot=num('im_r',e.rot);e.t=Math.max(.2,num('im_t',e.t));e.col=$('im_c').value;e.same=$('im_same').checked;e.cw=$('im_cw').checked;e.mode=$('im_mode').value;e.k=Math.max(2,Math.min(16,Math.round(num('im_k',e.k||8))));e.st=Math.max(0,num('im_st',e.st==null?.3:e.st));e.tol=Math.max(5,Math.min(120,num('im_tol',e.tol==null?40:e.tol)));e.fill=$('im_fill').checked;e.sh=$('im_sh').value==='1';e.flat=$('im_flat').checked;e.bs=$('im_bs').value;e.sw=shOv('im_sw');e.sd=shOv('im_sd');e.sa=Math.min(150,Math.max(20,parseFloat($('im_sa').value)||60));$('im_bd').style.display=e.bs==='custom'?'':'none';imDis(e);
 if(ev&&ev.target&&ev.target.id==='im_bs'&&e.bs==='custom'&&!(e.cs&&e.cs.length>2))csOpen('pic');if(wch&&ob){imAnchor(e,ob);$('im_x').value=+e.x.toFixed(2);$('im_z').value=+(-e.z).toFixed(2)}imSyncSl(e);pvQuick(e);txSched()};if(i==='im_k'||i==='im_tol'||i==='im_st'){let tm=0;$(i).addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(()=>f(),600)});$(i).addEventListener('change',()=>{clearTimeout(tm);f()})}else{$(i).addEventListener('input',f);$(i).addEventListener('change',f)}});
 $('im_del').onclick=()=>{const i=TXIM.findIndex(e=>e.id===imSel);if(i<0)return;TXIM.splice(i,1);imSel=TXIM.length?TXIM[Math.max(0,i-1)].id:null;imRefresh();txSched(30)};
 $('im_dup').onclick=()=>{const e=imEl(imSel);if(!e)return;const c=Object.assign({},e,{x:e.x+e.w*.6,z:e.z+e.w*.2,id:'d'+(++imN)+Date.now().toString(36)});TXIMG[c.id]=TXIMG[e.id];TXIM.push(c);imSel=c.id;imRefresh();txSched(30)};
@@ -1905,7 +2102,7 @@ var ovTrig=null,OVW={},ovCur=null;
 $('addtx').onclick=()=>{const p=txRead(),g=txBuild(p);if(!g){hint.textContent='Type some text or add a picture first.';return}const o=add(g,'Text “'+(p.txt.trim()||'pictures').slice(0,12)+'”');o.userData.tx=p;hint.textContent=p.pl?'Keychain added. Click it any time to change shape, gap, border, pictures or colours here.':'Text added.'};
 function txLoad(){const o=txSel();if(!o)return;const p=o.userData.tx,s=(i,v)=>{const el=$(i);if(document.activeElement===el)return;if(el.value!==String(v))el.value=v},c=(i,v)=>{$(i).checked=v};s('tx',p.txt);s('txf',p.fname);s('th',p.h);s('ths',p.h);c('tx_b',!!p.bold);s('tx_w',p.lw||100);s('kp_ex',p.pex||0);s('kp_ag',p.ag||0);s('kp_jw',p.jw||0);c('tx_i',!!p.ital);c('tx_fl',!!p.flat);TXCS.plate=p.cs||null;s('td',p.d);s('txc',p.col);c('kp_on',p.pl);s('kp_sh',p.shape);s('kp_gap',p.gap);s('kp_th',p.pth);s('kp_col',p.pcol);c('kp_bd',p.bd);s('kp_bw',p.bw);s('kp_bh',p.bh);s('kp_bcol',p.bcol);s('kp_hm',p.hm||(p.ring?'tab':'none'));s('kp_hs',p.hs||'round');s('kp_hw',p.hwall==null?2:p.hwall);s('kp_hside',p.hside||'left');s('kp_hoff',p.hoff||0);s('kp_hsl',p.hsl||0);s('kp_hoffs',p.hoff||0);s('kp_rd',p.rd);shLoadKp(p);
  TXIM=JSON.parse(JSON.stringify(p.imgs||[]));if(!TXIM.some(e=>e.id===imSel))imSel=TXIM.length?TXIM[0].id:null;txVis();imRefresh();if(TXLAY&&TXLAY.p!==p){txBuild(p,true);PV=null;pvDraw()}}
-{const _stx=select;select=function(){const r=_stx.apply(this,arguments);try{txLoad()}catch(e){}return r}}
+{const _stx=select;select=function(){const r=_stx.apply(this,arguments);try{txLoad();if(isKC(txSel()))tab('text')}catch(e){}return r}}
 TXHS.forEach(h=>{const o=document.createElement('option');o.value=h[0];o.textContent=h[1];$('kp_hs').appendChild(o)});
 $('kp_hoffs').addEventListener('input',()=>{$('kp_hoff').value=$('kp_hoffs').value;$('kp_hoff').dispatchEvent(new Event('input'))});
 $('kp_hoff').addEventListener('input',()=>{const v=Math.max(-15,Math.min(15,parseFloat($('kp_hoff').value)||0));if($('kp_hoffs').value!==String(v))$('kp_hoffs').value=v});
@@ -5938,5 +6135,136 @@ P2.addEventListener('change',e=>{if(e.target.matches('[data-j]')){prgSet(e.targe
 fillTypes();buildFields();selBlock();
 window.V70={TYPES,program,gearFix,fitTo,poseDeg,motions,get steps(){return STEPS},sizeFor,weigh,prox,toast,computePad,plan,norm,mkAsm,addJoint,rebuild,asmOf,movOf,tipOf,setRev,setUni,setBall,applyDelta,attach,autoAttach,detach,partsOf,startSim,stopSim,BUILD,sync,get cur(){return curJ},get sim(){return SIM},get drag(){return DR}};
 }catch(e){console.error('v70 joints module failed:',e)}})();
+</script>
+<script>
+try{/* ===== Colour assistant v7: suggestions, picture colour editor, filament library, strict toggle, Bambu export ===== */
+(function(){
+const FC=window.FC={strict:false,ver:0,custom:[]};
+const BI=[['Neutrals',[['Jade White','#FFFFFF'],['Ivory','#F4EFE2'],['Light Gray','#C8C9C9'],['Silver','#A6A9AA'],['Gray','#8E9089'],['Dark Gray','#545454'],['Black','#000000']]],
+['Warm',[['Red','#C12E1F'],['Orange','#FF6A13'],['Sunflower','#FEC600'],['Yellow','#F4EE2A'],['Gold','#E4BD68']]],
+['Greens',[['Lime','#A3D95B'],['Bambu Green','#00AE42'],['Mistletoe','#3F8E43'],['Dark Green','#1F5E3B']]],
+['Blues',[['Sky Blue','#73B2E5'],['Cyan','#0086D6'],['Turquoise','#00B1B7'],['Cobalt Blue','#0056B8'],['Blue','#0A2989'],['Navy','#1B2A4A']]],
+['Purples & pinks',[['Lavender','#B8A6E0'],['Purple','#5E43B7'],['Magenta','#EC008C'],['Pink','#F55A74'],['Light Pink','#F4B6C2']]],
+['Browns',[['Beige','#F7E6DE'],['Tan','#D3B7A7'],['Brown','#9D432C'],['Cocoa Brown','#6F5034']]]];
+const BIL=[];BI.forEach(g=>g[1].forEach(a=>BIL.push({name:a[0],hex:a[1].toLowerCase(),n:parseInt(a[1].slice(1),16),builtin:true,group:g[0]})));
+try{const s=JSON.parse(localStorage.getItem('mc_fil')||'[]');if(Array.isArray(s))s.forEach(f=>{if(/^#[0-9a-f]{6}$/i.test(f.h))FC.custom.push({name:String(f.n||f.h).slice(0,24),hex:f.h.toLowerCase(),n:parseInt(f.h.slice(1),16),builtin:false})})}catch(e){}
+const saveLib=()=>{try{localStorage.setItem('mc_fil',JSON.stringify(FC.custom.map(f=>({n:f.name,h:f.hex}))))}catch(e){}FC.ver++};
+FC.lib=()=>FC.custom.concat(BIL);
+const h2n=s=>parseInt(String(s).slice(1),16)||0,n2h=n=>'#'+(n&0xffffff).toString(16).padStart(6,'0'),rgb=n=>[n>>16&255,n>>8&255,n&255];
+FC.h2n=h2n;FC.n2h=n2h;
+const LC=new Map();
+function lab(n){let v=LC.get(n);if(v)return v;const[r,g,b]=rgb(n).map(x=>{x/=255;return x<=.04045?x/12.92:((x+.055)/1.055)**2.4});const X=(r*.4124+g*.3576+b*.1805)/.95047,Y=r*.2126+g*.7152+b*.0722,Z=(r*.0193+g*.1192+b*.9505)/1.08883,f=t=>t>.008856?Math.cbrt(t):7.787*t+16/116;v=[116*f(Y)-16,500*(f(X)-f(Y)),200*(f(Y)-f(Z))];LC.set(n,v);return v}
+const dE=(a,b)=>{const p=lab(a),q=lab(b);return Math.hypot(p[0]-q[0],p[1]-q[1],p[2]-q[2])};
+FC.lab=lab;FC.dE=dE;
+function hsl(n){const[r,g,b]=rgb(n).map(v=>v/255),mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn;let h=0,s=0;if(d){s=d/(1-Math.abs(2*l-1));h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return[h,s,l]}
+function fromHsl(h,s,l){h=((h%360)+360)%360;s=Math.max(0,Math.min(1,s));l=Math.max(0,Math.min(1,l));const c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs((h/60)%2-1)),m=l-c/2;const[r,g,b]=h<60?[c,x,0]:h<120?[x,c,0]:h<180?[0,c,x]:h<240?[0,x,c]:h<300?[x,0,c]:[c,0,x];return(Math.round((r+m)*255)<<16)|(Math.round((g+m)*255)<<8)|Math.round((b+m)*255)}
+const OFFS=[[0,0,-.06],[0,0,.06],[10,0,0],[-10,0,0],[0,-.12,0],[0,.12,0],[0,0,-.12],[0,0,.12],[20,0,0],[-20,0,0],[8,0,.08],[-8,0,-.08],[0,0,-.18],[0,0,.18],[0,-.24,0],[0,.24,0],[8,0,-.08],[-8,0,.08],[0,0,-.24],[0,0,.24]];
+function similar(n,cnt){const[h,s,l]=hsl(n),out=[];OFFS.map(o=>fromHsl(h+o[0],s+o[1],l+o[2])).filter(x=>dE(x,n)>=4).sort((a,b)=>dE(a,n)-dE(b,n)).forEach(x=>{if(out.length<cnt&&!out.some(y=>dE(x,y)<4))out.push(x)});return out}
+function nearest(n,k){return FC.lib().map(f=>({f,d:dE(n,f.n)})).sort((a,b)=>a.d-b.d).slice(0,k)}
+FC.nearest=nearest;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* picture colour override: e.cm = [[detectedHex, newHex],...] (matched by nearest so it survives a change of colour count) */
+window.fcMap=function(en,hex){const cm=en&&en.cm;if(!cm||!cm.length)return hex;for(const x of cm)if(x[0]===hex)return x[1];let bd=1e9,bt=hex;const a=rgb(hex);for(const x of cm){const b=rgb(x[0]),d=(a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2;if(d<bd){bd=d;bt=x[1]}}return bd<700?bt:hex};
+/* export: strict = exact colours; otherwise near-identical colours share one filament (max 16 slots) */
+window.fcExport=function(C){if(FC.strict)return C;const cnt=new Map();C.forEach(h=>cnt.set(h,(cnt.get(h)||0)+1));const list=[...cnt.keys()].sort((a,b)=>cnt.get(b)-cnt.get(a)),rep=new Map(),reps=[];
+list.forEach(h=>{const r=reps.find(q=>dE(q,h)<8);if(r!==undefined)rep.set(h,r);else{reps.push(h);rep.set(h,h)}});
+while(reps.length>16){let bi=0,bj=1,bd=1e9;for(let i=0;i<reps.length;i++)for(let j=i+1;j<reps.length;j++){const d=dE(reps[i],reps[j]);if(d<bd){bd=d;bi=i;bj=j}}const gone=reps[bj];reps.splice(bj,1);rep.forEach((v,k)=>{if(v===gone)rep.set(k,reps[bi])})}
+return C.map(h=>rep.get(h))};
+/* Bambu Studio / OrcaSlicer style 3MF: one part per colour, each part bound to its own filament slot */
+window.mf3b=async function(){const{t,c}=trisC(),E=new TextEncoder(),cm=new Map(),cols=[],G=[];
+for(let i=0;i<t.length;i+=3){const h=c[i/3];let ci=cm.get(h);if(ci===undefined){ci=cols.length;cm.set(h,ci);cols.push(h);G.push([])}G[ci].push(i)}
+if(!cols.length)return mf3();
+const hx=h=>h.toString(16).padStart(6,'0').toUpperCase(),P0=2,A=P0+cols.length;
+const parts=G.map((ids,ci)=>{const idx=new Map(),vs=[],tr=[];ids.forEach(i=>{const q=[0,1,2].map(k=>{const p=t[i+k],key=Math.round(p[0]*1e4)+','+Math.round(p[1]*1e4)+','+Math.round(p[2]*1e4);let j=idx.get(key);if(j===undefined){j=vs.length;idx.set(key,j);vs.push(p)}return j});if(q[0]===q[1]||q[1]===q[2]||q[0]===q[2])return;tr.push(`<triangle v1="${q[0]}" v2="${q[1]}" v3="${q[2]}"/>`)});
+return`<object id="${P0+ci}" type="model" pid="1" pindex="${ci}"><mesh><vertices>`+vs.map(p=>`<vertex x="${p[0].toFixed(4)}" y="${p[1].toFixed(4)}" z="${p[2].toFixed(4)}"/>`).join('')+'</vertices><triangles>'+tr.join('')+'</triangles></mesh></object>'});
+const model='<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:BambuStudio="http://schemas.bambulab.com/package/2021"><metadata name="Application">MiniCAD</metadata><metadata name="BambuStudio:3mfVersion">1</metadata><resources><basematerials id="1">'+cols.map((h,i)=>`<base name="Filament ${i+1}" displaycolor="#${hx(h)}FF"/>`).join('')+'</basematerials>'+parts.join('')+`<object id="${A}" type="model"><components>`+cols.map((h,i)=>`<component objectid="${P0+i}"/>`).join('')+`</components></object></resources><build><item objectid="${A}" printable="1"/></build></model>`;
+const ms='<?xml version="1.0" encoding="UTF-8"?><config><object id="'+A+'"><metadata key="name" value="MiniCAD design"/><metadata key="extruder" value="1"/>'+cols.map((h,i)=>`<part id="${P0+i}" subtype="normal_part"><metadata key="name" value="Filament ${i+1} #${hx(h)}"/><metadata key="matrix" value="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"/><metadata key="extruder" value="${i+1}"/></part>`).join('')+`</object><plate><metadata key="plater_id" value="1"/><metadata key="plater_name" value=""/><metadata key="locked" value="false"/><model_instance><metadata key="object_id" value="${A}"/><metadata key="instance_id" value="0"/></model_instance></plate></config>`;
+const ps=JSON.stringify({filament_colour:cols.map(h=>'#'+hx(h)),filament_type:cols.map(()=>'PLA')},null,1);
+const z=zip([{name:'[Content_Types].xml',data:E.encode('<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/><Default Extension="config" ContentType="text/xml"/></Types>')},{name:'_rels/.rels',data:E.encode('<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>')},{name:'3D/3dmodel.model',data:E.encode(model)},{name:'Metadata/model_settings.config',data:E.encode(ms)},{name:'Metadata/project_settings.config',data:E.encode(ps)}]);
+return new Uint8Array(await z.arrayBuffer())};
+
+
+if(typeof document==='undefined'||!document.getElementById('fc_pic'))return;
+const PICSIG=()=>TXIM.map(e=>e.id+e.mode+(e.sh?'S':'F')+e.k+(e.fill?1:0)+(e.cw?1:0)+e.tol+(e.mode==='one'?e.col:'')+JSON.stringify(e.cm||0)).join(';');
+const designSig=()=>[$('txc').value,$('kp_col').value,$('kp_bcol').value,$('kp_on').checked,$('kp_bd').checked,PICSIG(),FC.strict,FC.ver].join('|');
+function groupsFor(e){const Ls=txImgQuant(e)||[],tot=Ls.reduce((s,l)=>s+l.area,0)||1;let th=FC.strict?0:7,G;for(;;){G=[];Ls.forEach(l=>{const g=th>0&&G.find(g=>dE(g.rep,l.hex)<th);if(g){g.m.push(l.hex);g.area+=l.area}else G.push({rep:l.hex,m:[l.hex],area:l.area})});if(G.length<=8||th>=30||FC.strict)break;th+=5}G.forEach(g=>g.pct=Math.max(1,Math.round(g.area/tot*100)));return G}
+/* every colour already used in the design (text, plate, border, picture shades), except the one being edited */
+function designCols(excl){const raw=[],add=(hex,src,key)=>{if(key===excl||!/^#[0-9a-f]{6}$/i.test(hex||''))return;raw.push({hex:hex.toLowerCase(),n:h2n(hex),src})};
+add($('txc').value,'Text','txt');if($('kp_on').checked){add($('kp_col').value,'Plate','plate');if($('kp_bd').checked)add($('kp_bcol').value,'Border','border')}
+TXIM.forEach((e,i)=>{const nm=TXIM.length>1?'Image '+(i+1):'Image';if(e.mode==='one')add(e.col,nm,'img'+e.id+':one');else{let G=[];try{G=groupsFor(e)}catch(x){}G.forEach((g,gi)=>add(n2h(fcMap(e,g.rep)),nm,'img'+e.id+':'+gi))}});
+const out=[];raw.forEach(r=>{const o=out.find(x=>dE(x.n,r.n)<3);if(o){if(!o.srcs.includes(r.src))o.srcs.push(r.src)}else out.push({hex:r.hex,n:r.n,srcs:[r.src]})});return out}
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
+const NEAR=35;
+/* ---------- the colour picker panel ---------- */
+function makePicker(o){const root=el('div','fcpk'),head=el('div','fcph'),tabs=el('div','fctabs'),body=el('div','fcbd');root.append(head,tabs,body);
+const TB=[['s','Suggested'],['f','Filaments'],['c','Custom']];let tab='s';
+TB.forEach(t=>{const b=el('button','fctab',t[1]);b.type='button';b.dataset.k=t[0];b.onclick=()=>{tab=t[0];pk.render()};tabs.appendChild(b)});
+const csec=el('div','fccu','<div class="fch">Pick any colour</div><div class="fcr"><input type="color" class="fcci"><input class="fchx" maxlength="7" placeholder="#rrggbb"></div><div class="fch" style="margin-top:12px">Make it a filament</div><div class="fcr"><input class="fcnm" maxlength="24" placeholder="Name (optional)"><button type="button" class="fcsv">Save</button></div><div class="fcsm"></div>');
+const ci=csec.querySelector('.fcci'),hx=csec.querySelector('.fchx'),nm=csec.querySelector('.fcnm'),sv=csec.querySelector('.fcsv'),sm=csec.querySelector('.fcsm');
+ci.oninput=()=>o.apply(ci.value);hx.onchange=()=>{const v=hx.value.trim();if(/^#[0-9a-f]{6}$/i.test(v))o.apply(v.toLowerCase())};
+sv.onclick=()=>{const h=(o.getCur()||'#000000').toLowerCase();if(FC.custom.some(f=>f.hex===h)||FC.lib().some(f=>f.hex===h&&f.builtin)){sm.textContent='That colour is already in your filament list.';return}FC.custom.unshift({name:(nm.value.trim()||h).slice(0,24),hex:h,n:h2n(h),builtin:false});nm.value='';saveLib();libRender();sm.textContent='Saved to My filaments.';pk.render()};
+const order=['My filaments','Neutrals','Warm','Greens','Blues','Purples & pinks','Browns'];
+const pk={el:root,render(){const cur=(o.getCur()||'#000000').toLowerCase(),n=h2n(cur),nn=nearest(n,1)[0];
+ head.innerHTML='<span class="fcdot big" style="background:'+cur+'"></span><div class="fcht"><b>'+cur.toUpperCase()+'</b><small>'+(nn.d<4?esc(nn.f.name):'Nearest filament: '+esc(nn.f.name))+'</small></div>';
+ tabs.querySelectorAll('.fctab').forEach(b=>b.classList.toggle('on',b.dataset.k===tab));
+ if(tab==='c'&&body.contains(document.activeElement)){if(document.activeElement!==ci)ci.value=cur;if(document.activeElement!==hx)hx.value=cur;return}
+ body.innerHTML='';
+ if(tab==='s'){const ss=el('div','fcsec');ss.innerHTML='<div class="fch">Similar shades<small>close to this colour</small></div>';const sw=el('div','fcgrid');similar(n,10).forEach(x=>{const h=n2h(x),b=el('button','fcsw lg');b.type='button';b.style.background=h;b.title=h.toUpperCase();b.onclick=()=>o.apply(h);sw.appendChild(b)});ss.appendChild(sw);body.appendChild(ss);
+  const ds=el('div','fcsec');ds.innerHTML='<div class="fch">From your design<small>reuse a colour you already print with</small></div>';
+  const dc=designCols(o.excl()).map(d=>Object.assign(d,{d:dE(d.n,n)})).sort((a,b)=>a.d-b.d);
+  if(!dc.length)ds.appendChild(el('div','fcemp','Add a plate or a picture and its colours show up here.'));
+  else{const w=el('div','fcdw');dc.forEach(d=>{const near=d.d<NEAR,b=el('button','fcdc'+(near?' near':'')+(d.d<1?' on':''),'<span class="fcdot" style="background:'+d.hex+'"></span><small>'+esc(d.srcs.join(' · '))+'</small>');b.type='button';b.title=d.srcs.join(', ')+' · '+d.hex.toUpperCase();b.onclick=()=>o.apply(d.hex);w.appendChild(b)});ds.appendChild(w)}
+  body.appendChild(ds)}
+ else if(tab==='f'){const fs=el('div','fcsec');const cap=el('div','fccap'),capDef=()=>{cap.innerHTML=nn.d<4?'<b>'+esc(nn.f.name)+'</b> · '+cur.toUpperCase():'Hover a filament to see its name'};
+  const G={};FC.lib().forEach(f=>{const k=f.builtin?f.group:'My filaments';(G[k]=G[k]||[]).push(f)});
+  order.forEach(gn=>{if(!G[gn])return;const r=el('div','fcgr','<span class="fcgn">'+gn+'</span>'),w=el('div','fcgrid');G[gn].forEach(f=>{const b=el('button','fcsw'+(f.hex===cur?' on':''));b.type='button';b.style.background=f.hex;b.title=f.name+' '+f.hex.toUpperCase();b.onmouseenter=()=>{cap.innerHTML='<b>'+esc(f.name)+'</b> · '+f.hex.toUpperCase()};b.onmouseleave=capDef;b.onclick=()=>o.apply(f.hex);w.appendChild(b)});r.appendChild(w);fs.appendChild(r)});
+  capDef();fs.appendChild(cap);body.appendChild(fs)}
+ else{sm.textContent='';ci.value=cur;hx.value=cur;body.appendChild(csec)}}};
+return pk}
+/* ---------- text / plate / border fields: one tidy button that opens the picker ---------- */
+const FIELDS=[];
+function bindField(id,key){const inp=$(id);if(!inp)return;inp.style.display='none';const tr=el('button','fctr');tr.type='button';inp.parentNode.insertBefore(tr,inp);
+const f={inp,tr,open:false,last:null,ver:-1,ds:null};
+f.pk=makePicker({getCur:()=>inp.value,apply:h=>{inp.value=h;inp.dispatchEvent(new Event('input',{bubbles:true}));f.sync();if(f.open)f.pk.render()},excl:()=>key});f.pk.el.style.display='none';inp.parentNode.appendChild(f.pk.el);
+f.sync=()=>{const cur=inp.value||'#000000',nn=nearest(h2n(cur),1)[0];tr.innerHTML='<span class="fcdot" style="background:'+cur+'"></span><span class="fctx">'+(nn.d<4?esc(nn.f.name):cur.toUpperCase())+'</span><span class="fccar">'+(f.open?'▴':'▾')+'</span>';tr.title='Nearest filament: '+nn.f.name;f.last=inp.value;f.ver=FC.ver};
+tr.onclick=()=>{f.open=!f.open;f.pk.el.style.display=f.open?'':'none';f.sync();if(f.open)f.pk.render()};
+f.sync();FIELDS.push(f)}
+bindField('txc','txt');bindField('kp_col','plate');bindField('kp_bcol','border');
+/* ---------- pictures ---------- */
+const pp=$('fc_pic'),FCSEL={};let PIC=null,lastPic='';
+pp.insertAdjacentHTML('afterbegin','<div class="fcrh"><div class="fch" style="margin:0">Picture colours</div><button id="fc_ra" type="button">Reset all</button></div><div id="fc_pt" class="fcn"></div><div id="fc_chips"></div><div id="fc_mt" style="margin-top:8px"></div><div id="fc_ed" style="display:none;margin:2px 0 8px"><div class="fcr"><button id="fc_r1" type="button">Reset this colour</button></div></div><div id="fc_oneh" style="display:none"></div>');
+function setGroupTo(e,g,to){e.cm=e.cm||[];g.m.forEach(m=>{const x=e.cm.find(y=>y[0]===m);if(x)x[1]=to;else e.cm.push([m,to])})}
+const refresh=e=>{try{pvQuick(e)}catch(x){}txSched();picRender(true)};
+const pk2=makePicker({getCur:()=>PIC?n2h(fcMap(PIC.e,PIC.G[PIC.si].rep)):'#000000',apply:h=>{if(!PIC)return;setGroupTo(PIC.e,PIC.G[PIC.si],h2n(h));refresh(PIC.e)},excl:()=>PIC?'img'+PIC.e.id+':'+PIC.si:'',sim:true});$('fc_ed').appendChild(pk2.el);
+const pk1=makePicker({getCur:()=>$('im_c').value,apply:h=>{const i=$('im_c');i.value=h;i.dispatchEvent(new Event('input',{bubbles:true}));pk1.render()},excl:()=>'img'+__fcIm.sel()+':one',sim:true});$('fc_oneh').appendChild(pk1.el);
+$('fc_r1').onclick=()=>{if(!PIC)return;const e=PIC.e,g=PIC.G[PIC.si];if(e.cm)e.cm=e.cm.filter(x=>!g.m.includes(x[0]));refresh(e)};
+$('fc_ra').onclick=()=>{const e=__fcIm.el(__fcIm.sel());if(!e)return;delete e.cm;refresh(e)};
+function matchList(e,G){const base=designCols(null).filter(d=>d.srcs.some(s=>!/^Image/.test(s))),out=[];G.forEach((g,i)=>{const cur=h2n(n2h(fcMap(e,g.rep)));let b=null,bd=1e9;base.forEach(d=>{const x=dE(cur,d.n);if(x<bd){bd=x;b=d}});if(b&&bd<32&&cur!==b.n)out.push({g,i,to:b.n,src:b.srcs.find(s=>!/^Image/.test(s))})});return out}
+function picRender(force){const e=__fcIm.el(__fcIm.sel()),ed=$('fc_ed');if(!e){pp.style.display='none';PIC=null;lastPic='';return}pp.style.display='';const one=e.mode==='one';
+const sig=[e.id,e.mode,FCSEL[e.id],designSig()].join('|');if(!force&&sig===lastPic)return;lastPic=sig;
+$('fc_oneh').style.display=one?'':'none';
+if(one){$('fc_pt').textContent='One colour for the whole picture.';$('fc_chips').style.display='none';$('fc_mt').innerHTML='';ed.style.display='none';PIC=null;pk1.render();return}
+let G;try{G=groupsFor(e)}catch(x){G=[]}const box=$('fc_chips');box.style.display='';
+if(!G.length){$('fc_pt').textContent='Detected colours appear here once the picture is processed.';box.innerHTML='';$('fc_mt').innerHTML='';ed.style.display='none';PIC=null;return}
+let si=FCSEL[e.id];if(si==null||si>=G.length)si=-1;PIC={e,G,si};const ml=matchList(e,G),mset=new Set(ml.map(m=>m.i));
+$('fc_pt').textContent=G.length+' colour'+(G.length>1?'s':'')+' found'+(G.some(g=>g.m.length>1)&&!FC.strict?' (near-identical shades are grouped)':'')+'. Press Change on any colour to replace it.';
+box.innerHTML='';ed.style.display='none';
+G.forEach((g,i)=>{const cur=n2h(fcMap(e,g.rep)),orig=n2h(g.rep),ch=cur.toLowerCase()!==orig.toLowerCase(),row=el('div','fcrow'+(i===si?' on':'')),dot=el('span','fcdot big'),t=el('div','fcrt'),bt=el('button','',i===si?'Close ▴':'Change ▾');dot.style.background=cur;bt.type='button';
+ const near=mset.has(i)?' · close to your '+ml.find(m=>m.i===i).src.toLowerCase()+' colour':'';
+ t.innerHTML='<b>Colour '+(i+1)+'</b><span class="fcxh">'+cur.toUpperCase()+'</span><div class="fcbar"><i style="width:'+g.pct+'%;background:'+cur+'"></i></div><small>'+g.pct+'% of the picture'+(ch?' · was '+orig.toUpperCase():'')+(g.m.length>1?' · '+g.m.length+' shades grouped':'')+near+'</small>';
+ bt.onclick=()=>{FCSEL[e.id]=i===si?-1:i;picRender(true)};row.onclick=ev=>{if(ev.target===bt)return;bt.click()};row.append(dot,t,bt);box.appendChild(row);
+ if(i===si){ed.style.display='';box.appendChild(ed);pk2.render()}});
+const mt=$('fc_mt');mt.innerHTML='';if(ml.length){const b=el('button','fcmb','Match '+ml.length+' close colour'+(ml.length>1?'s':'')+' to your '+[...new Set(ml.map(m=>m.src.toLowerCase()))].join(' / ')+' colour');b.type='button';b.onclick=()=>{ml.forEach(m=>setGroupTo(e,m.g,m.to));refresh(e)};mt.appendChild(b)}}
+/* ---------- strict toggle + filament library ---------- */
+function libRender(){const box=$('fc_libchips');box.innerHTML='';FC.lib().forEach(f=>{const b=el('button','fcsw');b.type='button';b.style.background=f.hex;b.title=f.name+' '+f.hex.toUpperCase()+(f.builtin?'':' (yours – tap to remove)');if(!f.builtin)b.onclick=()=>{FC.custom=FC.custom.filter(x=>x!==f);saveLib();libRender()};box.appendChild(b)})}
+$('fc_add').onclick=()=>{const h=$('fc_nc').value.toLowerCase();if(!FC.custom.some(f=>f.hex===h))FC.custom.unshift({name:($('fc_nn').value.trim()||h).slice(0,24),hex:h,n:h2n(h),builtin:false});$('fc_nn').value='';saveLib();libRender()};
+function strictTxt(){$('fc_strict_t').textContent=FC.strict?'On: every colour is kept exactly as you picked it – nothing is merged. Only use this if you own those exact filaments.':'Off: when you export, very close shades are merged into one filament so Bambu Studio and other slicers show a short, clean filament list.'}
+$('fc_strict').checked=false;$('fc_strict').addEventListener('change',()=>{FC.strict=$('fc_strict').checked;FC.ver++;strictTxt();$('fc_needout').innerHTML='';picRender(true)});
+$('fc_need').onclick=()=>{const out=$('fc_needout');let c;try{c=trisC().c}catch(e){c=[]}const cnt=[...new Set(c)];if(!cnt.length){out.textContent='Nothing in the design yet.';return}
+out.innerHTML='<div class="fcn">'+cnt.length+' filament'+(cnt.length>1?'s':'')+' needed'+(cnt.length>16?' – <span class="fcwarn">more than 16, Bambu Studio only has 16 slots</span>':'')+':</div>'+cnt.map((h,i)=>{const nn=nearest(h,1)[0];return'<div class="fcr"><span style="width:22px">'+(i+1)+'</span><span class="fcdot" style="background:'+n2h(h)+'"></span><span style="flex:1">'+n2h(h).toUpperCase()+' · '+esc(nn.f.name)+'</span></div>'}).join('')};
+libRender();strictTxt();
+setInterval(()=>{try{const ds=designSig();FIELDS.forEach(f=>{if(f.inp.value!==f.last||f.ver!==FC.ver)f.sync();if(f.open&&(f.ds!==ds)){f.ds=ds;f.pk.render()}});picRender(false)}catch(e){}},350);
+})();
+}catch(e){console.error("colour assistant failed:",e)}
 </script>
 </body></html>
