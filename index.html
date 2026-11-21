@@ -170,6 +170,31 @@ button.fcdc small{max-width:70px}
 #fc_pic button.fcmb{position:relative;z-index:0;margin-top:12px}
 #fc_mt{clear:both;position:relative}
 </style>
+<style id="mcfix2">
+#pend{background:var(--bg);border:1px solid var(--b);border-radius:12px;box-shadow:0 10px 30px #0004;overflow:hidden;max-height:calc(100% - 70px)}
+#pend .pe_h{padding:10px 14px;border-bottom:1px solid var(--b);background:var(--p);font-size:13px}
+#pend .pe_body{padding:12px 14px 6px;display:flex;flex-direction:column;gap:9px;overflow:auto}
+#pend .pr{display:flex;align-items:center;gap:10px;min-height:30px;margin:0}
+#pend .pl{flex:0 0 118px;color:var(--m);font-size:12.5px;line-height:1.2}
+#pend .pc{flex:1;min-width:0;display:flex;align-items:center;gap:8px}
+#pend .pc input[type=number]{width:78px;flex:none}
+#pend .pc input[type=range]{flex:1;min-width:0;padding:0;height:20px;border:0;background:none}
+#pend .pc select{flex:1;min-width:0}
+#pend .pc em{font-style:normal;color:var(--m);font-size:12px}
+#pend .pchk{gap:16px;flex-wrap:wrap}#pend .pchk label{display:flex;gap:6px;align-items:center;width:auto;font-size:12.5px;color:var(--t)}#pend .pchk input{height:auto}
+#pend .pe_f{display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid var(--b);background:var(--p)}
+#pend .pe_f .sp{flex:1}#pend .pe_f .mut{font-size:11.5px}
+@media(max-width:480px){#pend .pl{flex-basis:92px}#pend .pe_f .mut{display:none}}
+#shpfly{position:fixed;z-index:60;width:288px;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow:auto;background:var(--bg);border:1px solid var(--b);border-radius:12px;box-shadow:0 12px 34px #0004;padding:10px;opacity:0;transform:translateX(-8px) scale(.97);transform-origin:left top;visibility:hidden;pointer-events:none;transition:opacity .16s ease,transform .16s ease,visibility 0s .16s}
+#shpfly.on{opacity:1;transform:none;visibility:visible;pointer-events:auto;transition:opacity .16s ease,transform .16s ease}
+#shpfly h5{margin:10px 2px 4px;font:700 10.5px system-ui;letter-spacing:.06em;text-transform:uppercase;color:var(--m)}#shpfly h5:first-child{margin-top:0}
+#shpfly .g{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+#shpfly .g button{height:auto;min-height:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px 5px;border-color:transparent;background:none;font-size:10px;line-height:1.15;color:var(--m);text-align:center;white-space:normal}
+#shpfly .g button svg{width:26px;height:26px;color:var(--t)}
+#shpfly .g button:hover:not(.on){background:var(--h);color:var(--t)}
+#shpfly .g button.on{background:var(--a);color:#fff}#shpfly .g button.on svg{color:#fff}
+#shpfly .nn{display:none;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--b);font-size:12.5px;color:var(--m)}#shpfly .nn input{width:64px}
+</style>
 </head><body><div id="ld" style="position:fixed;inset:0;z-index:99998;background:var(--bg,#e8ebf0);color:#1b2330;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font:14px system-ui;transition:opacity .12s"><div style="width:38px;height:38px;border:4px solid #0002;border-top-color:#3b7cff;border-radius:50%;animation:ldspin .8s linear infinite"></div><div id="ldt">Loading project…</div></div><style>@keyframes ldspin{to{transform:rotate(360deg)}}@media(prefers-color-scheme:dark){#ld{background:#1d222a!important;color:#e6e9ef!important}}</style><script>window.__mcHideLd=function(){var e=document.getElementById("ld");if(e){e.style.opacity=0;setTimeout(function(){e.remove()},130)}};setTimeout(window.__mcHideLd,15000)</script><div id="veil" class="on"></div>
 <div id="app">
 <header><button id="bk" title="Back to projects">← Back</button><svg style="width:42px;height:42px;flex:none;margin:0 4px 0 2px;filter:drop-shadow(0 3px 8px #3b7cff66)" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lgd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b7cff"/><stop offset="1" stop-color="#7a4dff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#lgd)"/><path d="M32 8 55 21.5v21L32 56 9 42.5v-21z" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="1.2"/><path d="M32 12 52 23.5 32 35 12 23.5z" fill="#fff"/><path d="M12 23.5 32 35v21L12 44.5z" fill="#fff" fill-opacity=".6"/><path d="M52 23.5 32 35v21l20-11.5z" fill="#fff" fill-opacity=".32"/><g transform="translate(32 23.5) scale(1 .577)"><path d="M9.23 -1.78L11.91 -1.44L11.91 1.44L9.23 1.78L8.52 3.98L10.49 5.83L8.79 8.17L6.42 6.87L4.55 8.23L5.05 10.88L2.31 11.78L1.15 9.33L-1.15 9.33L-2.31 11.78L-5.05 10.88L-4.55 8.23L-6.42 6.87L-8.79 8.17L-10.49 5.83L-8.52 3.98L-9.23 1.78L-11.91 1.44L-11.91 -1.44L-9.23 -1.78L-8.52 -3.98L-10.49 -5.83L-8.79 -8.17L-6.42 -6.87L-4.55 -8.23L-5.05 -10.88L-2.31 -11.78L-1.15 -9.33L1.15 -9.33L2.31 -11.78L5.05 -10.88L4.55 -8.23L6.42 -6.87L8.79 -8.17L10.49 -5.83L8.52 -3.98Z" fill="#4a5df0"/><circle r="4.4" fill="#fff"/><circle r="1.8" fill="#4a5df0"/></g><path d="M32 35v21" stroke="#fff" stroke-opacity=".5"/></svg><span class="logo" style="font-weight:300;font-size:28px;letter-spacing:-.01em">Mini<b style="font-weight:800">CAD</b></span><span id="pj"></span><button id="sv" class="pri" title="Save (Ctrl+S)">Save</button><span class="sep"></span>
@@ -177,7 +202,7 @@ button.fcdc small{max-width:70px}
 <button id="exp" class="pri">Export</button><span class="sep"></span>
 <button id="undo">Undo</button><button id="redo">Redo</button><span class="sep"></span>
 <label>Snap <select id="snap"><option value="0">Off</option><option value=".1">0.1 mm</option><option value=".5">0.5 mm</option><option value="1" selected>1 mm</option><option value="5">5 mm</option><option value="10">10 mm</option></select></label>
-<label>Shape <select id="shp"><option value="rect">Rectangle</option><option value="rrect">Rounded rectangle</option><option value="slot">Slot</option><option value="ell">Ellipse</option><option value="tri">Triangle</option><option value="rtri">Right triangle</option><option value="dia">Diamond</option><option value="trap">Trapezoid</option><option value="para">Parallelogram</option><option value="pent">Pentagon</option><option value="hex">Hexagon</option><option value="oct">Octagon</option><option value="ngon">Regular N-gon</option><option value="star5">Star (5)</option><option value="starn">Star (N points)</option><option value="arrow">Arrow</option><option value="chev">Chevron</option><option value="cross">Plus / cross</option><option value="L">L-shape</option><option value="Tt">T-shape</option><option value="heart">Heart</option><option value="semi">Semicircle</option></select><input id="shn" type="number" value="6" min="3" max="24" style="width:50px" title="N = number of sides / points"></label><label title="What a stroke that crosses from the blue plane to the base plate becomes">3D stroke <select id="w3"><option value="solid">Solid</option><option value="wire">Wire</option></select></label><label>Draw as <select id="dk"><option value="extrude">Extrude (prism)</option><option value="sphere">Sphere</option><option value="dome">Dome</option><option value="cone">Cone / pyramid</option><option value="taper">Tapered</option></select></label><label title="Auto: each new shape is drawn on whatever is under the cursor – the blue upright plane, the base plate, or a face of a part.">Draw on <select id="dpl"><option value="auto">Auto</option><option value="ground">Ground (flat)</option><option value="front">Upright – front</option><option value="side">Upright – side</option></select></label><label>Draw height <input id="dh" type="number" value="20" min="0.1"> mm</label><label title="Stops any model sinking below the base plate"><input type="checkbox" id="kab" checked style="height:auto"> Stay above plate</label><label title="Objects rest on top of whatever is under them when you drop them"><input type="checkbox" id="stk" style="height:auto"> Auto-stack</label><span class="sp"></span>
+<span id="shhide" hidden><label>Shape <select id="shp"><option value="rect">Rectangle</option><option value="rrect">Rounded rectangle</option><option value="slot">Slot</option><option value="ell">Ellipse</option><option value="tri">Triangle</option><option value="rtri">Right triangle</option><option value="dia">Diamond</option><option value="trap">Trapezoid</option><option value="para">Parallelogram</option><option value="pent">Pentagon</option><option value="hex">Hexagon</option><option value="oct">Octagon</option><option value="ngon">Regular N-gon</option><option value="star5">Star (5)</option><option value="starn">Star (N points)</option><option value="arrow">Arrow</option><option value="chev">Chevron</option><option value="cross">Plus / cross</option><option value="L">L-shape</option><option value="Tt">T-shape</option><option value="heart">Heart</option><option value="semi">Semicircle</option></select><input id="shn" type="number" value="6" min="3" max="24" style="width:50px" title="N = number of sides / points"></label></span><label title="What a stroke that crosses from the blue plane to the base plate becomes">3D stroke <select id="w3"><option value="solid">Solid</option><option value="wire">Wire</option></select></label><label title="Auto: each new shape is drawn on whatever is under the cursor – the blue upright plane, the base plate, or a face of a part.">Draw on <select id="dpl"><option value="auto">Auto</option><option value="ground">Ground (flat)</option><option value="front">Upright – front</option><option value="side">Upright – side</option></select></label><label>Draw height <input id="dh" type="number" value="20" min="0.1"> mm</label><label title="Stops any model sinking below the base plate"><input type="checkbox" id="kab" checked style="height:auto"> Stay above plate</label><label title="Objects rest on top of whatever is under them when you drop them"><input type="checkbox" id="stk" style="height:auto"> Auto-stack</label><span class="sp"></span>
 <button id="arrbtn" class="btn-o c-blue" title="Make copies of the selected part, or arrange everything on the print bed">▦ Array ▾</button><div class="seg" id="views"><button data-v="iso">Iso</button><button data-v="top">Top</button><button data-v="front">Front</button><button data-v="right">Right</button><button data-v="fit">Fit</button></div>
 </header>
 <nav id="tools"></nav>
@@ -186,13 +211,16 @@ button.fcdc small{max-width:70px}
 <button data-g="size" class="on" title="Resize handles: red = width (X), green = height (Y), blue = depth (Z), orange corners = scale everything, purple = lift up/down">⤢ Resize</button><button data-g="rot" title="Rotation rings: drag the red / green / blue ring to turn the part around X / Y / Z">⟳ Rotate</button><i></i><button data-a="grp" title="Group. If a Hole is selected with solids, the hole is cut out of them">Group</button><button data-a="ungrp">Ungroup</button><i></i>
 <button data-a="uni">Union</button><button data-a="sub" title="Removes every other selected object from the first one you selected">Subtract</button><button data-a="int">Intersect</button><button data-a="hollow" title="Hollow out the selected shape (or group) into a sealed shell – you choose the wall thickness, nothing is left inside">Hollow</button><i></i>
 <button data-a="hole" title="Hole objects are cut out when grouped">Hole</button><button data-a="rot">Rotate 90°</button><button data-a="ontop" title="Puts the first-selected object(s) on top of the last-selected one, centred">Stack</button><button data-a="dup">Duplicate</button><button data-a="del">Delete</button></div>
-<div id="pbar" style="position:absolute;bottom:44px;left:50%;transform:translateX(-50%);display:none;gap:6px;background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:4px"><button id="pfin" class="pri">✓ Finish shape</button><button id="pund">↶ Undo point</button><button id="pcan">✕ Cancel</button></div><div id="sbar" style="position:absolute;top:52px;left:50%;transform:translateX(-50%);display:none;gap:6px;align-items:center;background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:5px 8px;box-shadow:0 2px 8px #0002"><span id="stxt"></span><button id="syes" class="pri">Stack on top</button><button id="sno">Keep overlapping</button></div><div id="pend" style="position:absolute;left:50%;bottom:44px;transform:translateX(-50%);display:none;flex-direction:column;gap:2px;background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:8px 10px;box-shadow:0 2px 10px #0003;width:min(430px,94%);z-index:5"><b id="pe_tit"></b>
-<div class="row"><span style="width:108px" id="pe_yl">Plane / base Y</span><input id="pe_y" type="number" step=".1" style="width:80px"><span>mm</span></div>
-<div class="row addonly"><span style="width:108px" id="pe_lxl">Length X / Width Z</span><input id="pe_lx" type="number" step=".1" min=".1" style="width:70px"><input id="pe_lz" type="number" step=".1" min=".1" style="width:70px"><span>mm</span></div>
-<div class="row"><span style="width:108px" id="pe_dl">Depth</span><input id="pe_d" type="number" step=".1" min=".01" style="width:80px"><input id="pe_s" type="range" min="0" max="100" step=".1" style="flex:1"></div>
-<div class="row cutonly"><span style="width:108px">End condition</span><select id="pe_end" style="flex:1"><option value="blind">Blind (set depth)</option><option value="thru">Through all</option><option value="thruboth">Through all – both sides</option><option value="mid">Mid plane</option></select></div>
-<div class="row cutonly"><label style="width:auto"><input type="checkbox" id="pe_rev" style="height:auto"> Reverse (cut upwards)</label><label style="width:auto"><input type="checkbox" id="pe_flip" style="height:auto"> Flip side (remove outside)</label></div>
-<div class="row"><button class="pri" id="pe_ok">✓ Apply</button><button id="pe_no">✕ Cancel</button><span class="mut">Enter / Esc</span></div></div><div id="labels"></div><div id="hint"></div></main>
+<div id="pbar" style="position:absolute;bottom:44px;left:50%;transform:translateX(-50%);display:none;gap:6px;background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:4px"><button id="pfin" class="pri">✓ Finish shape</button><button id="pund">↶ Undo point</button><button id="pcan">✕ Cancel</button></div><div id="sbar" style="position:absolute;top:52px;left:50%;transform:translateX(-50%);display:none;gap:6px;align-items:center;background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:5px 8px;box-shadow:0 2px 8px #0002"><span id="stxt"></span><button id="syes" class="pri">Stack on top</button><button id="sno">Keep overlapping</button></div><div id="pend" style="position:absolute;left:50%;bottom:44px;transform:translateX(-50%);display:none;flex-direction:column;width:min(440px,calc(100% - 16px));z-index:5"><div class="pe_h"><b id="pe_tit"></b></div>
+<div class="pe_body">
+<div class="pr"><span class="pl" id="pe_yl">Plane / base Y</span><div class="pc"><input id="pe_y" type="number" step=".1"><em>mm</em></div></div>
+<div class="pr addonly"><span class="pl" id="pe_lxl">Length X / Width Z</span><div class="pc"><input id="pe_lx" type="number" step=".1" min=".1"><input id="pe_lz" type="number" step=".1" min=".1"><em>mm</em></div></div>
+<div class="pr"><span class="pl" id="pe_dl">Depth</span><div class="pc"><input id="pe_d" type="number" step=".1" min=".01"><input id="pe_s" type="range" min="0" max="100" step=".1"></div></div>
+<div class="pr addonly"><span class="pl">Draw as</span><div class="pc"><select id="dk"><option value="extrude">Extrude (prism)</option><option value="sphere">Sphere</option><option value="dome">Dome</option><option value="cone">Cone / pyramid</option><option value="taper">Tapered</option></select></div></div>
+<div class="pr cutonly"><span class="pl">End condition</span><div class="pc"><select id="pe_end"><option value="blind">Blind (set depth)</option><option value="thru">Through all</option><option value="thruboth">Through all – both sides</option><option value="mid">Mid plane</option></select></div></div>
+<div class="pr cutonly pchk"><label><input type="checkbox" id="pe_rev"> Reverse (cut upwards)</label><label><input type="checkbox" id="pe_flip"> Flip side (remove outside)</label></div>
+</div>
+<div class="pe_f"><span class="mut">Enter = Apply · Esc = Cancel</span><span class="sp"></span><button id="pe_no">✕ Cancel</button><button class="pri" id="pe_ok">✓ Apply</button></div></div><div id="labels"></div><div id="hint"></div></main>
 <aside id="side">
 <div class="tabs"><button data-p="inspect" class="on">Inspector</button><button data-p="shapes">Shapes</button><button data-p="parts">Parts</button><button data-p="gears">Gears</button><button data-p="cut">Cut</button><button data-p="era">Erase</button><button data-p="text">Text</button></div>
 <div class="pane on" id="p-inspect">
@@ -590,22 +618,24 @@ function doHollow(src,wall){if(!J)throw new Error('boolean engine not loaded');c
  const pts=J.geometries.geom3.toPoints(outer);let mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9];pts.forEach(p=>p.forEach(v=>{for(let i=0;i<3;i++){if(v[i]<mn[i])mn[i]=v[i];if(v[i]>mx[i])mx[i]=v[i]}}));
  const ext=[0,1,2].map(i=>mx[i]-mn[i]),ctr=[0,1,2].map(i=>(mx[i]+mn[i])/2);
  if(Math.min(ext[0],ext[1],ext[2])<=2*wall+.2)throw new Error('wall '+wall+' mm is too thick for this shape');
- /* inner void = the shape shrunk inwards by 'wall' everywhere (erosion): intersection of the shape moved by 'wall' in 18 directions.
-    Unlike scaling toward the centre, this keeps a solid wall of even thickness around holes, pockets and cut-outs too. */
- const dirs=[];for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)for(let c=-1;c<=1;c++){const n=Math.abs(a)+Math.abs(b)+Math.abs(c);if(n<1||n>2)continue;const l=Math.hypot(a,b,c);dirs.push([a/l*wall,b/l*wall,c/l*wall])}
- const inner=J.booleans.intersect(...dirs.map(d=>J.transforms.translate(d,outer)));
+ /* inner void = the outer surface scaled inwards so every side sits 'wall' mm in. It is a clean, smooth
+    copy of the outer shell (no bevels or facet lines), so the walls stay even and the shading stays clean –
+    the old 18-direction erosion left faceted inner edges that showed up as weird lines across the shape. */
+ const s=ext.map(e=>(e-2*wall)/e);
+ const inner=J.transforms.translate(ctr,J.transforms.scale(s,J.transforms.translate(ctr.map(c=>-c),outer)));
  if(!J.geometries.geom3.toPoints(inner).length)throw new Error('wall '+wall+' mm is too thick for this shape');
- const r=J.booleans.subtract(outer,inner),rp=J.geometries.geom3.toPoints(r),pos=[];rp.forEach(p=>{for(let i=1;i<p.length-1;i++)pos.push(...p[0],...p[i],...p[i+1])});
- if(!pos.length)throw new Error('result is empty');
- const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));smoothJG(g);g.userData.jg=1;
+ const r=J.booleans.subtract(outer,inner);
+ const g=jGeo(r);if(!g)throw new Error('result is empty');
  let c=0x4f8cff;src[0].traverse(n=>{if(n.isMesh)c=n.userData.col??n.material.color.getHex()});
- commit();src.forEach(o=>{S.remove(o);objs.splice(objs.indexOf(o),1)});return place(M(g,c),'Hollow',true)}
+ commit();src.forEach(o=>{S.remove(o);objs.splice(objs.indexOf(o),1)});const mm=M(g,c);mm.userData.col=c;const hw=place(mm,'Hollow',true);
+ hw.userData.hollowShell={shell:r,inner,mn:mn.slice(),mx:mx.slice(),ctr:ctr.slice(),wall,col:c};return hw}
 function hollowSel(){if(!J){hint.textContent='Hollow needs the boolean engine (CDN).';return}
  const src=sel.filter(o=>!o.userData.hole&&!o.userData.link&&!o.userData.hubOf&&!(o.userData.jp));
  if(!src.length){hint.textContent='Select a shape (or a group) first, then press Hollow.';return}
- let w=parseFloat(prompt('Hollow – wall thickness in mm (the inside is sealed, nothing left inside):','2'));
- if(!(w>0)){hint.textContent='Hollow cancelled.';return}w=Math.max(.3,Math.min(50,w));
- hint.textContent='Hollowing…';setTimeout(()=>{try{doHollow(src,w);hint.textContent='Done – hollow shell with '+w+' mm walls (sealed, nothing inside).'}catch(e){hint.textContent='Hollow failed: '+e.message}},30)}
+ const run=(w,openAfter)=>{if(!(w>0)){hint.textContent='Hollow cancelled.';return}w=Math.max(.3,Math.min(50,w));
+  hint.textContent='Hollowing…';setTimeout(()=>{try{const o=doHollow(src,w);if(openAfter&&typeof startHollowOpening==='function')startHollowOpening(o);else hint.textContent='Done – hollow shell with '+w+' mm walls (sealed, nothing inside).'}catch(e){hint.textContent='Hollow failed: '+e.message}},30)};
+ if(typeof hollowDialog==='function')hollowDialog(run);
+ else{const w=parseFloat(prompt('Hollow – wall thickness in mm:','2'));if(!(w>0)){hint.textContent='Hollow cancelled.';return}run(w,confirm('After hollowing, open a face?'))}}
 const ACT={ontop:()=>{commit();const base=sel[sel.length-1],bb=bbx(base),c=bb.getCenter(V(0,0,0));sel.slice(0,-1).forEach(o=>{const b=bbx(o),k=b.getCenter(V(0,0,0));o.position.x+=c.x-k.x;o.position.z+=c.z-k.z;o.position.y+=bb.max.y-b.min.y});info()},grp:()=>bool('grp'),uni:()=>bool('uni'),sub:()=>bool('sub'),int:()=>bool('int'),hollow:()=>hollowSel(),
 ungrp:()=>{const g=sel[0];if(!g||!g.userData.group)return;commit();g.children.filter(c=>!c.isLineSegments).forEach(c=>{S.attach(c);objs.push(c);own(c)});S.remove(g);objs.splice(objs.indexOf(g),1);select([])},
 hole:()=>{commit();const on=!sel.every(o=>o.userData.hole);sel.forEach(o=>setHole(o,on));info();olist()},
@@ -613,13 +643,13 @@ rot:()=>{commit();sel.forEach(o=>o.rotation.y+=Math.PI/2);info()},
 dup:()=>{commit();const n=sel.map(o=>{const c=o.clone(true);c.position.x+=15;c.position.z+=15;c.userData={...o.userData,name:o.userData.name.replace(/ \d+$/,'')+' '+(++cnt)};c.traverse(m=>{if(m.isMesh)m.material=m.material.clone()});objs.push(c);S.add(c);own(c);return c});select(n)},
 del:()=>{if(!sel.length)return;commit();sel.slice().forEach(killObj);select([]);sweep()}};
 document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>ACT[b.dataset.a]());
-const IC={select:'M5 3l14 7-6 2-2 6z',orbit:'M12 4a8 8 0 1 0 8 8M20 4v5h-5',pan:'M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3',measure:'M3 17L17 3l4 4L7 21zM9 11l2 2M12 8l2 2',rect:'M4 6h16v12H4z',circle:'M4 12a8 8 0 1 0 16 0a8 8 0 1 0-16 0',poly:'M12 3l8 6-3 11H7L4 9z',shape:'M12 3l2.5 6 6.5.5-5 4.2 1.7 6.3-5.7-3.5-5.7 3.5 1.7-6.3-5-4.2 6.5-.5z',free:'M3 17c4-12 6 4 9-6s6 8 9-6',text:'M5 6V4h14v2M12 4v16M9 20h6',erase:'M20 20H9l-6-6L14 3l7 7zM8 9l7 7',cutr:'M4 6h16v12H4zM8 10l8 4M8 14l8-4',cutc:'M4 12a8 8 0 1 0 16 0a8 8 0 1 0-16 0M8 9l8 6M8 15l8-6'};
+const IC={shapes:'M8.3 10a.7.7 0 0 1-.63-1.08L11.4 3a.7.7 0 0 1 1.2-.04l3.7 5.94a.7.7 0 0 1-.57 1.1zM4 14h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1zM17.5 14a3.5 3.5 0 1 0 0 7a3.5 3.5 0 1 0 0-7',select:'M4.04 4.69a.5.5 0 0 1 .65-.65l16 6.5a.5.5 0 0 1-.06.95l-6.12 1.58a2 2 0 0 0-1.44 1.44l-1.58 6.12a.5.5 0 0 1-.95.06z',orbit:'M16.47 7.5C15.64 4.24 13.95 2 12 2 9.24 2 7 6.48 7 12s2.24 10 5 10c.34 0 .68-.07 1-.2M15.19 13.71l3.81 1.86-1.86 3.81M19 15.57c-1.8.89-4.27 1.43-7 1.43-5.52 0-10-2.24-10-5s4.48-5 10-5c4.84 0 8.87 1.72 9.8 4',pan:'M18 11V6a2 2 0 0 0-4 0M14 10V4a2 2 0 0 0-4 0v2M10 10.5V6a2 2 0 0 0-4 0v8M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6-2.3l-3.6-3.6a2 2 0 0 1 2.8-2.8L7 15',measure:'M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0zM14.5 12.5l2-2M11.5 9.5l2-2M8.5 6.5l2-2M17.5 15.5l2-2',rect:'M4 6h16v12H4z',circle:'M4 12a8 8 0 1 0 16 0a8 8 0 1 0-16 0',poly:'M5 8l8-4 7 6-3 9-10-1zM5 6.6a1.4 1.4 0 1 0 0 2.8a1.4 1.4 0 1 0 0-2.8M13 2.6a1.4 1.4 0 1 0 0 2.8a1.4 1.4 0 1 0 0-2.8M20 8.6a1.4 1.4 0 1 0 0 2.8a1.4 1.4 0 1 0 0-2.8M17 17.6a1.4 1.4 0 1 0 0 2.8a1.4 1.4 0 1 0 0-2.8M7 16.6a1.4 1.4 0 1 0 0 2.8a1.4 1.4 0 1 0 0-2.8',shape:'M8.3 10a.7.7 0 0 1-.63-1.08L11.4 3a.7.7 0 0 1 1.2-.04l3.7 5.94a.7.7 0 0 1-.57 1.1zM4 14h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1zM17.5 14a3.5 3.5 0 1 0 0 7a3.5 3.5 0 1 0 0-7',free:'M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5zM15 5l4 4',text:'M5 6V4h14v2M12 4v16M9 20h6',erase:'M7 21l-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21M22 21H7M5 11l9 9',cutr:'M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3M9 9h6v6H9z',cutc:'M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3M12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6'};
 const svg=(d,s=20)=>`<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
-[['select','Select / move (V)'],['orbit','Orbit (O)'],['pan','Pan (H)'],0,['measure','Measure distance (M)'],0,['rect','Rectangle (R)'],['circle','Circle (C)'],['poly','Polygon – click points to draw any shape (P)'],['shape','Shapes – choose one in the header, then drag (S)'],['free','Freehand – drag to draw any curved shape (F)'],['text','Text (T)'],0,['erase','Eraser – click an object to delete it (E)'],['cutr','Cut tool – drag a rectangle to cut a pocket/slot through shapes (X)'],['cutc','Cut tool – drag a circle to drill a round hole (D)']].forEach(t=>{
+[['select','Select / move (V)'],['orbit','Orbit (O)'],['pan','Pan (H)'],0,['measure','Measure distance (M)'],0,['shapes','Shapes – rectangle, circle, triangle, star, heart… (R / C / S)'],['poly','Polygon – click points to draw any shape (P)'],['free','Freehand – drag to draw any curved shape (F)'],['text','Text (T)'],0,['erase','Eraser – click to rub out a round spot, or drag a shape to erase (E)'],['cutr','Cut rectangle – drag to cut a square pocket / slot (X)'],['cutc','Drill circle – drag to cut a round hole (D)']].forEach(t=>{
 if(!t){$('tools').appendChild(document.createElement('hr'));return}const b=document.createElement('button');b.dataset.t=t[0];b.title=t[1];b.innerHTML=svg(IC[t[0]]);
-b.onclick=()=>t[0]==='text'?(tab('text'),$('tx').focus()):setTool(t[0]);$('tools').appendChild(b)});
+b.onclick=()=>t[0]==='shapes'?0:t[0]==='text'?(tab('text'),$('tx').focus()):setTool(t[0]);$('tools').appendChild(b)});
 const HT={select:'Click to select, drag to move. Shift-click for multi-select. Resize handles: red = X, green = Y, blue = Z, orange = all.',orbit:'Drag to orbit. Right-drag orbits, middle-drag pans, wheel zooms in any tool.',pan:'Drag to pan the view.',measure:'Click two points to measure. Snaps to corners of your shapes.',rect:'Drag on the grid to draw a rectangle – it is extruded to the draw height.',circle:'Drag outward from the centre to set the radius.',poly:'Click points to draw any shape. Press ✓ Finish shape (or Enter / double-click / click the first point). Choose Draw as: sphere, dome, cone…',free:'Press and drag to draw any shape freehand; release to finish. Choose Draw as in the header.'};
-Object.assign(HT,{shape:'Pick a shape in the header (triangle, hexagon, star, arrow, heart…) and drag corner to corner. Hover a face of a part to draw on that face; otherwise you draw on the ground.',erase:'Click an object to erase it.',cutr:'Drag a rectangle: it is cut out of every shape beneath it (set the depth in the Erase tab; 0 = all the way through). Use “Draw on” in the header to cut from the front / side instead of from above.',cutc:'Drag from the centre outward: a round hole is cut in every shape beneath it (depth in the Erase tab). Use “Draw on” in the header to drill from the front / side instead of from above.'});
+Object.assign(HT,{shape:'Drag corner to corner to draw the shape you picked in the Shapes button (left toolbar). Hover a face of a part to draw on that face; otherwise you draw on the ground.',erase:'Click to erase a round spot, or drag to erase a shape. Pick the shape, mode and depth in the Erase tab.',cutr:'Drag a rectangle: it is cut out of every shape beneath it (set the depth in the Erase tab; 0 = all the way through). Use “Draw on” in the header to cut from the front / side instead of from above.',cutc:'Drag from the centre outward: a round hole is cut in every shape beneath it (depth in the Erase tab). Use “Draw on” in the header to drill from the front / side instead of from above.'});
 function setPrev(a,loop){if(prev){S.remove(prev);prev.geometry.dispose();prev=null}if(prev2){S.remove(prev2);prev2.geometry.dispose();prev2=null}const md=dmd();a=(a.length>1&&mixed())?wp.map(q=>q.p.clone().setY(q.p.y+.2)):a.map(p=>c2w(p,md));if(a.length>1){prev=new(loop?THREE.LineLoop:THREE.Line)(new THREE.BufferGeometry().setFromPoints(a),new THREE.LineBasicMaterial({color:0xd92d4b,depthTest:false}));prev.renderOrder=999;S.add(prev);if(loop&&(tool==='rect'||tool==='circle'||tool==='shape')){prev2=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(a.map(p=>p.clone().addScaledVector(nrmOf(md),Math.max(.1,+$('dh').value||20)))),new THREE.LineBasicMaterial({color:0xf5a524,depthTest:false}));prev2.renderOrder=999;S.add(prev2)}}}
 function cancel(){wp=[];pts=[];start=null;fh=null;workY=0;pl.constant=0;pendClear();A=null;setPrev([]);mk.visible=false}
 function setTool(t){cancel();tool=t;lookDown();document.querySelectorAll('#tools button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));hint.textContent=HT[t];cv.style.cursor=t==='select'?'default':t==='orbit'||t==='pan'?'grab':'crosshair'}
@@ -646,7 +676,7 @@ cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);const l=
 cv.addEventListener('pointermove',e=>{if(drag&&drag.m!=='tool'){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;
 if(drag.m==='orbit'){th-=dx*.008;ph=Math.min(3.05,Math.max(.05,ph-dy*.008))}else{const k=dist*.0016;tgt.addScaledVector(V(0,0,0).setFromMatrixColumn(cam.matrix,0),-dx*k).addScaledVector(V(0,0,0).setFromMatrixColumn(cam.matrix,1),dy*k)}upd()}else mvQ(e)});
 let mvE=null,mvR=0;const mvQ=e=>{mvE=e;if(!mvR)mvR=requestAnimationFrame(()=>{mvR=0;const x=mvE;mvE=null;if(x)move(x)})};
-let _it=0;const infoT=()=>{const n=performance.now();if(n-_it>90){_it=n;info()}};
+let _sy=0;let _it=0;const infoT=()=>{const n=performance.now();if(n-_it>90){_it=n;info()}};
 cv.addEventListener('pointerup',e=>{if(mvE){const x=mvE;mvE=null;move(x)}if(drag&&drag.m==='tool')up(e);drag=null});
 cv.addEventListener('wheel',e=>{e.preventDefault();dist=Math.min(3000,Math.max(15,dist*Math.exp(e.deltaY*.001)));upd()},{passive:false});
 cv.addEventListener('dblclick',()=>{if(tool==='poly'||tool==='erase')closePoly()});
@@ -659,7 +689,7 @@ if(ph>=.5&&RC.ray.intersectPlane(new THREE.Plane(nrmOf(m),0),u)&&Math.abs(m==='f
 return tu<tg?{p:u.clone(),m}:tg<1e9?{p:g.clone(),m:'ground'}:null}
 function mkTube(P,closed){const r=Math.max(.5,(+$('dh').value||20)/8),g=new THREE.Group(),K2=[];P.forEach(q=>{if(!K2.length||q.distanceTo(K2[K2.length-1])>=Math.max(2,r*1.5))K2.push(q)});if(closed)K2.push(K2[0]);
 if(K2.length<2)return;
-if($('w3').value==='solid'&&K2.length>=4){try{const gm=jGeo(J.hulls.hull(J.geometries.geom3.fromPoints(K2.map(q=>[[q.x,q.y,q.z],[q.x+.01,q.y,q.z],[q.x,q.y+.01,q.z]]))));if(gm){vertAdd=true;add(M(gm),'Solid (3D sketch)',true);vertAdd=false;setTool('select');hint.textContent='Solid made from everything you drew across the blue plane and base plate. Set "3D stroke" to Wire in the header for a thin wire instead.';return}}catch(err){}}K2.forEach((q,i)=>{g.add(M(new THREE.SphereGeometry(r,12,8),0x4f8cff,q.x,q.y,q.z));if(i){const a=K2[i-1],d=q.clone().sub(a),L=d.length();if(L<.01)return;const c=M(new THREE.CylinderGeometry(r,r,L,12),0x4f8cff);c.position.copy(a).addScaledVector(d,.5);c.quaternion.setFromUnitVectors(V(0,1,0),d.normalize());g.add(c)}});
+if($('w3').value==='solid'&&K2.length>=4){try{const gm=jGeo(J.hulls.hull(J.geometries.geom3.fromPoints(K2.flatMap(q=>[[r,0,0],[-r,0,0],[0,r,0],[0,-r,0],[0,0,r],[0,0,-r]].map(o=>{const a=[q.x+o[0],Math.max(0,q.y+o[1]),q.z+o[2]];return[a,[a[0]+.01,a[1],a[2]],[a[0],a[1]+.01,a[2]]]})))));if(gm){vertAdd=true;add(M(gm),'Solid (3D sketch)',true);vertAdd=false;setTool('select');hint.textContent='Solid made from everything you drew across the blue plane and base plate. Set "3D stroke" to Wire in the header for a thin wire instead.';return}}catch(err){}}K2.forEach((q,i)=>{g.add(M(new THREE.SphereGeometry(r,12,8),0x4f8cff,q.x,q.y,q.z));if(i){const a=K2[i-1],d=q.clone().sub(a),L=d.length();if(L<.01)return;const c=M(new THREE.CylinderGeometry(r,r,L,12),0x4f8cff);c.position.copy(a).addScaledVector(d,.5);c.quaternion.setFromUnitVectors(V(0,1,0),d.normalize());g.add(c)}});
 vertAdd=true;add(g,'Wire',true);vertAdd=false;setTool('select');hint.textContent='Wire made from your stroke across the blue plane and base plate (thickness = Draw height ÷ 4).'}
 const camMode=()=>Math.abs(Math.cos(th))>=Math.abs(Math.sin(th))?'front':'side';
 function faceM(e){hovM=null;hovSg=0;if($('dpl').value!=='auto')return;setRay(e);const h=RC.intersectObjects(meshes().filter(m=>{const r=rootOf.get(m);return!(r&&r.userData.hole)}),false)[0];
@@ -687,7 +717,7 @@ if(hd){dragHd(e);return}if(rt){dragRot(e);return}
 if(mv){const g=ground();if(!g)return;const fs=v=>e.altKey?Math.round(v*100)/100:sn(v),dx=fs(g.x-mv.g0.x),dz=fs(g.z-mv.g0.z);if(!mv.c&&(dx||dz)){mv.c=true;const cur=objs.map(T);cur.forEach(n=>{const s=mv.s.find(q=>q.o===n.o);if(s)n.p=s.p.clone()});hist.push(cur);redo=[]}
 mv.s.forEach(s=>{const o=s.o,a=o.userData.gearAttach,g=a&&a.gear,gearDragged=g&&mv.s.some(k=>k.o===g);if(a&&g&&objs.includes(g)&&!gearDragged){const basis=(a.role==='motor'?(g.userData.mountQ||g.quaternion):g.quaternion).clone();if(a.role==='wheel'){const bs=a.base||{x:0,y:0,z:0},t=V(s.p.x+dx,s.p.y,s.p.z+dz).sub(g.position).applyQuaternion(basis.clone().invert());a.offset={x:t.x-(+bs.x||0),y:t.y-(+bs.y||0)-(+a.caseShift||0),z:t.z-(+bs.z||0)};{const sh=objs.find(q=>q!==o&&q.userData.link===g&&q.userData.gearAttach&&q.userData.gearAttach.role==='shaft'),sa=sh&&sh.userData.gearAttach,sb=(sa&&sa.base)||{x:0,y:0,z:0},so=(sa&&sa.offset)||{x:0,y:0,z:0};a.detached=Math.hypot(t.x-((+sb.x||0)+(+so.x||0)),t.z-((+sb.z||0)+(+so.z||0)))>1}__syncGearAttachment(o);if(a.detached)o.position.set(s.p.x+dx,s.p.y,s.p.z+dz)}else{const local=V(dx,0,dz).applyQuaternion(basis.invert()),off=s.off||{x:0,y:0,z:0};a.offset={x:(off.x||0)+local.x,y:(off.y||0)+local.y,z:(off.z||0)+local.z};__syncGearAttachment(o)}}else o.position.set(s.p.x+dx,s.p.y,s.p.z+dz)});infoT()}return}
 if(tool==='orbit'||tool==='pan')return;
-if(!start&&!pts.length&&!fh&&tool!=='measure'){if(DRAWT.includes(tool))faceM(e);const um=dmd()!=='ground',ny=um?(hovM?hovOff:0):surfY(e);if(um&&lastM!==dmd()&&drawV())hint.textContent='Upright drawing plane (shown in blue): left-right = width, up = height. You set thickness after drawing. Use "Draw on" in the header for flat drawing.';lastM=dmd();if(ny!==workY){workY=ny;pl.constant=-ny;hint.textContent=ny?`Surface detected – drawing at height ${ny} mm`:(HT[tool]||'')}}
+if(!start&&!pts.length&&!fh&&tool!=='measure'){const _ef=tool==='erase'&&$('esh').value==='click';if(DRAWT.includes(tool)&&!_ef)faceM(e);const um=dmd()!=='ground',ny=um?(hovM?hovOff:0):(_ef&&performance.now()-_sy<100?workY:(_sy=performance.now(),surfY(e)));if(um&&lastM!==dmd()&&drawV())hint.textContent='Upright drawing plane (shown in blue): left-right = width, up = height. You set thickness after drawing. Use "Draw on" in the header for flat drawing.';lastM=dmd();if(ny!==workY){workY=ny;pl.constant=-ny;hint.textContent=ny?`Surface detected – drawing at height ${ny} mm`:(HT[tool]||'')}}
 if(isFree()){if(fh){setRay(e);const g=ground();if(g&&g.distanceTo(fh[fh.length-1])>Math.max(.6,dist*.006)){fh.push(g.clone());{const q=wOK()&&sp(e);if(q)wp.push(q)}setPrev(fh.map(q=>V(q.x,.2,q.z)),false)}}return}
 const r=pick(e,tool==='measure');if(!r){mk.visible=false;return}mk.visible=true;mk.position.copy(tool==='measure'?r.p:c2w(r.p));mk.scale.setScalar(dist*.006);const f=a=>a.toFixed(1),p=r.p;
 if(tool==='measure'&&A){setPrev([A,p]);hint.textContent=`Length ${A.distanceTo(p).toFixed(2)} mm  |  Δx ${f(p.x-A.x)}  Δheight ${f(p.y-A.y)}  Δdepth ${f(p.z-A.z)}`}
@@ -1246,12 +1276,21 @@ let cb=null;if(upr){const cg=orient(cutterGeo(poly,y0,y1,flip),md,y0);cg.compute
 const T=objs.filter(o=>{if(o.userData.hole||(only&&!sel.includes(o)))return false;const b=bbx(o);if(upr){if(!(b.max[uax]>y0+1e-4&&b.min[uax]<y1-1e-4))return false;return flip||(b.max.x>cb.min.x&&b.min.x<cb.max.x&&b.max.y>cb.min.y&&b.min.y<cb.max.y&&b.max.z>cb.min.z&&b.min.z<cb.max.z)}return b.max.y>y0+1e-4&&b.min.y<y1-1e-4&&(flip||(b.max.x>x0&&b.min.x<x1&&b.max.z>z0&&b.min.z<z1))});
 if(!T.length){hint.textContent='No part is inside the cut volume – check plane height, depth, direction and targets.';return}
 hint.textContent='Cutting…';
-setTimeout(()=>{try{const jc=toJ(upr?M(orient(cutterGeo(poly,y0,y1,flip),md,y0),0xffffff):M(cutterGeo(poly,y0,y1,flip),0xffffff,0,y0,0));
+setTimeout(()=>{try{const cm=upr?M(orient(cutterGeo(poly,y0,y1,flip),md,y0),0xffffff):M(cutterGeo(poly,y0,y1,flip),0xffffff,0,y0,0);cm.updateMatrixWorld(true);const cbw=new THREE.Box3().setFromObject(cm),jc=toJ(cm);
 const subSafe=(a,b)=>{try{const r=J.booleans.subtract(a,b);if(J.geometries.geom3.toPolygons(r).length)return r}catch(e){}
  try{const r=J.booleans.subtract(J.modifiers.generalize({snap:true,triangulate:true},a),b);if(J.geometries.geom3.toPolygons(r).length)return r}catch(e){}return null};
-const out=T.map(o=>{let c=0x4f8cff;o.traverse(n=>{if(n.isMesh)c=n.userData.col??n.material.color.getHex()});let g=null;try{const r=subSafe(toJ(o),jc);g=r?jGeo(r):null}catch(e){g=null}return[o,g,c]});
-if(!out.some(x=>x[1])){hint.textContent='Cut failed – that shape could not be cut there. Nudge the position or depth a little and try again.';return}
-commit();const made=[];let fail=0;out.forEach(([o,g,c])=>{if(!g){fail++;return}S.remove(o);objs.splice(objs.indexOf(o),1);made.push(place(M(g,c),nameOf(o).replace(/ \d+$/,''),true))});select(made);
+const colOf=n=>n.userData.col??n.material.color.getHex();
+/* cut each coloured piece on its own: pieces the cutter never touches are kept exactly as they are (fast, colours stay) */
+const out=T.map(o=>{o.updateMatrixWorld(true);const parts=[];let hit=0,bad=0;
+ o.traverse(n=>{if(!n.isMesh)return;const mb=new THREE.Box3().setFromObject(n);
+  if(!mb.intersectsBox(cbw)){parts.push({n});return}
+  let g=null;try{const jm=toJ(n),r=jm&&subSafe(jm,jc);g=r?jGeo(r):null}catch(e){g=null}
+  if(g){parts.push({n,g});hit++}else if(cbw.containsBox(mb)){hit++}else{parts.push({n});bad++}});
+ return[o,parts,hit,bad]});
+if(!out.some(x=>x[2])){hint.textContent=out.some(x=>x[3])?'Cut failed – that shape could not be cut there. Nudge the position or depth a little and try again.':'The cut did not touch any part – check position and depth.';return}
+commit();const made=[];let fail=0;out.forEach(([o,parts,hit,bad])=>{if(!hit)return;fail+=bad?1:0;S.remove(o);objs.splice(objs.indexOf(o),1);if(!parts.length)return;
+ const grp=new THREE.Group();parts.forEach(({n,g})=>{const m=M(g||n.geometry.clone().applyMatrix4(n.matrixWorld),colOf(n));m.material.roughness=n.material.roughness;m.material.metalness=n.material.metalness;if(n.userData.tp!==undefined)m.userData.tp=n.userData.tp;if(n.userData.noEdges)m.userData.noEdges=true;grp.add(m)});
+ made.push(place(grp,nameOf(o).replace(/ \d+$/,''),true))});if(made.length)select(made);else{select([]);sweep()}
 hint.textContent=`Cut applied: ${(y1-y0).toFixed(2)} mm tall volume, ${made.length} part(s).`+(fail?` ${fail} part(s) could not be cut there.`:'')+' Ctrl+Z undoes.'}catch(e){hint.textContent='Cut failed: '+e.message}},30)}
 const TX={Smooth:[.65,.05],Matte:[1,0],Glossy:[.12,.1],'Brushed metal':[.4,.55,'lines'],Rough:[.95,0,'noise'],Knurled:[.5,.5,'diamond'],Dots:[.6,.05,'dots'],Grooves:[.6,.05,'grooves'],Checker:[.6,.05,'checker'],'Carbon weave':[.35,.3,'weave'],Hammered:[.45,.45,'hammer']},PT={};
 Object.keys(TX).forEach(k=>{const o=document.createElement('option');o.textContent=k;$('tex').appendChild(o)});
@@ -1370,7 +1409,7 @@ const inPoly=(x,z,p)=>{let r=false;for(let i=0,j=p.length-1;i<p.length;j=i++)if(
 function eraseRegion(poly){const hit=objs.filter(o=>{if(o.userData.link)return false;const b=bbx(o),xs=[b.min.x,(b.min.x+b.max.x)/2,b.max.x],zs=[b.min.z,(b.min.z+b.max.z)/2,b.max.z];return xs.some(x=>zs.some(z=>inPoly(x,z,poly)))||poly.some(q=>q.x>=b.min.x&&q.x<=b.max.x&&q.z>=b.min.z&&q.z<=b.max.z)});
 if(!hit.length){hint.textContent='Nothing inside that area.';return}commit();hit.forEach(killObj);select([]);sweep();hint.textContent='Erased '+hit.length+' object(s). Undo brings them back.'}
 const region=(poly,md)=>tool==='erase'&&$('emd').value==='obj'?eraseRegion(poly):cutRegion(poly,md);
-Object.assign(HT,{erase:'Eraser: pick the shape, mode and depth in the Erase tab.'});
+Object.assign(HT,{erase:'Click to erase a round spot, or drag to erase a shape. Pick the shape, mode and depth in the Erase tab.'});
 const dm=()=>{const m=objs.find(o=>o.userData.motor&&o.userData.link&&objs.includes(o.userData.link));return m?m.userData.link:(objs.find(o=>isG(o)&&o.userData.vm)||null)};
 function hull(P){P=P.slice().sort((a,b)=>a.x-b.x||a.z-b.z);const cr=(o,a,b)=>(a.x-o.x)*(b.z-o.z)-(a.z-o.z)*(b.x-o.x),h=[];for(const p of P){while(h.length>1&&cr(h[h.length-2],h[h.length-1],p)<=0)h.pop();h.push(p)}const k=h.length+1;for(let i=P.length-2;i>=0;i--){const p=P[i];while(h.length>=k&&cr(h[h.length-2],h[h.length-1],p)<=0)h.pop();h.push(p)}h.pop();return h}
 function mateF(c,n){const pc=gp(c),pn=gp(n),std=-pc.N/pn.N;if(pc.ty!=='worm'&&pn.ty!=='worm')return std;
@@ -1700,16 +1739,50 @@ hint.textContent=tt?'TT-size double-D shaft added (Ø'+TT.sd+', flats '+TT.ff+')
 const EXC={w:true,m:false};
 function kindOf(c){for(let n=c;n;n=n.parent){const u=n.userData||{};if(u.isWheel)return u.extra?'p':'w';if(u.isPrint||u.ext)return'p';if(u.hw)return'm'}return'p'}
 const inc=c=>{const k=kindOf(c);return k==='w'?EXC.w:k==='m'?EXC.m:true};
+function expCSS(){if(document.getElementById('exp-css'))return;const st=document.createElement('style');st.id='exp-css';st.textContent=
+ '#expdlg{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:rgba(10,12,16,.55);backdrop-filter:blur(2px);opacity:0;transition:opacity .15s ease}'+
+ '#expdlg.on{opacity:1}'+
+ '#expdlg .card{width:420px;max-width:calc(100vw - 24px);max-height:calc(100vh - 32px);overflow:auto;background:var(--bg);color:var(--t);border:1px solid var(--b);border-radius:14px;box-shadow:0 18px 50px #0007;padding:18px;transform:translateY(8px) scale(.98);transition:transform .15s ease}'+
+ '#expdlg.on .card{transform:none}'+
+ '#expdlg h3{margin:0 0 3px;font:600 16px system-ui}'+
+ '#expdlg .sub{margin:0 0 14px;color:var(--m);font-size:12px;line-height:1.45}'+
+ '#expdlg .grp{border:1px solid var(--b);border-radius:10px;padding:11px 12px;margin:9px 0}'+
+ '#expdlg .grp h4{margin:0 0 7px;font:600 11px system-ui;letter-spacing:.04em;color:var(--m);text-transform:uppercase}'+
+ '#expdlg .ck{display:flex;align-items:flex-start;gap:9px;font-size:13px;line-height:1.4;cursor:pointer;margin:2px 0}'+
+ '#expdlg .ck input{margin-top:2px;height:auto}'+
+ '#expdlg .rowf{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:9px;font-size:12.5px;color:var(--m)}'+
+ '#expdlg input[type=number],#expdlg select{padding:6px 8px;font:inherit;color:var(--t);background:var(--p);border:1px solid var(--b);border-radius:7px}'+
+ '#expdlg input[type=number]{width:58px}'+
+ '#expdlg .note{display:flex;gap:9px;background:var(--p);border:1px solid var(--b);border-radius:10px;padding:10px 11px;margin:10px 0 0;font-size:12px;line-height:1.45;color:var(--m)}'+
+ '#expdlg .note b{color:var(--t)}'+
+ '#expdlg .row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px}'+
+ '#expdlg .row button{height:36px;padding:0 15px;border-radius:8px;border:1px solid var(--b);background:var(--p);color:var(--t);font:600 13px system-ui;cursor:pointer}'+
+ '#expdlg .row button.pri{background:var(--a);border-color:var(--a);color:#fff}'+
+ '#expdlg .row button:hover{filter:brightness(1.06)}';
+ document.head.appendChild(st)}
 function expDlg(){return new Promise(res=>{let nW=0,nM=0;objs.forEach(o=>o.traverse(c=>{const u=c.userData||{};if(u.isWheel&&!(c.parent&&c.parent.userData&&c.parent.userData.isWheel))nW++;if(u.hw)nM++}));
-const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;z-index:99';
-const opt=a=>a.map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
-d.innerHTML=`<div style="background:var(--bg);color:var(--t);border:1px solid var(--b);border-radius:10px;padding:16px;width:min(400px,92vw);font:13px system-ui;line-height:1.5"><h3 style="margin:0 0 6px;font-size:15px">Export – wheels &amp; colour</h3>
- <label style="display:block;margin:6px 0"><input type="checkbox" id="xw" ${nW?'checked':'disabled'} style="height:auto"> Include the <b>${nW}</b> wheel(s) in my design</label>
- <div style="margin:6px 0">Extra wheels to print: <input id="xn" type="number" min="0" max="12" value="0" style="width:52px"> <select id="xt">${opt(Object.keys(WT).map(k=>[k,WT[k].n]))}</select></div>
- <div style="margin:6px 0">Hub for the extra wheels: <select id="xh">${opt(HUBS)}</select></div>
- <label style="display:block;margin:6px 0"><input type="checkbox" id="xm" ${nM?'':'disabled'} style="height:auto"> Include ${nM} motor / servo reference model(s) <span class="mut">(normally bought, not printed)</span></label>
- <div class="mut" style="margin:8px 0 0;font-size:12px"><b>With colour</b>: your exact colours for Bambu Studio, OrcaSlicer, PrusaSlicer, Cura and others (nothing merged). <b>Without colour</b>: plain geometry (STL / 3MF / OBJ).</div><div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:10px"><button id="xc">Cancel</button><button id="xn0">Export without colour</button><button class="pri" id="xo">Export with colour</button></div></div>`;
-document.body.appendChild(d);const q=i=>d.querySelector('#'+i),done=v=>{d.remove();res(v)};q('xc').onclick=()=>done(null);
+expCSS();const opt=a=>a.map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
+const d=document.createElement('div');d.id='expdlg';
+d.innerHTML=`<div class="card" role="dialog" aria-modal="true" aria-label="Export your design">
+ <h3>Export your design</h3>
+ <p class="sub">Choose what to include, then export with your exact colours or as plain geometry.</p>
+ <div class="grp"><h4>Wheels</h4>
+  <label class="ck"><input type="checkbox" id="xw" ${nW?'checked':'disabled'}><span>Include the <b>${nW}</b> wheel(s) already in my design</span></label>
+  <div class="rowf">Extra wheels to print <input id="xn" type="number" min="0" max="12" value="0"> <select id="xt">${opt(Object.keys(WT).map(k=>[k,WT[k].n]))}</select></div>
+  <div class="rowf">Hub for the extra wheels <select id="xh">${opt(HUBS)}</select></div>
+ </div>
+ <div class="grp"><h4>Reference models</h4>
+  <label class="ck"><input type="checkbox" id="xm" ${nM?'':'disabled'}><span>Include ${nM} motor / servo reference model(s) <span class="mut">— normally bought, not printed</span></span></label>
+ </div>
+ <div class="note"><span>🎨</span><span><b>With colour</b> keeps your exact colours for Bambu Studio, OrcaSlicer, PrusaSlicer, Cura and more — nothing merged. <b>Without colour</b> is plain geometry (STL / 3MF / OBJ).</span></div>
+ <div class="row"><button type="button" id="xc">Cancel</button><button type="button" id="xn0">Without colour</button><button type="button" class="pri" id="xo">Export with colour</button></div>
+</div>`;
+document.body.appendChild(d);requestAnimationFrame(()=>d.classList.add('on'));
+const q=i=>d.querySelector('#'+i);let shut=false;const done=v=>{if(shut)return;shut=true;d.classList.remove('on');setTimeout(()=>d.remove(),170);document.removeEventListener('keydown',onk,true);res(v)};
+const onk=e=>{if(e.key==='Escape'){e.stopPropagation();e.preventDefault();done(null)}else{e.stopPropagation()}};
+document.addEventListener('keydown',onk,true);
+d.addEventListener('pointerdown',e=>{if(e.target===d)done(null)});
+q('xc').onclick=()=>done(null);
 const rd=c=>done({c,w:q('xw').checked,m:q('xm').checked,n:Math.max(0,Math.min(12,+q('xn').value|0)),t:q('xt').value,h:q('xh').value});q('xo').onclick=()=>rd(true);q('xn0').onclick=()=>rd(false)})}
 const _exp=$('exp').onclick;
 $('exp').onclick=async()=>{if(!objs.length){_exp();return}const r=await expDlg();if(!r)return;EXC.w=r.w;EXC.m=r.m;window.EXPCOL=r.c;const ex=[];let x=-1e9;objs.forEach(o=>{x=Math.max(x,bbx(o).max.x)});x+=15;
@@ -4287,7 +4360,7 @@ const k=[...pP.children];pS.appendChild(E('h4','Parts library'));k.slice(0,3).fo
 const gr=g('grep');pG.insertBefore(E('h4','Motors, wheels, shafts, run &amp; physics'),gr);k.slice(3).forEach(n=>pG.insertBefore(n,gr));
 pE.insertBefore(E('h4','Erase &amp; carve'),pE.firstChild);[...pC.childNodes].forEach(n=>pE.appendChild(n));
 tabs.querySelectorAll('button').forEach(b=>{const p=b.dataset.p;if(['parts','cut','text'].includes(p))b.remove();else if(p==='shapes')b.textContent='Add';else if(p==='era')b.textContent='Cut & Erase';else if(p==='gears')b.textContent='Gears & Motors'})});
-T(()=>{const D=['w3','dk','dpl','dh'].map(i=>g(i).closest('label')),SH=g('shp').closest('label'),DT=['rect','circle','poly','shape','free'];
+T(()=>{const D=['w3','dpl','dh'].map(i=>g(i).closest('label')),SH=g('shp').closest('label'),DT=['rect','circle','poly','shape','free'];
 const ctx=t=>{const on=DT.includes(t);D.forEach(l=>l.style.display=on?'':'none');SH.style.display=t==='shape'?'':'none'};
 const o=setTool;setTool=function(t){o(t);ctx(t)};ctx(typeof tool==='string'?tool:'select');
 const w=E('div','<h4>Placement</h4>');[g('kab'),g('stk')].forEach(i=>{const l=i.closest('label');l.style.cssText='display:flex;gap:6px;align-items:center;margin:4px 0;color:var(--m)';w.appendChild(l)});g('p-inspect').prepend(w)});
@@ -6605,5 +6678,182 @@ libRender();strictTxt();
 setInterval(()=>{try{const ds=designSig();FIELDS.forEach(f=>{if(f.inp.value!==f.last||f.ver!==FC.ver)f.sync();if(f.open&&(f.ds!==ds)){f.ds=ds;f.pk.render()}});picRender(false)}catch(e){}},350);
 })();
 }catch(e){console.error("colour assistant failed:",e)}
+</script>
+<script>
+/* Shapes flyout: rectangle, circle and every other shape in ONE toolbar button; "3D stroke" only where it applies */
+(function(){try{
+const $=i=>document.getElementById(i),btn=document.querySelector('#tools button[data-t="shapes"]');if(!btn)return;
+const GROUPS=[['Basic',[['rect','Rectangle'],['circle','Circle'],['rrect','Rounded'],['slot','Slot'],['ell','Ellipse'],['semi','Semicircle'],['tri','Triangle'],['rtri','Right tri.']]],
+['Polygons',[['dia','Diamond'],['trap','Trapezoid'],['para','Slanted'],['pent','Pentagon'],['hex','Hexagon'],['oct','Octagon'],['ngon','N-gon'],['star5','Star']]],
+['Special',[['starn','Star (N)'],['arrow','Arrow'],['chev','Chevron'],['cross','Plus'],['L','L-shape'],['Tt','T-shape'],['heart','Heart']]]];
+const FULL={};[...$('shp').options].forEach(o=>FULL[o.value]=o.textContent);FULL.circle='Circle';
+const pathOf=k=>{if(k==='rect')return'M4 6h16v12H4z';if(k==='circle')return'M12 4a8 8 0 1 0 0 16a8 8 0 1 0 0-16';
+ if(k==='rrect')return'M7 5h10a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3z';if(k==='slot')return'M8 7h8a5 5 0 0 1 0 10H8a5 5 0 0 1 0-10z';
+ try{const a=SHP[k]();return'M'+a.map(q=>(12+q[0]*9).toFixed(1)+' '+(12+q[1]*8).toFixed(1)).join('L')+'z'}catch(e){return'M4 6h16v12H4z'}};
+const svg=d=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="'+d+'"/></svg>';
+const fly=document.createElement('div');fly.id='shpfly';fly.setAttribute('role','menu');document.body.appendChild(fly);
+const cur=()=>tool==='rect'?'rect':tool==='circle'?'circle':tool==='shape'?$('shp').value:'';
+function build(){let h='';GROUPS.forEach(([t,l])=>{h+='<h5>'+t+'</h5><div class="g">'+l.map(([k,n])=>'<button data-k="'+k+'" title="'+(FULL[k]||n)+'" class="'+(cur()===k?'on':'')+'">'+svg(pathOf(k))+'<span>'+n+'</span></button>').join('')+'</div>'});
+ h+='<div class="nn"><span>Sides / points</span><input id="shpn" type="number" min="3" max="24" step="1"></div>';fly.innerHTML=h;
+ const nn=fly.querySelector('.nn'),ni=$('shpn');ni.value=$('shn').value;nn.style.display=(tool==='shape'&&['ngon','starn'].includes($('shp').value))?'flex':'none';
+ ni.oninput=()=>{$('shn').value=ni.value;fly.querySelectorAll('[data-k=ngon] svg,[data-k=starn] svg').forEach(v=>{const k=v.closest('button').dataset.k;v.querySelector('path').setAttribute('d',pathOf(k))})};
+ fly.querySelectorAll('.g button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(k==='rect'||k==='circle')setTool(k);else{$('shp').value=k;setTool('shape')}close()})}
+function place(){const r=btn.getBoundingClientRect(),vert=getComputedStyle($('tools')).flexDirection==='column',w=fly.offsetWidth,h=fly.offsetHeight;
+ let l=vert?r.right+8:r.left,t=vert?r.top-4:r.bottom+8;l=Math.max(8,Math.min(l,innerWidth-w-8));t=Math.max(8,Math.min(t,innerHeight-h-8));fly.style.left=l+'px';fly.style.top=t+'px'}
+function open(){build();place();fly.classList.add('on');btn.classList.add('on');btn.setAttribute('aria-expanded','true')}
+function close(){fly.classList.remove('on');btn.classList.toggle('on',['rect','circle','shape'].includes(tool));btn.setAttribute('aria-expanded','false')}
+btn.addEventListener('click',e=>{e.stopPropagation();fly.classList.contains('on')?close():open()});
+document.addEventListener('pointerdown',e=>{if(fly.classList.contains('on')&&!fly.contains(e.target)&&!btn.contains(e.target))close()},true);
+addEventListener('keydown',e=>{if(e.key==='Escape'&&fly.classList.contains('on')){close();e.stopPropagation()}},true);
+addEventListener('resize',()=>{if(fly.classList.contains('on'))place()});
+/* keep the toolbar button lit while any shape tool is active, and show 3D stroke only for Polygon / Freehand */
+const w3=$('w3').closest('label'),_s=setTool;
+const sync=t=>{btn.classList.toggle('on',['rect','circle','shape'].includes(t));w3.style.display=['poly','free'].includes(t)?'':'none';if(fly.classList.contains('on'))close()};
+setTool=function(t){_s(t);sync(t)};sync(typeof tool==='string'?tool:'select');
+}catch(e){console.error('shapes flyout failed',e)}})();
+</script>
+<script>
+/* After Hollow, an optional interactive step: hover a face of the shell to see a red ghost, click to open
+   that face (remove the base / wall), or press C to cut a round hole instead. Self-contained. */
+(function(){try{
+const RC2=new THREE.Raycaster(),ndc2=new THREE.Vector2(),CREASE=Math.cos(42*Math.PI/180);
+let active=null,ghost=null,mode='remove',lastHit=null,bar=null;
+function setRay(e){const r=cv.getBoundingClientRect();ndc2.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);RC2.setFromCamera(ndc2,cam)}
+function meshesOf(o){const a=[];o.traverse(n=>{if(n.isMesh)a.push(n)});return a}
+/* Build (once per mesh) per-triangle normals + edge adjacency, so a hovered "face" can be grown by flood-fill
+   across the real surface – a flat base, a curved cylinder/cone wall, anything – not just the 6 box sides. */
+function faceCache(mesh){if(mesh.userData._fc)return mesh.userData._fc;const arr=mesh.geometry.attributes.position.array,N=(arr.length/9)|0,tn=new Float32Array(N*3),Q=1e3,kk=(x,y,z)=>Math.round(x*Q)+'_'+Math.round(y*Q)+'_'+Math.round(z*Q),emap=new Map();
+ for(let i=0;i<N;i++){const o=i*9,ax=arr[o],ay=arr[o+1],az=arr[o+2],bx=arr[o+3],by=arr[o+4],bz=arr[o+5],cx=arr[o+6],cy=arr[o+7],cz=arr[o+8];
+  let nx=(by-ay)*(cz-az)-(bz-az)*(cy-ay),ny=(bz-az)*(cx-ax)-(bx-ax)*(cz-az),nz=(bx-ax)*(cy-ay)-(by-ay)*(cx-ax),l=Math.hypot(nx,ny,nz)||1;tn[i*3]=nx/l;tn[i*3+1]=ny/l;tn[i*3+2]=nz/l;
+  const vv=[kk(ax,ay,az),kk(bx,by,bz),kk(cx,cy,cz)];for(let e=0;e<3;e++){const a=vv[e],b=vv[(e+1)%3],ek=a<b?a+'|'+b:b+'|'+a;let L=emap.get(ek);if(!L)emap.set(ek,L=[]);L.push(i)}}
+ const adj=Array.from({length:N},()=>[]);emap.forEach(L=>{for(let a=0;a<L.length;a++)for(let b=a+1;b<L.length;b++){adj[L[a]].push(L[b]);adj[L[b]].push(L[a])}});
+ return mesh.userData._fc={arr,N,tn,adj}}
+function faceGroup(fc,startT){const {tn,adj,N}=fc,seen=new Uint8Array(N),st=[startT],grp=[];seen[startT]=1;
+ while(st.length){const t=st.pop();grp.push(t);const ax=tn[t*3],ay=tn[t*3+1],az=tn[t*3+2];adj[t].forEach(u=>{if(seen[u])return;if(ax*tn[u*3]+ay*tn[u*3+1]+az*tn[u*3+2]>=CREASE){seen[u]=1;st.push(u)}})}
+ return grp}
+function rayObj(e){if(!active||!objs.includes(active))return null;setRay(e);active.updateMatrixWorld(true);const h=RC2.intersectObjects(meshesOf(active),false)[0];if(!h||h.faceIndex==null)return null;
+ return{mesh:h.object,fi:h.faceIndex,p:h.point.clone(),n:h.face.normal.clone().transformDirection(h.object.matrixWorld)}}
+function cavity(){const u=active.userData.hollowShell,w=u.wall;return{mn:[u.mn[0]+w,u.mn[1]+w,u.mn[2]+w],mx:[u.mx[0]-w,u.mx[1]-w,u.mx[2]-w]}}
+function axisOf(n){const an=[Math.abs(n.x),Math.abs(n.y),Math.abs(n.z)];let ai=0;if(an[1]>an[0])ai=1;if(an[2]>an[ai])ai=2;return{ai,sg:n.getComponent(ai)>=0?1:-1}}
+function groupInfo(mesh,fc,grp){const nm=new THREE.Matrix3().getNormalMatrix(mesh.matrixWorld),nv=new THREE.Vector3();let x=0,y=0,z=0;
+ grp.forEach(t=>{nv.set(fc.tn[t*3],fc.tn[t*3+1],fc.tn[t*3+2]).applyMatrix3(nm).normalize();x+=nv.x;y+=nv.y;z+=nv.z});
+ const dir=new THREE.Vector3(x,y,z).normalize();let mnDot=1;
+ grp.forEach(t=>{nv.set(fc.tn[t*3],fc.tn[t*3+1],fc.tn[t*3+2]).applyMatrix3(nm).normalize();const dd=nv.dot(dir);if(dd<mnDot)mnDot=dd});
+ /* spread = how far the face's normals fan out from their average. ~0 on a true flat face, large on any
+    curved or rounded wall – a reliable flat-vs-curved test that does not depend on how finely it is meshed. */
+ return{dir,spread:Math.acos(Math.max(-1,Math.min(1,mnDot)))}}
+function disposeGhost(){if(ghost){S.remove(ghost);if(ghost.geometry)ghost.geometry.dispose();ghost=null}}
+function ghostMat(){return new THREE.MeshBasicMaterial({color:0xd92d4b,transparent:true,opacity:.45,side:THREE.DoubleSide,depthTest:false,depthWrite:false})}
+/* Round hole follows the exact clicked point and the real surface normal, so it lands right on a curved
+   cylinder / cone wall. Shared by round mode and by the automatic fallback on any curved face. */
+function holeRnn(u,hit){const ext=[u.mx[0]-u.mn[0],u.mx[1]-u.mn[1],u.mx[2]-u.mn[2]];
+ /* average the normal over the clicked triangle and its neighbours, so the hole sits square to a curved
+    wall instead of being tilted by one facet. */
+ const fc=faceCache(hit.mesh),nm=new THREE.Matrix3().getNormalMatrix(hit.mesh.matrixWorld),acc=new THREE.Vector3(),nv=new THREE.Vector3();
+ [hit.fi,...(fc.adj[hit.fi]||[])].forEach(t=>{nv.set(fc.tn[t*3],fc.tn[t*3+1],fc.tn[t*3+2]).applyMatrix3(nm).normalize();acc.add(nv)});
+ const nn=acc.lengthSq()>1e-6?acc.normalize():hit.n.clone().normalize();
+ return{R:Math.max(1.5,.22*Math.min(ext[0],ext[1],ext[2])),nn}}
+function roundGhost(hit){const u=active.userData.hollowShell,{R,nn}=holeRnn(u,hit),m=new THREE.Mesh(new THREE.CircleGeometry(R,40),ghostMat());m.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),nn);m.position.copy(hit.p).addScaledVector(nn,.5);m.renderOrder=1200;ghost=m;S.add(m)}
+function roundCutter(hit){const u=active.userData.hollowShell,{R,nn}=holeRnn(u,hit),H=u.wall+3,cm=new THREE.Mesh(new THREE.CylinderGeometry(R,R,H,48));cm.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),nn);cm.position.copy(hit.p).addScaledVector(nn,-u.wall/2);cm.updateMatrixWorld(true);return toJ(cm)}
+function faceAt(hit){const fc=faceCache(hit.mesh),grp=faceGroup(fc,hit.fi),gi=groupInfo(hit.mesh,fc,grp);return{fc,grp,gi,flat:gi.spread<=0.14}}
+function regionGhost(hit){const fc=faceCache(hit.mesh),grp=faceGroup(fc,hit.fi),arr=fc.arr,tn=fc.tn,mw=hit.mesh.matrixWorld,nm=new THREE.Matrix3().getNormalMatrix(mw),out=new Float32Array(grp.length*9),v=new THREE.Vector3(),nv=new THREE.Vector3();
+ for(let gi=0;gi<grp.length;gi++){const t=grp[gi],o=t*9;nv.set(tn[t*3],tn[t*3+1],tn[t*3+2]).applyMatrix3(nm).normalize();for(let c=0;c<3;c++){v.set(arr[o+c*3],arr[o+c*3+1],arr[o+c*3+2]).applyMatrix4(mw).addScaledVector(nv,.3);out[(gi*3+c)*3]=v.x;out[(gi*3+c)*3+1]=v.y;out[(gi*3+c)*3+2]=v.z}}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(out,3));const m=new THREE.Mesh(g,ghostMat());m.renderOrder=1200;ghost=m;S.add(m)}
+function showGhost(hit){disposeGhost();if(mode==='hole')roundGhost(hit);else regionGhost(hit)}
+/* Remove a whole flat wall at ANY orientation (base, top, bottom, box side, slanted): a thin slab, square to
+   the face normal, spanning the full cross-section – so it comes away flush with no leftover rim. */
+function orientedSlab(u,F,hit){const nf=F.gi.dir.clone().normalize(),ext=[u.mx[0]-u.mn[0],u.mx[1]-u.mn[1],u.mx[2]-u.mn[2]],BIG=2*Math.max(ext[0],ext[1],ext[2])+30,T=u.wall+1.4;
+ const box=new THREE.Mesh(new THREE.BoxGeometry(BIG,BIG,T));box.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),nf);box.position.copy(hit.p).addScaledVector(nf,(0.8-u.wall)/2);box.updateMatrixWorld(true);return toJ(box)}
+/* Remove a curved wall region (cone / cylinder side, a rounded patch): sweep each face triangle inward
+   through the wall and union the pieces, so exactly that wall comes away and the rest of the shell stays. */
+function sweptRegion(u,hit,F){const mesh=hit.mesh,mw=mesh.matrixWorld,arr=F.fc.arr,tn=F.fc.tn,nm=new THREE.Matrix3().getNormalMatrix(mw),d=u.wall+3,v=new THREE.Vector3(),nv=new THREE.Vector3(),prisms=[];
+ const wp=o=>{v.set(arr[o],arr[o+1],arr[o+2]).applyMatrix4(mw);return[v.x,v.y,v.z]};
+ F.grp.forEach(t=>{const o=t*9;nv.set(tn[t*3],tn[t*3+1],tn[t*3+2]).applyMatrix3(nm).normalize();const n=[nv.x,nv.y,nv.z],A=wp(o),B=wp(o+3),C=wp(o+6),
+  A1=A.map((x,k)=>x+n[k]),B1=B.map((x,k)=>x+n[k]),C1=C.map((x,k)=>x+n[k]),A2=A.map((x,k)=>x-n[k]*d),B2=B.map((x,k)=>x-n[k]*d),C2=C.map((x,k)=>x-n[k]*d);
+  prisms.push(J.geometries.geom3.fromPoints([[A1,B1,C1],[C2,B2,A2],[A1,C1,C2],[A1,C2,A2],[B1,A1,A2],[B1,A2,B2],[C1,B1,B2],[C1,B2,C2]]))});
+ if(!prisms.length)return null;try{return prisms.length>1?J.booleans.union(...prisms):prisms[0]}catch(e){return null}}
+function cut(hit){const u=active.userData.hollowShell;let cutter;
+ if(mode==='hole')cutter=roundCutter(hit);
+ else{const F=faceAt(hit);
+  if(F.flat)cutter=orientedSlab(u,F,hit);
+  else if(F.grp.length>0.9*F.fc.N){hint.textContent='That whole surface is round – use “Cut hole” for an opening.';return false}
+  else{hint.textContent='Removing…';cutter=sweptRegion(u,hit,F);if(!cutter){hint.textContent='Could not remove that wall – try “Cut hole”.';return false}}}
+ let opened=null;try{opened=J.booleans.subtract(u.shell,cutter)}catch(err){}
+ if(!opened||!J.geometries.geom3.toPolygons(opened).length){try{opened=J.booleans.subtract(J.modifiers.generalize({snap:true,triangulate:true},u.shell),cutter)}catch(e){}}
+ const g=(opened&&J.geometries.geom3.toPolygons(opened).length)?jGeo(opened):null;
+ if(!g){hint.textContent='Could not open that face – try a thinner wall or a different spot.';return false}
+ commit();const col=u.col,mm=M(g,col);mm.userData.col=col;killObj(active);sweep();const nw=place(mm,'Hollow (open)',true);
+ nw.userData.hollowShell={shell:opened,inner:u.inner,mn:u.mn.slice(),mx:u.mx.slice(),ctr:u.ctr.slice(),wall:u.wall,col};
+ hint.textContent=(mode==='hole'?'Cut a round hole.':'Removed that wall.')+' The rest of the shell is kept.';return true}
+function onMove(e){const h=rayObj(e);lastHit=h;if(h)showGhost(h);else disposeGhost()}
+function onDown(e){if(e.button!==0)return;e.preventDefault();e.stopImmediatePropagation();const h=rayObj(e);if(!h)return;if(cut(h))end()}
+function onKey(e){if(!active)return;if(e.key==='Escape'){hint.textContent='Kept the hollow shell sealed.';end();e.stopPropagation()}
+ else if(e.key==='h'||e.key==='H'){setMode('hole')}else if(e.key==='r'||e.key==='R'){setMode('remove')}}
+function updHint(){hint.textContent=mode==='hole'?'Cut hole – click anywhere on the shell, curved walls included, for a round hole. Press R to switch to Remove, Esc to keep sealed.':'Remove face – click a face (base, side, a cone or cylinder wall) to remove that whole wall. Press H for a round hole, Esc to keep sealed.'}
+function setMode(m){mode=m;if(bar)bar.querySelectorAll('[data-m]').forEach(b=>b.classList.toggle('on',b.dataset.m===m));updHint();if(lastHit)showGhost(lastHit)}
+function barCSS(){if(document.getElementById('hobar-css'))return;const st=document.createElement('style');st.id='hobar-css';st.textContent=
+ '#hobar{position:fixed;z-index:1000;display:flex;align-items:center;gap:3px;padding:5px;background:var(--bg);border:1px solid var(--b);border-radius:12px;box-shadow:0 10px 30px #0005;font:600 13px system-ui}'+
+ '#hobar button{height:32px;padding:0 14px;border:0;border-radius:8px;background:none;color:var(--t);cursor:pointer}'+
+ '#hobar button:hover{background:var(--h)}'+
+ '#hobar button.on{background:var(--a);color:#fff}'+
+ '#hobar .sep{width:1px;height:20px;background:var(--b);margin:0 3px}'+
+ '#hobar .dn{color:var(--m)}';document.head.appendChild(st)}
+function placeBar(){if(!bar)return;const r=cv.getBoundingClientRect();bar.style.left=Math.round(r.left+r.width/2-bar.offsetWidth/2)+'px';bar.style.top=Math.round(r.top+14)+'px'}
+function buildBar(){barCSS();bar=document.createElement('div');bar.id='hobar';
+ bar.innerHTML='<button data-m="remove">Remove face</button><button data-m="hole">Cut hole</button><span class="sep"></span><button class="dn" data-x="done">Done</button>';
+ document.body.appendChild(bar);
+ bar.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+ bar.querySelector('[data-x=done]').onclick=()=>{hint.textContent='Kept the hollow shell.';end()};
+ setMode(mode);placeBar();addEventListener('resize',placeBar);addEventListener('scroll',placeBar,true)}
+function start(obj){end();if(!obj||!obj.userData.hollowShell){hint.textContent='Done – hollow shell.';return}active=obj;mode='remove';lastHit=null;try{select([obj])}catch(e){}
+ cv.addEventListener('pointermove',onMove,true);cv.addEventListener('pointerdown',onDown,true);window.addEventListener('keydown',onKey,true);buildBar()}
+function end(){cv.removeEventListener('pointermove',onMove,true);cv.removeEventListener('pointerdown',onDown,true);window.removeEventListener('keydown',onKey,true);removeEventListener('resize',placeBar);removeEventListener('scroll',placeBar,true);disposeGhost();if(bar){bar.remove();bar=null}active=null;lastHit=null}
+window.startHollowOpening=start;
+/* A proper, themed dialog for the Hollow options (replaces the plain browser prompt / confirm). */
+function hwCSS(){if(document.getElementById('hw-css'))return;const st=document.createElement('style');st.id='hw-css';st.textContent=
+ '#hwdlg{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:rgba(10,12,16,.55);backdrop-filter:blur(2px);opacity:0;transition:opacity .15s ease}'+
+ '#hwdlg.on{opacity:1}'+
+ '#hwdlg .card{width:344px;max-width:calc(100vw - 24px);background:var(--bg);color:var(--t);border:1px solid var(--b);border-radius:14px;box-shadow:0 18px 50px #0007;padding:18px 18px 14px;transform:translateY(8px) scale(.98);transition:transform .15s ease}'+
+ '#hwdlg.on .card{transform:none}'+
+ '#hwdlg h3{margin:0 0 3px;font:600 15px system-ui}'+
+ '#hwdlg .sub{margin:0 0 14px;color:var(--m);font-size:12px;line-height:1.4}'+
+ '#hwdlg .fld{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}'+
+ '#hwdlg .fld label{font-size:13px}'+
+ '#hwdlg .fld input{width:94px;padding:7px 9px;font:inherit;color:var(--t);background:var(--p);border:1px solid var(--b);border-radius:8px}'+
+ '#hwdlg .opt{display:flex;gap:10px;align-items:flex-start;padding:10px 11px;border:1px solid var(--b);border-radius:10px;margin:7px 0;cursor:pointer;transition:border-color .12s,background .12s}'+
+ '#hwdlg .opt:hover{border-color:var(--a)}'+
+ '#hwdlg .opt.sel{border-color:var(--a);background:color-mix(in srgb,var(--a) 10%,transparent)}'+
+ '#hwdlg .opt .dot{flex:0 0 16px;height:16px;margin-top:1px;border-radius:50%;border:2px solid var(--m);position:relative}'+
+ '#hwdlg .opt.sel .dot{border-color:var(--a)}'+
+ '#hwdlg .opt.sel .dot:after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--a)}'+
+ '#hwdlg .opt b{display:block;font:600 13px system-ui}'+
+ '#hwdlg .opt small{display:block;color:var(--m);font-size:11.5px;margin-top:2px;line-height:1.35}'+
+ '#hwdlg .row{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}'+
+ '#hwdlg .row button{height:34px;padding:0 15px;border-radius:8px;border:1px solid var(--b);background:var(--p);color:var(--t);font:600 13px system-ui;cursor:pointer}'+
+ '#hwdlg .row button.pri{background:var(--a);border-color:var(--a);color:#fff}'+
+ '#hwdlg .row button:hover{filter:brightness(1.06)}';
+ document.head.appendChild(st)}
+function hollowDialog(cb){hwCSS();const old=document.getElementById('hwdlg');if(old)old.remove();
+ const ov=document.createElement('div');ov.id='hwdlg';
+ ov.innerHTML='<div class="card" role="dialog" aria-modal="true" aria-label="Hollow out">'+
+  '<h3>Hollow out</h3>'+
+  '<p class="sub">Turns the selected shape into a sealed shell with even walls.</p>'+
+  '<div class="fld"><label for="hw-w">Wall thickness (mm)</label><input id="hw-w" type="number" min="0.3" max="50" step="0.1" value="2"></div>'+
+  '<div class="opt sel" data-v="0"><span class="dot"></span><span><b>Keep it sealed</b><small>A closed, watertight shell with nothing left inside.</small></span></div>'+
+  '<div class="opt" data-v="1"><span class="dot"></span><span><b>Open a face afterwards</b><small>Hollow, then click a face &ndash; such as the base &ndash; to remove just that wall. Press C while picking for a round hole.</small></span></div>'+
+  '<div class="row"><button type="button" data-x="c">Cancel</button><button type="button" class="pri" data-x="ok">Hollow</button></div>'+
+  '</div>';
+ document.body.appendChild(ov);requestAnimationFrame(()=>ov.classList.add('on'));
+ const wIn=ov.querySelector('#hw-w');let openSel=0;
+ ov.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{openSel=+o.dataset.v;ov.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel',x===o))});
+ let done=false;const fin=ok=>{if(done)return;done=true;const w=parseFloat(wIn.value);ov.classList.remove('on');setTimeout(()=>ov.remove(),170);document.removeEventListener('keydown',onk,true);if(ok)cb(w,openSel===1)};
+ const onk=e=>{if(e.key==='Escape'){e.stopPropagation();e.preventDefault();fin(false)}else if(e.key==='Enter'){e.stopPropagation();e.preventDefault();fin(true)}else{e.stopPropagation()}};
+ document.addEventListener('keydown',onk,true);
+ ov.querySelector('[data-x=c]').onclick=()=>fin(false);
+ ov.querySelector('[data-x=ok]').onclick=()=>fin(true);
+ ov.addEventListener('pointerdown',e=>{if(e.target===ov)fin(false)});
+ setTimeout(()=>{try{wIn.focus();wIn.select()}catch(e){}},30)}
+window.hollowDialog=hollowDialog;
+}catch(e){console.error('hollow opening failed',e)}})();
 </script>
 </body></html>
